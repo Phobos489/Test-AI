@@ -60,6 +60,27 @@
             transition: all 0.2s;
         }
         .new-chat-btn:hover { background: var(--primary-dark); }
+
+        /* ── NLP Sidebar Link ── */
+        .nlp-sidebar-btn {
+            margin: 0 20px 15px;
+            padding: 11px 16px;
+            background: rgba(6,182,212,0.08);
+            border: 1px solid rgba(6,182,212,0.25);
+            color: #67e8f9;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .nlp-sidebar-btn:hover { background: rgba(6,182,212,0.18); border-color: rgba(6,182,212,0.5); }
+
         .history-list { flex: 1; overflow-y: auto; padding: 10px; }
         .history-item {
             padding: 12px 15px;
@@ -112,8 +133,52 @@
 
         /* ── Main Content ── */
         .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; transition: all 0.3s ease; }
-        .header { padding: 20px 30px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .header {
+            padding: 0 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+            flex-shrink: 0;
+        }
         .header h2 { font-size: 24px; font-weight: 600; }
+        .header-right { display: flex; align-items: center; gap: 12px; }
+
+        /* ── NLP Header Button ── */
+        .nlp-header-btn {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 16px;
+            background: rgba(6,182,212,0.1);
+            border: 1px solid rgba(6,182,212,0.3);
+            border-radius: 8px;
+            color: #67e8f9;
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .nlp-header-btn:hover { background: rgba(6,182,212,0.2); border-color: rgba(6,182,212,0.6); }
+        .nlp-count-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--primary-color);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+            display: none;
+        }
+        .nlp-count-badge.visible { display: block; }
+
         .toggle-sidebar { background: none; border: none; color: var(--text-secondary); font-size: 20px; cursor: pointer; padding: 5px; border-radius: 5px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; }
         .toggle-sidebar:hover { background: rgba(255, 255, 255, 0.1); }
         .toggle-sidebar .menu-icon { display: block; }
@@ -127,6 +192,21 @@
         .ai-message { background: rgba(139, 92, 246, 0.1); margin-right: auto; border: 1px solid rgba(139, 92, 246, 0.3); }
         .message-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 14px; color: var(--primary-light); }
         .message-content { line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+
+        /* ── NLP inline tag on message ── */
+        .nlp-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-left: 8px;
+            font-weight: 500;
+        }
+        .nlp-tag.positive { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+        .nlp-tag.negative { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+        .nlp-tag.neutral  { background: rgba(156,163,175,0.12); color: #9ca3af; border: 1px solid rgba(156,163,175,0.2); }
 
         /* ── File Badge in Message ── */
         .file-badge {
@@ -144,8 +224,6 @@
 
         /* ── Input Area ── */
         .input-container { display: flex; flex-direction: column; gap: 8px; margin-top: auto; position: relative; }
-
-        /* File preview strip */
         .file-preview {
             display: none;
             align-items: center;
@@ -162,7 +240,7 @@
         .file-preview-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-primary); }
         .file-preview-size { color: var(--text-secondary); font-size: 12px; white-space: nowrap; }
         .file-remove-btn { background: none; border: none; cursor: pointer; color: var(--text-secondary); font-size: 18px; padding: 2px 6px; border-radius: 4px; transition: all 0.2s; }
-        .file-remove-btn:hover { color: var(--error-color); background: rgba(239, 68, 68, 0.1); }
+        .file-remove-btn:hover { color: #ef4444; background: rgba(239, 68, 68, 0.1); }
 
         .input-row { display: flex; gap: 10px; }
         .input-wrapper { flex: 1; position: relative; display: flex; align-items: center; }
@@ -209,12 +287,8 @@
         .send-btn:hover { background: var(--primary-dark); }
         .send-btn:disabled { background: var(--border-color); cursor: not-allowed; }
 
-        /* File input hidden */
         #fileInput { display: none; }
-
-        /* Supported format hint */
         .format-hint { font-size: 11px; color: var(--text-secondary); text-align: center; margin-top: 4px; opacity: 0.7; }
-
         .speech-status { position: absolute; bottom: -25px; left: 0; font-size: 12px; color: var(--text-secondary); display: none; }
         .speech-status.active { display: block; }
         .speech-status.listening { color: var(--error-color); }
@@ -258,7 +332,6 @@
         .auth-success { color: var(--success-color); font-size: 14px; margin-bottom: 16px; text-align: center; display: none; }
         .auth-success.active { display: block; }
 
-        /* ── Sidebar Overlay (mobile) ── */
         .sidebar-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 99; opacity: 0; visibility: hidden; transition: all 0.3s; }
         .sidebar-overlay.active { opacity: 1; visibility: visible; }
 
@@ -274,25 +347,22 @@
         .feature-title { font-size: 18px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary); }
         .feature-description { font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
 
-        /* ── Animations ── */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.2); opacity: 0.7; } }
 
-        /* ── Responsive ── */
         @media (max-width: 768px) {
             .sidebar { position: fixed; left: -280px; height: 100%; z-index: 100; width: 280px; }
             .sidebar.active { left: 0; }
             .main-content { width: 100%; }
-            .main-content.sidebar-open { transform: translateX(280px); }
             .message { max-width: 90%; }
             .delete-btn { opacity: 1; }
             .user-menu { left: 10px; right: 10px; }
             .features-grid { grid-template-columns: 1fr; }
             .welcome-title { font-size: 24px; }
             .welcome-subtitle { font-size: 16px; }
+            .nlp-header-btn span.label { display: none; }
         }
 
-        /* ── Scrollbar ── */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg-sidebar); }
         ::-webkit-scrollbar-thumb { background: var(--primary-dark); border-radius: 3px; }
@@ -311,6 +381,8 @@
     <button class="new-chat-btn" id="newChatBtn">
         <i>+</i> Chat Baru
     </button>
+    <!-- NLP Dashboard Link -->
+    <a href="/nlp" class="nlp-sidebar-btn">📊 Lihat Analisis NLP</a>
     <div class="history-list" id="historyList"></div>
     <div class="user-section" id="userSection"></div>
 </div>
@@ -323,12 +395,18 @@
             <span class="close-icon">✕</span>
         </button>
         <h2>Phobos AI</h2>
-        <div style="width: 40px;"></div>
+        <div class="header-right">
+            <!-- NLP Dashboard Button -->
+            <a href="/nlp" class="nlp-header-btn" id="nlpHeaderBtn" title="Lihat Analisis NLP">
+                <span>📊</span>
+                <span class="label">NLP Dashboard</span>
+                <span class="nlp-count-badge" id="nlpCountBadge">0</span>
+            </a>
+        </div>
     </div>
 
     <div class="chat-container">
         <div class="chat-messages" id="chatMessages">
-            <!-- Welcome Screen -->
             <div class="welcome-screen" id="welcomeScreen">
                 <h1 class="welcome-title">Selamat Datang di Phobos AI</h1>
                 <p class="welcome-subtitle">
@@ -338,9 +416,7 @@
             </div>
         </div>
 
-        <!-- Input Area -->
         <div class="input-container">
-            <!-- File Preview -->
             <div class="file-preview" id="filePreview">
                 <span class="file-preview-icon" id="filePreviewIcon">📄</span>
                 <span class="file-preview-name" id="filePreviewName">nama_file.pdf</span>
@@ -352,9 +428,7 @@
                 <div class="input-wrapper">
                     <textarea id="prompt" placeholder="Silakan login untuk mulai chat..." rows="1" disabled></textarea>
                     <div class="input-action-btns">
-                        <!-- Attach File Button -->
                         <button class="attach-btn" id="attachBtn" title="Upload file (PDF/Word/Excel)" disabled>📎</button>
-                        <!-- Voice Button -->
                         <button class="voice-btn" id="voiceBtn" title="Speech to Text" disabled>🎤</button>
                     </div>
                     <div class="speech-status" id="speechStatus"></div>
@@ -362,12 +436,11 @@
                 <button class="send-btn" id="sendBtn" disabled>➤</button>
             </div>
 
-            <div class="format-hint">📎 Mendukung: PDF · Word (.docx) · Excel (.xlsx) · TXT · CSV</div>
+            <div class="format-hint">📎 Mendukung: PDF · Word (.docx) · Excel (.xlsx) · TXT · CSV &nbsp;|&nbsp; 📊 NLP aktif — setiap pesan dianalisis otomatis</div>
         </div>
     </div>
 </div>
 
-<!-- Hidden file input -->
 <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.csv,.md">
 
 <!-- Modal Hapus -->
@@ -415,6 +488,50 @@
 </div>
 
 <script>
+    // ─── NLP Storage Key ─────────────────────────────────────────────────────────
+    const NLP_KEY = 'phobosNLPHistory';
+
+    function getNLPHistory() {
+        try { return JSON.parse(localStorage.getItem(NLP_KEY)) || []; } catch { return []; }
+    }
+    function saveNLPEntry(entry) {
+        const hist = getNLPHistory();
+        hist.push(entry);
+        // Keep last 500 entries
+        if (hist.length > 500) hist.splice(0, hist.length - 500);
+        localStorage.setItem(NLP_KEY, JSON.stringify(hist));
+        updateNLPBadge();
+    }
+    function updateNLPBadge() {
+        const count = getNLPHistory().length;
+        const badge = document.getElementById('nlpCountBadge');
+        if (badge) {
+            badge.textContent = count;
+            badge.classList.toggle('visible', count > 0);
+        }
+    }
+
+    // ─── Call NLP API ─────────────────────────────────────────────────────────────
+    async function analyzeWithNLP(text, timestamp) {
+        if (!text || text.trim().length < 2) return null;
+        try {
+            const resp = await fetch('/api/nlp-analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text, timestamp: timestamp || new Date().toISOString() })
+            });
+            if (!resp.ok) return null;
+            return await resp.json();
+        } catch { return null; }
+    }
+
+    function sentimentToTag(sentiment, score) {
+        if (!sentiment) return '';
+        const icon = sentiment === 'positive' ? '😊' : sentiment === 'negative' ? '😞' : '😐';
+        const label = sentiment === 'positive' ? 'Positif' : sentiment === 'negative' ? 'Negatif' : 'Netral';
+        return `<span class="nlp-tag ${sentiment}">${icon} ${label} ${score !== undefined ? '(' + (score >= 0 ? '+' : '') + parseFloat(score).toFixed(2) + ')' : ''}</span>`;
+    }
+
     // ─── State ───────────────────────────────────────────────────────────────────
     let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
     let users = JSON.parse(localStorage.getItem('aiChatUsers')) || [];
@@ -428,13 +545,11 @@
     let isListening = false;
     let speechFinal = '';
     let silenceTimer = null;
-
-    // File terpilih untuk dikirim
     let selectedFile = null;
 
     let guestChat = { id: 'guest_chat', title: 'Chat Guest', messages: [], timestamp: Date.now() };
 
-    // ─── DOM Elements ─────────────────────────────────────────────────────────────
+    // ─── DOM ─────────────────────────────────────────────────────────────────────
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
     const mainContent = document.getElementById('mainContent');
@@ -468,45 +583,33 @@
     const loginSuccess = document.getElementById('loginSuccess');
     const registerSuccess = document.getElementById('registerSuccess');
 
-    // ─── File Icon Helper ─────────────────────────────────────────────────────────
+    // ─── File Helpers ─────────────────────────────────────────────────────────────
     function getFileIcon(filename) {
         const ext = filename.split('.').pop().toLowerCase();
         const icons = { pdf: '📕', doc: '📘', docx: '📘', xls: '📗', xlsx: '📗', txt: '📄', csv: '📊', md: '📝' };
         return icons[ext] || '📄';
     }
-
     function formatFileSize(bytes) {
         if (bytes < 1024) return bytes + ' B';
         if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
         return (bytes / 1048576).toFixed(1) + ' MB';
     }
 
-    // ─── File Selection ───────────────────────────────────────────────────────────
+    // ─── File Input ───────────────────────────────────────────────────────────────
     function setupFileInput() {
         attachBtn.addEventListener('click', () => fileInput.click());
-
         fileInput.addEventListener('change', function() {
             const file = this.files[0];
             if (!file) return;
-
-            const maxSize = 20 * 1024 * 1024; // 20 MB
-            if (file.size > maxSize) {
-                alert('Ukuran file terlalu besar. Maksimal 20 MB.');
-                fileInput.value = '';
-                return;
-            }
-
+            if (file.size > 20 * 1024 * 1024) { alert('Ukuran file terlalu besar. Maksimal 20 MB.'); fileInput.value = ''; return; }
             selectedFile = file;
             filePreviewIcon.textContent = getFileIcon(file.name);
             filePreviewName.textContent = file.name;
             filePreviewSize.textContent = formatFileSize(file.size);
             filePreview.classList.add('visible');
-
-            // Update placeholder
             promptInput.placeholder = 'Tulis pertanyaan atau perintah tentang file ini...';
             promptInput.focus();
         });
-
         fileRemoveBtn.addEventListener('click', clearSelectedFile);
     }
 
@@ -514,23 +617,17 @@
         selectedFile = null;
         fileInput.value = '';
         filePreview.classList.remove('visible');
-        promptInput.placeholder = currentUser
-            ? 'Tulis prompt kamu...'
-            : 'Tulis prompt kamu... (Login untuk menyimpan riwayat)';
+        promptInput.placeholder = currentUser ? 'Tulis prompt kamu...' : 'Tulis prompt kamu... (Login untuk menyimpan riwayat)';
     }
 
-    // ─── Speech Recognition ───────────────────────────────────────────────────────
+    // ─── Speech ───────────────────────────────────────────────────────────────────
     function initializeSpeechRecognition() {
-        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            voiceBtn.style.display = 'none';
-            return;
-        }
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) { voiceBtn.style.display = 'none'; return; }
         const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
         recognition = new SR();
         recognition.continuous = true;
         recognition.interimResults = true;
         recognition.lang = 'id-ID';
-
         recognition.onstart = () => {
             isListening = true;
             voiceBtn.classList.add('listening');
@@ -538,7 +635,6 @@
             speechStatus.classList.add('active', 'listening');
             speechFinal = '';
         };
-
         recognition.onresult = (event) => {
             let interim = '';
             resetSilenceTimer();
@@ -549,18 +645,15 @@
             promptInput.value = speechFinal + interim;
             autoResizeTextarea();
         };
-
         recognition.onerror = (event) => {
             if (event.error === 'no-speech') return;
             const msgs = { 'not-allowed': 'Akses mikrofon ditolak.', 'audio-capture': 'Tidak ada mikrofon.', 'network': 'Error jaringan.' };
             speechStatus.textContent = msgs[event.error] || 'Error: ' + event.error;
             setTimeout(() => speechStatus.classList.remove('active', 'listening'), 3000);
         };
-
         recognition.onend = () => {
-            if (isListening) {
-                setTimeout(() => { if (isListening && recognition) { try { recognition.start(); } catch(e){} } }, 100);
-            } else { stopListening(); }
+            if (isListening) { setTimeout(() => { if (isListening && recognition) { try { recognition.start(); } catch(e){} } }, 100); }
+            else { stopListening(); }
         };
     }
 
@@ -568,13 +661,7 @@
         if (silenceTimer) clearTimeout(silenceTimer);
         silenceTimer = setTimeout(() => { if (isListening) speechStatus.textContent = 'Menunggu perintah...'; }, 5000);
     }
-
-    function startListening() {
-        if (!recognition) return;
-        try { recognition.start(); speechFinal = ''; }
-        catch(e) { console.error(e); }
-    }
-
+    function startListening() { if (!recognition) return; try { recognition.start(); speechFinal = ''; } catch(e) {} }
     function stopListening() {
         if (recognition && isListening) {
             isListening = false;
@@ -585,11 +672,10 @@
             setTimeout(() => speechStatus.classList.remove('active', 'listening'), 2000);
         }
     }
-
     function toggleListening() { isListening ? stopListening() : startListening(); }
     function autoResizeTextarea() { promptInput.style.height = 'auto'; promptInput.style.height = Math.min(promptInput.scrollHeight, 150) + 'px'; }
 
-    // ─── UI Helpers ───────────────────────────────────────────────────────────────
+    // ─── UI ───────────────────────────────────────────────────────────────────────
     function showWelcomeScreen() { welcomeScreen.style.display = 'flex'; hasUserSentMessage = false; }
     function hideWelcomeScreen() { welcomeScreen.style.display = 'none'; hasUserSentMessage = true; }
 
@@ -600,7 +686,6 @@
         attachBtn.disabled = false;
         sendBtn.disabled = false;
     }
-
     function enableGuestChat() {
         promptInput.disabled = false;
         promptInput.placeholder = 'Tulis prompt kamu... (Login untuk menyimpan riwayat)';
@@ -609,7 +694,6 @@
         sendBtn.disabled = false;
         loadGuestChat();
     }
-
     function disableChatInput() {
         promptInput.disabled = true;
         promptInput.placeholder = 'Silakan login untuk mulai chat...';
@@ -617,16 +701,15 @@
         attachBtn.disabled = true;
         sendBtn.disabled = true;
     }
-
     function loadGuestChat() {
         currentChatId = guestChat.id;
         clearChatMessages();
         if (guestChat.messages.length === 0) { showWelcomeScreen(); }
-        else { hideWelcomeScreen(); guestChat.messages.forEach(m => addMessageToDisplay(m.type, m.content, m.filename)); }
+        else { hideWelcomeScreen(); guestChat.messages.forEach(m => addMessageToDisplay(m.type, m.content, m.filename, m.nlpSentiment, m.nlpScore)); }
         loadChatHistory();
     }
 
-    // ─── Send Message ─────────────────────────────────────────────────────────────
+    // ─── Send Message (with NLP) ──────────────────────────────────────────────────
     async function sendMessage() {
         const prompt = promptInput.value.trim();
         if (!prompt && !selectedFile) return;
@@ -634,10 +717,28 @@
 
         if (!hasUserSentMessage) hideWelcomeScreen();
 
-        // Display user message
+        const ts = new Date().toISOString();
+
+        // ── 1. Call NLP on user prompt in background ──
+        analyzeWithNLP(prompt, ts).then(nlpResult => {
+            if (nlpResult && !nlpResult.error) {
+                saveNLPEntry(nlpResult);
+                // Update the last user message tag in DOM
+                const userMsgs = chatMessages.querySelectorAll('.user-message');
+                const lastUserMsg = userMsgs[userMsgs.length - 1];
+                if (lastUserMsg) {
+                    const existing = lastUserMsg.querySelector('.nlp-tag');
+                    if (!existing) {
+                        const header = lastUserMsg.querySelector('.message-header');
+                        if (header) header.insertAdjacentHTML('beforeend', sentimentToTag(nlpResult.sentiment, nlpResult.sentiment_score));
+                    }
+                }
+            }
+        });
+
+        // Display user message (no tag yet, will be added after NLP)
         addMessageToDisplay('user', prompt, selectedFile ? selectedFile.name : null);
 
-        // Capture & clear file before async ops
         const fileToSend = selectedFile;
         promptInput.value = '';
         promptInput.style.height = 'auto';
@@ -646,7 +747,6 @@
         attachBtn.disabled = true;
         clearSelectedFile();
 
-        // Loading indicator
         const loadingEl = document.createElement('div');
         loadingEl.className = 'loading';
         loadingEl.innerHTML = `<div class="message-header"><strong>AI Assistant</strong></div><div class="loading-dots"><span></span><span></span><span></span></div>`;
@@ -655,17 +755,13 @@
 
         try {
             let data;
-
             if (fileToSend) {
-                // Kirim dengan file
                 const formData = new FormData();
                 formData.append('prompt', prompt);
                 formData.append('file', fileToSend);
-
                 const resp = await fetch('/generate-with-file', { method: 'POST', body: formData });
                 data = await resp.json();
             } else {
-                // Kirim teks biasa
                 const resp = await fetch('/generate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -684,9 +780,10 @@
             } else {
                 const clean = data.result.replace(/\*\*/g, '').replace(/\*/g, '');
                 const truncNote = data.truncated ? '\n\n⚠️ Catatan: File terlalu panjang dan dipotong sebagian.' : '';
-                addMessageToDisplay('ai', clean + truncNote);
+                const fullResult = clean + truncNote;
+                addMessageToDisplay('ai', fullResult);
                 saveMsg('user', prompt, fileToSend ? fileToSend.name : null);
-                saveMsg('ai', clean + truncNote);
+                saveMsg('ai', fullResult);
                 if (currentUser) updateChatTitle(prompt);
             }
 
@@ -704,24 +801,23 @@
     }
 
     // ─── Message Display ──────────────────────────────────────────────────────────
-    function addMessageToDisplay(type, content, filename) {
+    function addMessageToDisplay(type, content, filename, nlpSentiment, nlpScore) {
         const el = document.createElement('div');
         el.className = `message ${type}-message`;
         const sender = type === 'user' ? 'Anda' : 'AI Assistant';
-        const fileBadge = filename
-            ? `<div class="file-badge">${getFileIcon(filename)} ${filename}</div>`
-            : '';
+        const fileBadge = filename ? `<div class="file-badge">${getFileIcon(filename)} ${filename}</div>` : '';
+        const nlpTagHtml = (type === 'user' && nlpSentiment) ? sentimentToTag(nlpSentiment, nlpScore) : '';
         el.innerHTML = `
-            <div class="message-header"><strong>${sender}</strong></div>
+            <div class="message-header"><strong>${sender}</strong>${nlpTagHtml}</div>
             ${fileBadge}
             <div class="message-content">${content}</div>`;
         chatMessages.appendChild(el);
         scrollToBottom();
     }
 
-    function saveMsg(type, content, filename) {
-        if (currentUser) saveMessageToHistory(type, content, filename);
-        else saveMessageToGuest(type, content, filename);
+    function saveMsg(type, content, filename, nlpSentiment, nlpScore) {
+        if (currentUser) saveMessageToHistory(type, content, filename, nlpSentiment, nlpScore);
+        else saveMessageToGuest(type, content, filename, nlpSentiment, nlpScore);
     }
 
     // ─── History ──────────────────────────────────────────────────────────────────
@@ -757,7 +853,7 @@
         });
     }
 
-    function saveMessageToHistory(type, content, filename) {
+    function saveMessageToHistory(type, content, filename, nlpSentiment, nlpScore) {
         if (!currentUser) return;
         let chat = chatHistory.find(c => c.id === currentChatId);
         if (!chat) {
@@ -765,13 +861,13 @@
             chat = { id: currentChatId, title: 'Chat Baru', messages: [], timestamp: Date.now() };
             chatHistory.unshift(chat);
         }
-        chat.messages.push({ type, content, filename: filename || null, timestamp: Date.now() });
+        chat.messages.push({ type, content, filename: filename || null, nlpSentiment: nlpSentiment || null, nlpScore: nlpScore || null, timestamp: Date.now() });
         saveUserChatHistory();
         loadChatHistory();
     }
 
-    function saveMessageToGuest(type, content, filename) {
-        guestChat.messages.push({ type, content, filename: filename || null, timestamp: Date.now() });
+    function saveMessageToGuest(type, content, filename, nlpSentiment, nlpScore) {
+        guestChat.messages.push({ type, content, filename: filename || null, nlpSentiment: nlpSentiment || null, nlpScore: nlpScore || null, timestamp: Date.now() });
     }
 
     function updateChatTitle(prompt) {
@@ -791,7 +887,7 @@
         loadChatHistory();
         clearChatMessages();
         if (chat.messages.length === 0) showWelcomeScreen();
-        else { hideWelcomeScreen(); chat.messages.forEach(m => addMessageToDisplay(m.type, m.content, m.filename)); }
+        else { hideWelcomeScreen(); chat.messages.forEach(m => addMessageToDisplay(m.type, m.content, m.filename, m.nlpSentiment, m.nlpScore)); }
         scrollToBottom();
     }
 
@@ -820,7 +916,7 @@
         loadChatHistory();
     }
 
-    // ─── Delete Modal ─────────────────────────────────────────────────────────────
+    // ─── Delete ───────────────────────────────────────────────────────────────────
     function openDeleteModal(chatId) { chatToDelete = chatId; deleteModal.classList.add('active'); }
     function closeDeleteModal() { deleteModal.classList.remove('active'); chatToDelete = null; }
     function confirmDeleteChat() {
@@ -950,7 +1046,7 @@
     function checkScreenSize() { if (window.innerWidth <= 768) closeSidebar(); else openSidebar(); }
     function scrollToBottom() { chatMessages.scrollTop = chatMessages.scrollHeight; }
 
-    // ─── Event Listeners ──────────────────────────────────────────────────────────
+    // ─── Events ───────────────────────────────────────────────────────────────────
     function setupEventListeners() {
         document.getElementById('cancelLoginBtn').addEventListener('click', closeAuthModal);
         document.getElementById('cancelRegisterBtn').addEventListener('click', closeAuthModal);
@@ -980,6 +1076,7 @@
         updateUserSection();
         loadUserChatHistory();
         initializeSpeechRecognition();
+        updateNLPBadge();
         if (currentUser) { enableChatInput(); showWelcomeScreen(); }
         else { enableGuestChat(); showWelcomeScreen(); }
         setupEventListeners();
