@@ -106,14 +106,11 @@ def analyze_nlp(text):
     words_raw = re.findall(r'\b\w+\b', text_clean.lower())
     sentences = [s.strip() for s in re.split(r'[.!?]+', text_clean) if s.strip()]
 
-    # Remove stop words for meaningful analysis
     all_stops = STOP_WORDS_ID | STOP_WORDS_EN
     filtered_words = [w for w in words_raw if w not in all_stops and len(w) > 2]
 
-    # Top words
     top_words = Counter(filtered_words).most_common(10)
 
-    # Sentiment scoring
     pos_count = sum(1 for w in words_raw if w in POS_WORDS_ID | POS_WORDS_EN)
     neg_count = sum(1 for w in words_raw if w in NEG_WORDS_ID | NEG_WORDS_EN)
 
@@ -135,10 +132,8 @@ def analyze_nlp(text):
         else:
             sentiment = 'neutral'
 
-    # Language
     language = detect_language(words_raw)
 
-    # Stats
     word_count = len(words_raw)
     char_count = len(text_clean)
     sentence_count = max(len(sentences), 1)
@@ -146,8 +141,6 @@ def analyze_nlp(text):
     unique_words = len(set(words_raw))
     lexical_diversity = round(unique_words / max(word_count, 1), 3)
 
-    # Simple POS estimation
-    # Nouns: words ending in typical noun suffixes
     noun_suffixes = ('tion', 'sion', 'ment', 'ness', 'ity', 'ism', 'ist',
                      'an', 'asi', 'kan', 'nya', 'an')
     verb_suffixes = ('ing', 'ed', 'ize', 'ise', 'ate',
@@ -159,11 +152,9 @@ def analyze_nlp(text):
     verbs_est = sum(1 for w in filtered_words if w.endswith(verb_suffixes))
     adjs_est = sum(1 for w in filtered_words if w.endswith(adj_suffixes))
 
-    # Question detection
     is_question = text_clean.strip().endswith('?') or \
                   bool(re.match(r'^(apa|bagaimana|apakah|siapa|kapan|mengapa|kenapa|dimana|berapa|what|how|who|when|why|where|which|is|are|do|does|did|can|could|should|would)\b', text_clean.lower()))
 
-    # Exclamation detection
     is_exclamation = text_clean.strip().endswith('!')
 
     return {
@@ -285,6 +276,13 @@ def index():
 @app.route("/nlp", methods=["GET"])
 def nlp_page():
     return render_template("nlp.html")
+
+
+# ─── Portal Guru ──────────────────────────────────────────────────────────────
+
+@app.route("/guru", methods=["GET"])
+def guru_page():
+    return render_template("guru.html")
 
 
 @app.route("/api/nlp-analyze", methods=["POST"])

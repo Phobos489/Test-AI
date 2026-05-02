@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Guru — Phobos Edu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Mulish:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:        #050d10;
+            --bg-card:   #0b1a1f;
+            --bg-card2:  #0f2129;
+            --border:    #163040;
+            --teal:      #0891b2;
+            --teal-light:#22d3ee;
+            --teal-glow: rgba(8,145,178,0.18);
+            --emerald:   #059669;
+            --emerald-l: #34d399;
+            --amber:     #d97706;
+            --amber-l:   #fbbf24;
+            --danger:    #dc2626;
+            --danger-l:  #f87171;
+            --text:      #e2f0f5;
+            --text-dim:  #6b8fa0;
+            --shadow:    0 8px 32px rgba(0,0,0,0.5);
+            --glow:      0 0 32px rgba(8,145,178,0.2);
+            --font-head: 'Syne', sans-serif;
+            --font-body: 'Mulish', sans-serif;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Background noise texture ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 50% at 10% 0%, rgba(8,145,178,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 90% 100%, rgba(5,150,105,0.06) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── LOGIN SCREEN ── */
+        #loginScreen {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            background: var(--bg);
+            transition: opacity 0.4s ease;
+        }
+
+        .login-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 48px 40px;
+            width: 420px;
+            max-width: 95vw;
+            box-shadow: var(--shadow), var(--glow);
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.5s ease both;
+        }
+
+        .login-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--teal), var(--emerald-l));
+        }
+
+        .login-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .login-logo-icon {
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, var(--teal), var(--emerald));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+
+        .login-logo-text { font-family: var(--font-head); }
+        .login-logo-text h1 { font-size: 20px; font-weight: 800; color: var(--text); line-height: 1; }
+        .login-logo-text span { font-size: 12px; color: var(--text-dim); }
+
+        /* Auth tabs */
+        .auth-tabs {
+            display: flex;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 28px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 7px;
+            transition: all 0.2s;
+        }
+
+        .auth-tab.active {
+            background: var(--teal);
+            color: white;
+        }
+
+        .auth-form { display: none; }
+        .auth-form.active { display: block; }
+
+        .form-group { margin-bottom: 16px; }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-dim);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 13px 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(8,145,178,0.15);
+        }
+
+        .form-group input::placeholder { color: var(--text-dim); }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        .auth-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--teal), #0e7490);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-family: var(--font-body);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+
+        .auth-submit:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(8,145,178,0.4);
+        }
+
+        .auth-submit:active { transform: translateY(0); }
+
+        .auth-msg {
+            margin-top: 14px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            text-align: center;
+            display: none;
+        }
+        .auth-msg.error { background: rgba(220,38,38,0.12); border: 1px solid rgba(220,38,38,0.3); color: var(--danger-l); display: block; }
+        .auth-msg.success { background: rgba(5,150,105,0.12); border: 1px solid rgba(5,150,105,0.3); color: var(--emerald-l); display: block; }
+
+        /* ── APP SHELL ── */
+        #app { display: none; position: relative; z-index: 1; }
+
+        /* ── Top Navbar ── */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: 64px;
+            background: rgba(5,13,16,0.9);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .nav-brand-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--teal), var(--emerald));
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .nav-brand-name {
+            font-family: var(--font-head);
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .nav-brand-name span {
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--teal-light);
+            display: block;
+            line-height: 1;
+        }
+
+        .nav-right { display: flex; align-items: center; gap: 16px; }
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 14px;
+            background: var(--bg-card2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+        }
+
+        .nav-avatar {
+            width: 30px; height: 30px;
+            background: linear-gradient(135deg, var(--teal), var(--emerald));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+            color: white;
+        }
+
+        .nav-user-info { line-height: 1.2; }
+        .nav-user-name { font-size: 13px; font-weight: 600; }
+        .nav-user-role { font-size: 11px; color: var(--teal-light); }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-dim);
+            font-size: 13px;
+            cursor: pointer;
+            font-family: var(--font-body);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .logout-btn:hover { border-color: var(--danger); color: var(--danger-l); }
+
+        /* ── Main layout ── */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 32px 24px 64px;
+        }
+
+        /* ── Page header ── */
+        .page-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 36px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .page-title {
+            font-family: var(--font-head);
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        .page-title span { color: var(--teal-light); }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-dim);
+            margin-top: 6px;
+        }
+
+        /* ── Stats row ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeUp 0.4s ease both;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 2px;
+            background: var(--stat-color, var(--teal));
+        }
+
+        .stat-num {
+            font-family: var(--font-head);
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--text);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-lbl { font-size: 12px; color: var(--text-dim); }
+        .stat-icon { font-size: 24px; margin-bottom: 8px; }
+
+        /* ── Upload panel ── */
+        .upload-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 28px;
+            margin-bottom: 28px;
+            animation: fadeUp 0.4s ease both;
+        }
+
+        .panel-title {
+            font-family: var(--font-head);
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-title-icon {
+            width: 36px; height: 36px;
+            background: rgba(8,145,178,0.15);
+            border: 1px solid rgba(8,145,178,0.3);
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+        @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
+
+        .field-group { display: flex; flex-direction: column; gap: 8px; }
+
+        .field-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-dim);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .field-input, .field-select, .field-textarea {
+            padding: 12px 16px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .field-input:focus, .field-select:focus, .field-textarea:focus {
+            outline: none;
+            border-color: var(--teal);
+            box-shadow: 0 0 0 3px rgba(8,145,178,0.12);
+        }
+        .field-select { cursor: pointer; }
+        .field-select option { background: var(--bg-card2); }
+        .field-textarea { resize: vertical; min-height: 80px; }
+
+        /* ── Drop zone ── */
+        .dropzone {
+            border: 2px dashed var(--border);
+            border-radius: 14px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .dropzone:hover, .dropzone.dragging {
+            border-color: var(--teal);
+            background: rgba(8,145,178,0.04);
+        }
+
+        .dropzone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .dz-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
+        .dz-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+        .dz-sub { font-size: 13px; color: var(--text-dim); }
+        .dz-formats {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+
+        .format-chip {
+            padding: 4px 10px;
+            background: var(--bg-card2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 11px;
+            color: var(--text-dim);
+            font-family: monospace;
+        }
+
+        /* ── File selected preview ── */
+        .selected-files { margin-bottom: 16px; display: none; }
+        .selected-files.visible { display: block; }
+
+        .selected-file-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(8,145,178,0.07);
+            border: 1px solid rgba(8,145,178,0.2);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .sf-icon { font-size: 24px; }
+        .sf-info { flex: 1; }
+        .sf-name { font-size: 14px; font-weight: 500; }
+        .sf-size { font-size: 12px; color: var(--text-dim); }
+        .sf-remove {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px 8px;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+        .sf-remove:hover { color: var(--danger-l); background: rgba(220,38,38,0.1); }
+
+        /* ── Upload button ── */
+        .upload-btn {
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--teal), #0e7490);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-family: var(--font-body);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .upload-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(8,145,178,0.35); }
+        .upload-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* ── Progress bar ── */
+        .progress-wrap {
+            background: var(--border);
+            border-radius: 10px;
+            height: 8px;
+            overflow: hidden;
+            margin: 12px 0;
+            display: none;
+        }
+        .progress-wrap.active { display: block; }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--teal), var(--teal-light));
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            z-index: 9999;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: var(--shadow);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.success { background: rgba(5,150,105,0.95); color: white; border: 1px solid var(--emerald); }
+        .toast.error { background: rgba(220,38,38,0.95); color: white; border: 1px solid var(--danger); }
+
+        /* ── Meeting cards grid ── */
+        .meetings-section { animation: fadeUp 0.5s ease both; }
+
+        .meetings-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .section-label {
+            font-family: var(--font-head);
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .search-filter {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-input {
+            padding: 10px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 13px;
+            width: 220px;
+            transition: all 0.2s;
+        }
+        .search-input:focus { outline: none; border-color: var(--teal); }
+        .search-input::placeholder { color: var(--text-dim); }
+
+        .filter-select {
+            padding: 10px 14px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .filter-select:focus { outline: none; border-color: var(--teal); }
+        .filter-select option { background: var(--bg-card2); }
+
+        /* ── Meeting accordion ── */
+        .meeting-group {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            margin-bottom: 14px;
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+        .meeting-group:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+
+        .meeting-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 18px 24px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .meeting-header:hover { background: rgba(8,145,178,0.05); }
+
+        .meeting-num {
+            width: 40px; height: 40px;
+            background: rgba(8,145,178,0.12);
+            border: 1px solid rgba(8,145,178,0.25);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-head);
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--teal-light);
+            flex-shrink: 0;
+        }
+
+        .meeting-info { flex: 1; }
+        .meeting-title-text { font-size: 15px; font-weight: 600; }
+        .meeting-meta { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+
+        .meeting-badge {
+            padding: 4px 12px;
+            background: rgba(8,145,178,0.12);
+            border: 1px solid rgba(8,145,178,0.2);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--teal-light);
+        }
+
+        .meeting-toggle {
+            color: var(--text-dim);
+            font-size: 18px;
+            transition: transform 0.3s;
+        }
+        .meeting-group.open .meeting-toggle { transform: rotate(180deg); }
+
+        .meeting-body {
+            display: none;
+            padding: 0 24px 20px;
+            border-top: 1px solid var(--border);
+        }
+        .meeting-group.open .meeting-body { display: block; }
+
+        /* ── Material cards ── */
+        .materials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .material-card {
+            background: var(--bg-card2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: all 0.2s;
+            animation: fadeIn 0.3s ease;
+            position: relative;
+        }
+        .material-card:hover {
+            border-color: rgba(8,145,178,0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .mat-header { display: flex; align-items: flex-start; gap: 10px; }
+
+        .mat-file-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .mat-file-icon.pdf { background: rgba(220,38,38,0.12); border: 1px solid rgba(220,38,38,0.2); }
+        .mat-file-icon.docx { background: rgba(8,109,220,0.12); border: 1px solid rgba(8,109,220,0.2); }
+        .mat-file-icon.xlsx { background: rgba(5,150,105,0.12); border: 1px solid rgba(5,150,105,0.2); }
+        .mat-file-icon.txt, .mat-file-icon.default { background: rgba(107,143,160,0.12); border: 1px solid rgba(107,143,160,0.2); }
+
+        .mat-info { flex: 1; overflow: hidden; }
+        .mat-name { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .mat-desc { font-size: 12px; color: var(--text-dim); margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+        .mat-footer { display: flex; align-items: center; justify-content: space-between; }
+
+        .mat-meta { font-size: 11px; color: var(--text-dim); }
+
+        .mat-actions { display: flex; gap: 6px; }
+
+        .mat-btn {
+            padding: 6px 12px;
+            border-radius: 7px;
+            border: 1px solid var(--border);
+            background: transparent;
+            font-size: 12px;
+            font-family: var(--font-body);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-dim);
+        }
+        .mat-btn:hover { border-color: var(--teal); color: var(--teal-light); }
+        .mat-btn.delete:hover { border-color: var(--danger); color: var(--danger-l); }
+
+        /* ── Empty meeting ── */
+        .meeting-empty {
+            text-align: center;
+            padding: 32px 20px;
+            color: var(--text-dim);
+            font-size: 14px;
+        }
+        .meeting-empty span { font-size: 32px; display: block; margin-bottom: 10px; opacity: 0.4; }
+
+        /* ── No results ── */
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-dim);
+        }
+        .no-results span { font-size: 48px; display: block; margin-bottom: 16px; opacity: 0.3; }
+        .no-results p { font-size: 16px; }
+
+        /* ── Confirm modal ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+        }
+        .modal-overlay.open { opacity: 1; visibility: visible; }
+
+        .modal-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+            max-width: 380px;
+            width: 90%;
+            box-shadow: var(--shadow);
+            transform: scale(0.95);
+            transition: transform 0.2s;
+        }
+        .modal-overlay.open .modal-box { transform: scale(1); }
+
+        .modal-title { font-family: var(--font-head); font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+        .modal-desc { font-size: 14px; color: var(--text-dim); line-height: 1.5; margin-bottom: 24px; }
+
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: 9px;
+            border: none;
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .modal-btn.cancel { background: var(--bg-card2); color: var(--text-dim); border: 1px solid var(--border); }
+        .modal-btn.cancel:hover { color: var(--text); }
+        .modal-btn.confirm-del { background: var(--danger); color: white; }
+        .modal-btn.confirm-del:hover { background: #b91c1c; }
+
+        /* ── Animations ── */
+        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes slideUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #1a3040; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--teal); }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .navbar { padding: 0 16px; }
+            .container { padding: 20px 12px 48px; }
+            .page-title { font-size: 24px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .search-filter { flex-wrap: wrap; }
+            .search-input { width: 100%; }
+            .stats-row { grid-template-columns: repeat(2,1fr); }
+            .meeting-header { padding: 14px 16px; }
+            .meeting-body { padding: 0 16px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── LOGIN SCREEN ─────────────────────────────────────────────────────────── -->
+<div id="loginScreen">
+    <div class="login-box">
+        <div class="login-logo">
+            <div class="login-logo-icon">📚</div>
+            <div class="login-logo-text">
+                <h1>Phobos Edu</h1>
+                <span>Portal Guru</span>
+            </div>
+        </div>
+
+        <div class="auth-tabs">
+            <button class="auth-tab active" data-tab="login">Masuk</button>
+            <button class="auth-tab" data-tab="register">Daftar</button>
+        </div>
+
+        <!-- Login form -->
+        <div class="auth-form active" id="loginForm">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" placeholder="guru@sekolah.ac.id" autocomplete="email">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Masukkan password" autocomplete="current-password">
+            </div>
+            <div id="loginMsg" class="auth-msg"></div>
+            <button class="auth-submit" id="loginSubmit">Masuk ke Portal</button>
+        </div>
+
+        <!-- Register form -->
+        <div class="auth-form" id="registerForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nama Depan</label>
+                    <input type="text" id="regFirstName" placeholder="Ahmad">
+                </div>
+                <div class="form-group">
+                    <label>Nama Belakang</label>
+                    <input type="text" id="regLastName" placeholder="Fauzi">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="regEmail" placeholder="guru@sekolah.ac.id">
+            </div>
+            <div class="form-group">
+                <label>Mata Pelajaran</label>
+                <input type="text" id="regSubject" placeholder="Matematika, IPA, Bahasa Indonesia...">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="regPassword" placeholder="Min. 6 karakter">
+            </div>
+            <div class="form-group">
+                <label>Konfirmasi Password</label>
+                <input type="password" id="regConfirm" placeholder="Ulangi password">
+            </div>
+            <div id="registerMsg" class="auth-msg"></div>
+            <button class="auth-submit" id="registerSubmit">Buat Akun Guru</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── APP SHELL ─────────────────────────────────────────────────────────────── -->
+<div id="app">
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <div class="nav-brand-icon">📚</div>
+            <div class="nav-brand-name">
+                Phobos Edu
+                <span>Portal Guru</span>
+            </div>
+        </div>
+        <div class="nav-right">
+            <div class="nav-user">
+                <div class="nav-avatar" id="navAvatar">G</div>
+                <div class="nav-user-info">
+                    <div class="nav-user-name" id="navName">Guru</div>
+                    <div class="nav-user-role" id="navSubject">—</div>
+                </div>
+            </div>
+            <button class="logout-btn" id="logoutBtn">⎋ Keluar</button>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- Page header -->
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Manajemen <span>Materi</span></h1>
+                <p class="page-subtitle">Kelola dan upload materi pembelajaran per pertemuan</p>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row" id="statsRow">
+            <div class="stat-card" style="--stat-color: var(--teal);">
+                <div class="stat-icon">📋</div>
+                <div class="stat-num" id="statMeetings">0</div>
+                <div class="stat-lbl">Pertemuan Aktif</div>
+            </div>
+            <div class="stat-card" style="--stat-color: var(--emerald);">
+                <div class="stat-icon">📁</div>
+                <div class="stat-num" id="statFiles">0</div>
+                <div class="stat-lbl">Total Materi</div>
+            </div>
+            <div class="stat-card" style="--stat-color: var(--amber);">
+                <div class="stat-icon">📄</div>
+                <div class="stat-num" id="statPDFs">0</div>
+                <div class="stat-lbl">File PDF</div>
+            </div>
+            <div class="stat-card" style="--stat-color: var(--teal-light);">
+                <div class="stat-icon">💾</div>
+                <div class="stat-num" id="statSize">0 MB</div>
+                <div class="stat-lbl">Total Ukuran</div>
+            </div>
+        </div>
+
+        <!-- Upload Panel -->
+        <div class="upload-panel">
+            <div class="panel-title">
+                <div class="panel-title-icon">⬆</div>
+                Upload Materi Baru
+            </div>
+
+            <div class="form-grid">
+                <div class="field-group">
+                    <label>Pertemuan Ke-</label>
+                    <select class="field-select" id="meetingNum">
+                        <option value="">Pilih pertemuan...</option>
+                        <!-- Generated by JS -->
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label>Topik Pertemuan</label>
+                    <input type="text" class="field-input" id="meetingTopic" placeholder="cth: Bilangan Bulat dan Operasinya">
+                </div>
+            </div>
+
+            <div class="field-group" style="margin-bottom:16px;">
+                <label>Deskripsi Materi (opsional)</label>
+                <textarea class="field-textarea" id="matDesc" placeholder="Deskripsikan isi materi ini..."></textarea>
+            </div>
+
+            <!-- Dropzone -->
+            <div class="dropzone" id="dropzone">
+                <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.md">
+                <div class="dz-icon">📂</div>
+                <div class="dz-title">Tarik & Lepas file di sini</div>
+                <div class="dz-sub">atau klik untuk memilih file</div>
+                <div class="dz-formats">
+                    <span class="format-chip">.pdf</span>
+                    <span class="format-chip">.docx</span>
+                    <span class="format-chip">.xlsx</span>
+                    <span class="format-chip">.pptx</span>
+                    <span class="format-chip">.txt</span>
+                    <span class="format-chip">.csv</span>
+                </div>
+            </div>
+
+            <!-- Selected files preview -->
+            <div class="selected-files" id="selectedFiles"></div>
+
+            <!-- Progress -->
+            <div class="progress-wrap" id="progressWrap">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+                <button class="upload-btn" id="uploadBtn" disabled>
+                    <span>⬆</span> Upload Materi
+                </button>
+                <span id="uploadStatus" style="font-size:13px;color:var(--text-dim);"></span>
+            </div>
+        </div>
+
+        <!-- Materials list -->
+        <div class="meetings-section">
+            <div class="meetings-header">
+                <div class="section-label">📋 Daftar Materi per Pertemuan</div>
+                <div class="search-filter">
+                    <input type="text" class="search-input" id="searchInput" placeholder="🔍  Cari materi...">
+                    <select class="filter-select" id="filterMeeting">
+                        <option value="">Semua Pertemuan</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="meetingsList">
+                <div class="no-results">
+                    <span>📭</span>
+                    <p>Belum ada materi yang diunggah.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ── Confirm Delete Modal ── -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+        <div class="modal-title">Hapus Materi?</div>
+        <div class="modal-desc">File ini akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.</div>
+        <div class="modal-actions">
+            <button class="modal-btn cancel" id="cancelDelete">Batal</button>
+            <button class="modal-btn confirm-del" id="confirmDelete">Ya, Hapus</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Toast ── -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Storage Keys ──────────────────────────────────────────────────────────────
+const TEACHERS_KEY   = 'phobosTeachers';
+const MATERIALS_KEY  = 'phobosMaterials';
+const SESSION_KEY    = 'phobosTeacherSession';
+
+// ── Utilities ─────────────────────────────────────────────────────────────────
+function loadTeachers() {
+    try { return JSON.parse(localStorage.getItem(TEACHERS_KEY)) || {}; } catch { return {}; }
+}
+function saveTeachers(t) { localStorage.setItem(TEACHERS_KEY, JSON.stringify(t)); }
+
+function loadMaterials() {
+    try { return JSON.parse(localStorage.getItem(MATERIALS_KEY)) || []; } catch { return []; }
+}
+function saveMaterials(m) { localStorage.setItem(MATERIALS_KEY, JSON.stringify(m)); }
+
+function getSession() {
+    try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch { return null; }
+}
+function setSession(user) { localStorage.setItem(SESSION_KEY, JSON.stringify(user)); }
+function clearSession() { localStorage.removeItem(SESSION_KEY); }
+
+let currentUser = getSession();
+
+function showToast(msg, type = 'success') {
+    const el = document.getElementById('toast');
+    el.textContent = (type === 'success' ? '✓  ' : '✕  ') + msg;
+    el.className = `toast ${type} show`;
+    setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+function formatSize(bytes) {
+    if (!bytes) return '0 B';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
+    return (bytes/1048576).toFixed(1) + ' MB';
+}
+
+function formatTotalMB(bytes) {
+    return (bytes / 1048576).toFixed(1) + ' MB';
+}
+
+function getFileIcon(filename) {
+    const ext = filename.split('.').pop().toLowerCase();
+    const map = {
+        pdf: '📕', doc: '📘', docx: '📘',
+        xls: '📗', xlsx: '📗', ppt: '📙',
+        pptx: '📙', txt: '📄', csv: '📊',
+        md: '📝'
+    };
+    return map[ext] || '📄';
+}
+
+function getFileClass(filename) {
+    const ext = filename.split('.').pop().toLowerCase();
+    if (ext === 'pdf') return 'pdf';
+    if (['doc','docx'].includes(ext)) return 'docx';
+    if (['xls','xlsx'].includes(ext)) return 'xlsx';
+    return 'default';
+}
+
+function formatDate(ts) {
+    const d = new Date(ts);
+    return d.toLocaleDateString('id-ID', { day:'2-digit', month:'short', year:'numeric' });
+}
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+const authTabs      = document.querySelectorAll('.auth-tab');
+const loginForm     = document.getElementById('loginForm');
+const registerForm  = document.getElementById('registerForm');
+const loginMsg      = document.getElementById('loginMsg');
+const registerMsg   = document.getElementById('registerMsg');
+
+authTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        authTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const target = tab.dataset.tab;
+        loginForm.classList.toggle('active', target === 'login');
+        registerForm.classList.toggle('active', target === 'register');
+        loginMsg.className = 'auth-msg';
+        registerMsg.className = 'auth-msg';
+    });
+});
+
+function showMsg(el, msg, type) {
+    el.textContent = msg;
+    el.className = `auth-msg ${type}`;
+}
+
+document.getElementById('loginSubmit').addEventListener('click', () => {
+    const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+    const pass  = document.getElementById('loginPassword').value;
+    if (!email || !pass) { showMsg(loginMsg, 'Harap isi email dan password.', 'error'); return; }
+    const teachers = loadTeachers();
+    const user = teachers[email];
+    if (!user || user.password !== pass) { showMsg(loginMsg, 'Email atau password salah.', 'error'); return; }
+    setSession(user);
+    currentUser = user;
+    enterApp();
+});
+
+document.getElementById('registerSubmit').addEventListener('click', () => {
+    const firstName = document.getElementById('regFirstName').value.trim();
+    const lastName  = document.getElementById('regLastName').value.trim();
+    const email     = document.getElementById('regEmail').value.trim().toLowerCase();
+    const subject   = document.getElementById('regSubject').value.trim();
+    const pass      = document.getElementById('regPassword').value;
+    const confirm   = document.getElementById('regConfirm').value;
+
+    if (!firstName || !lastName || !email || !pass || !confirm) {
+        showMsg(registerMsg, 'Harap isi semua field yang wajib.', 'error'); return;
+    }
+    if (pass.length < 6) { showMsg(registerMsg, 'Password minimal 6 karakter.', 'error'); return; }
+    if (pass !== confirm) { showMsg(registerMsg, 'Password tidak cocok.', 'error'); return; }
+
+    const teachers = loadTeachers();
+    if (teachers[email]) { showMsg(registerMsg, 'Email sudah terdaftar.', 'error'); return; }
+
+    const user = {
+        id: 'teacher_' + Date.now(),
+        name: firstName + ' ' + lastName,
+        email, subject: subject || 'Umum', password: pass,
+        createdAt: Date.now()
+    };
+    teachers[email] = user;
+    saveTeachers(teachers);
+    showMsg(registerMsg, 'Akun berhasil dibuat! Silakan masuk.', 'success');
+    setTimeout(() => {
+        authTabs[0].click();
+        document.getElementById('loginEmail').value = email;
+    }, 1500);
+});
+
+// Allow Enter key in login form
+['loginEmail','loginPassword'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => {
+        if (e.key === 'Enter') document.getElementById('loginSubmit').click();
+    });
+});
+
+// ── App Entry ─────────────────────────────────────────────────────────────────
+function enterApp() {
+    document.getElementById('loginScreen').style.opacity = '0';
+    setTimeout(() => {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+    }, 350);
+    document.getElementById('navName').textContent = currentUser.name;
+    document.getElementById('navSubject').textContent = currentUser.subject || '—';
+    document.getElementById('navAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+    populateMeetingSelect();
+    refreshStats();
+    renderMeetings();
+}
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+    clearSession();
+    currentUser = null;
+    location.reload();
+});
+
+// ── Meeting Select ─────────────────────────────────────────────────────────────
+function populateMeetingSelect() {
+    const sel = document.getElementById('meetingNum');
+    sel.innerHTML = '<option value="">Pilih pertemuan...</option>';
+    for (let i = 1; i <= 16; i++) {
+        sel.innerHTML += `<option value="${i}">Pertemuan ${i}</option>`;
+    }
+}
+
+// ── File handling ─────────────────────────────────────────────────────────────
+let selectedFiles = [];
+
+const dropzone   = document.getElementById('dropzone');
+const fileInput  = document.getElementById('fileInput');
+const sfContainer = document.getElementById('selectedFiles');
+
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('dragging'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragging'));
+dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropzone.classList.remove('dragging');
+    handleFiles(Array.from(e.dataTransfer.files));
+});
+
+fileInput.addEventListener('change', () => {
+    handleFiles(Array.from(fileInput.files));
+    fileInput.value = '';
+});
+
+const ALLOWED_EXTS = ['pdf','doc','docx','xls','xlsx','ppt','pptx','txt','csv','md'];
+
+function handleFiles(files) {
+    const valid = files.filter(f => {
+        const ext = f.name.split('.').pop().toLowerCase();
+        return ALLOWED_EXTS.includes(ext) && f.size <= 50 * 1024 * 1024;
+    });
+    if (valid.length < files.length) showToast('Beberapa file dilewati (format tidak didukung / > 50 MB)', 'error');
+    selectedFiles = [...selectedFiles, ...valid];
+    renderSelectedFiles();
+    checkUploadReady();
+}
+
+function renderSelectedFiles() {
+    sfContainer.innerHTML = '';
+    if (selectedFiles.length === 0) { sfContainer.classList.remove('visible'); return; }
+    sfContainer.classList.add('visible');
+    selectedFiles.forEach((f, idx) => {
+        const div = document.createElement('div');
+        div.className = 'selected-file-item';
+        div.innerHTML = `
+            <span class="sf-icon">${getFileIcon(f.name)}</span>
+            <div class="sf-info">
+                <div class="sf-name">${f.name}</div>
+                <div class="sf-size">${formatSize(f.size)}</div>
+            </div>
+            <button class="sf-remove" data-idx="${idx}">✕</button>`;
+        sfContainer.appendChild(div);
+    });
+    sfContainer.querySelectorAll('.sf-remove').forEach(btn => {
+        btn.addEventListener('click', () => {
+            selectedFiles.splice(+btn.dataset.idx, 1);
+            renderSelectedFiles();
+            checkUploadReady();
+        });
+    });
+}
+
+function checkUploadReady() {
+    const meetingNum = document.getElementById('meetingNum').value;
+    const topic = document.getElementById('meetingTopic').value.trim();
+    document.getElementById('uploadBtn').disabled = !(selectedFiles.length > 0 && meetingNum && topic);
+}
+
+document.getElementById('meetingNum').addEventListener('change', checkUploadReady);
+document.getElementById('meetingTopic').addEventListener('input', checkUploadReady);
+
+// ── Upload (simulated with FileReader for local-only demo) ────────────────────
+document.getElementById('uploadBtn').addEventListener('click', async () => {
+    const meetingNum = document.getElementById('meetingNum').value;
+    const topic      = document.getElementById('meetingTopic').value.trim();
+    const desc       = document.getElementById('matDesc').value.trim();
+
+    if (!meetingNum || !topic || selectedFiles.length === 0) return;
+
+    const progressWrap = document.getElementById('progressWrap');
+    const progressBar  = document.getElementById('progressBar');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const uploadBtn    = document.getElementById('uploadBtn');
+
+    uploadBtn.disabled = true;
+    progressWrap.classList.add('active');
+    progressBar.style.width = '0%';
+
+    const materials = loadMaterials();
+
+    for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+        uploadStatus.textContent = `Memproses ${i + 1}/${selectedFiles.length}: ${file.name}`;
+        progressBar.style.width = ((i / selectedFiles.length) * 100) + '%';
+
+        // Read file as base64 for local storage
+        const b64 = await new Promise(res => {
+            const r = new FileReader();
+            r.onload = () => res(r.result);
+            r.readAsDataURL(file);
+        });
+
+        materials.push({
+            id:          'mat_' + Date.now() + '_' + i,
+            teacherId:   currentUser.id,
+            teacherName: currentUser.name,
+            meetingNum:  +meetingNum,
+            topic,
+            desc,
+            filename:    file.name,
+            size:        file.size,
+            dataUrl:     b64,
+            uploadedAt:  Date.now()
+        });
+
+        // small delay for UX
+        await new Promise(r => setTimeout(r, 180));
+    }
+
+    saveMaterials(materials);
+    progressBar.style.width = '100%';
+    uploadStatus.textContent = '';
+
+    setTimeout(() => {
+        progressWrap.classList.remove('active');
+        progressBar.style.width = '0%';
+    }, 600);
+
+    // Reset form
+    selectedFiles = [];
+    renderSelectedFiles();
+    document.getElementById('meetingTopic').value = '';
+    document.getElementById('matDesc').value = '';
+    document.getElementById('meetingNum').value = '';
+    uploadBtn.disabled = true;
+
+    showToast(`${materials.filter(m => m.teacherId === currentUser.id).length > 0 ? selectedFiles.length === 0 ? 'Materi berhasil diunggah!' : '' : 'Materi berhasil diunggah!'}`);
+    showToast('Materi berhasil diunggah!');
+    refreshStats();
+    renderMeetings();
+});
+
+// ── Stats ─────────────────────────────────────────────────────────────────────
+function refreshStats() {
+    const all = loadMaterials().filter(m => m.teacherId === currentUser.id);
+    const meetings = new Set(all.map(m => m.meetingNum)).size;
+    const pdfs = all.filter(m => m.filename.toLowerCase().endsWith('.pdf')).length;
+    const totalBytes = all.reduce((s, m) => s + (m.size || 0), 0);
+
+    document.getElementById('statMeetings').textContent = meetings;
+    document.getElementById('statFiles').textContent = all.length;
+    document.getElementById('statPDFs').textContent = pdfs;
+    document.getElementById('statSize').textContent = formatTotalMB(totalBytes);
+}
+
+// ── Render Meetings ───────────────────────────────────────────────────────────
+let deleteTargetId = null;
+
+function renderMeetings() {
+    const search    = document.getElementById('searchInput').value.toLowerCase();
+    const filterNum = document.getElementById('filterMeeting').value;
+
+    let all = loadMaterials().filter(m => m.teacherId === currentUser.id);
+
+    // Apply search
+    if (search) {
+        all = all.filter(m =>
+            m.filename.toLowerCase().includes(search) ||
+            m.topic.toLowerCase().includes(search) ||
+            (m.desc && m.desc.toLowerCase().includes(search))
+        );
+    }
+
+    // Apply meeting filter
+    if (filterNum) all = all.filter(m => m.meetingNum === +filterNum);
+
+    // Group by meeting
+    const grouped = {};
+    all.forEach(m => {
+        if (!grouped[m.meetingNum]) grouped[m.meetingNum] = { topic: m.topic, items: [] };
+        grouped[m.meetingNum].items.push(m);
+    });
+
+    // Rebuild filter dropdown
+    const allMaterials = loadMaterials().filter(m => m.teacherId === currentUser.id);
+    const allMeetings = [...new Set(allMaterials.map(m => m.meetingNum))].sort((a,b) => a-b);
+    const filterSel = document.getElementById('filterMeeting');
+    const prevVal = filterSel.value;
+    filterSel.innerHTML = '<option value="">Semua Pertemuan</option>';
+    allMeetings.forEach(n => filterSel.innerHTML += `<option value="${n}">Pertemuan ${n}</option>`);
+    if (prevVal) filterSel.value = prevVal;
+
+    const container = document.getElementById('meetingsList');
+
+    if (Object.keys(grouped).length === 0) {
+        container.innerHTML = `
+            <div class="no-results">
+                <span>📭</span>
+                <p>${search || filterNum ? 'Tidak ada materi yang cocok.' : 'Belum ada materi yang diunggah.'}</p>
+            </div>`;
+        return;
+    }
+
+    const sortedNums = Object.keys(grouped).map(Number).sort((a,b) => a-b);
+
+    container.innerHTML = sortedNums.map(num => {
+        const group = grouped[num];
+        const items = group.items;
+        const isOpen = items.length > 0;
+
+        return `
+        <div class="meeting-group ${isOpen ? 'open' : ''}" data-meeting="${num}">
+            <div class="meeting-header">
+                <div class="meeting-num">${num}</div>
+                <div class="meeting-info">
+                    <div class="meeting-title-text">Pertemuan ${num} — ${escHtml(group.topic)}</div>
+                    <div class="meeting-meta">${items.length} file · Terakhir: ${formatDate(Math.max(...items.map(i => i.uploadedAt)))}</div>
+                </div>
+                <span class="meeting-badge">${items.length} materi</span>
+                <span class="meeting-toggle">▾</span>
+            </div>
+            <div class="meeting-body">
+                ${items.length === 0
+                    ? '<div class="meeting-empty"><span>📭</span>Belum ada materi untuk pertemuan ini.</div>'
+                    : `<div class="materials-grid">
+                        ${items.map(mat => `
+                            <div class="material-card" data-id="${mat.id}">
+                                <div class="mat-header">
+                                    <div class="mat-file-icon ${getFileClass(mat.filename)}">${getFileIcon(mat.filename)}</div>
+                                    <div class="mat-info">
+                                        <div class="mat-name" title="${escHtml(mat.filename)}">${escHtml(mat.filename)}</div>
+                                        <div class="mat-desc">${mat.desc ? escHtml(mat.desc) : '<span style="opacity:0.4">Tidak ada deskripsi</span>'}</div>
+                                    </div>
+                                </div>
+                                <div class="mat-footer">
+                                    <div class="mat-meta">${formatSize(mat.size)} · ${formatDate(mat.uploadedAt)}</div>
+                                    <div class="mat-actions">
+                                        <button class="mat-btn download-btn" data-id="${mat.id}">⬇ Unduh</button>
+                                        <button class="mat-btn delete delete-btn" data-id="${mat.id}">🗑</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>`
+                }
+            </div>
+        </div>`;
+    }).join('');
+
+    // Toggle accordion
+    container.querySelectorAll('.meeting-header').forEach(header => {
+        header.addEventListener('click', () => {
+            header.closest('.meeting-group').classList.toggle('open');
+        });
+    });
+
+    // Download buttons
+    container.querySelectorAll('.download-btn').forEach(btn => {
+        btn.addEventListener('click', e => { e.stopPropagation(); downloadMaterial(btn.dataset.id); });
+    });
+
+    // Delete buttons
+    container.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', e => { e.stopPropagation(); openDeleteModal(btn.dataset.id); });
+    });
+}
+
+function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function downloadMaterial(id) {
+    const materials = loadMaterials();
+    const mat = materials.find(m => m.id === id);
+    if (!mat || !mat.dataUrl) { showToast('File tidak ditemukan.', 'error'); return; }
+    const a = document.createElement('a');
+    a.href = mat.dataUrl;
+    a.download = mat.filename;
+    a.click();
+    showToast('Mengunduh ' + mat.filename);
+}
+
+// ── Delete ────────────────────────────────────────────────────────────────────
+function openDeleteModal(id) {
+    deleteTargetId = id;
+    document.getElementById('deleteModal').classList.add('open');
+}
+
+document.getElementById('cancelDelete').addEventListener('click', () => {
+    document.getElementById('deleteModal').classList.remove('open');
+    deleteTargetId = null;
+});
+
+document.getElementById('confirmDelete').addEventListener('click', () => {
+    if (!deleteTargetId) return;
+    const materials = loadMaterials().filter(m => m.id !== deleteTargetId);
+    saveMaterials(materials);
+    deleteTargetId = null;
+    document.getElementById('deleteModal').classList.remove('open');
+    showToast('Materi berhasil dihapus.');
+    refreshStats();
+    renderMeetings();
+});
+
+// ── Search & Filter ───────────────────────────────────────────────────────────
+document.getElementById('searchInput').addEventListener('input', renderMeetings);
+document.getElementById('filterMeeting').addEventListener('change', renderMeetings);
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+if (currentUser) {
+    enterApp();
+}
+</script>
+</body>
+</html>
