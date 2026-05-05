@@ -4,48 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Guru — Phobos Edu</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Mulish:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg:        #050d10;
-            --bg-card:   #0b1a1f;
-            --bg-card2:  #0f2129;
-            --border:    #163040;
-            --teal:      #0891b2;
-            --teal-light:#22d3ee;
-            --teal-glow: rgba(8,145,178,0.18);
-            --emerald:   #059669;
-            --emerald-l: #34d399;
-            --amber:     #d97706;
-            --amber-l:   #fbbf24;
-            --danger:    #dc2626;
-            --danger-l:  #f87171;
-            --text:      #e2f0f5;
-            --text-dim:  #6b8fa0;
-            --shadow:    0 8px 32px rgba(0,0,0,0.5);
-            --glow:      0 0 32px rgba(8,145,178,0.2);
-            --font-head: 'Syne', sans-serif;
-            --font-body: 'Mulish', sans-serif;
+            --primary:       #8b5cf6;
+            --primary-dark:  #7c3aed;
+            --primary-light: #a78bfa;
+            --accent:        #06b6d4;
+            --accent2:       #10b981;
+            --warn:          #f59e0b;
+            --danger:        #ef4444;
+            --danger-l:      #f87171;
+            --bg:            #08081a;
+            --bg-card:       #111128;
+            --bg-card2:      #181830;
+            --border:        #252545;
+            --text:          #f0f0ff;
+            --text-dim:      #8888aa;
+            --shadow:        0 8px 32px rgba(0,0,0,0.5);
+            --glow:          0 0 24px rgba(139,92,246,0.18);
+            --mono:          'Space Mono', monospace;
+            --sans:          'DM Sans', sans-serif;
         }
 
         * { margin:0; padding:0; box-sizing:border-box; }
 
         body {
-            font-family: var(--font-body);
+            font-family: var(--sans);
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
         }
 
-        /* ── Background noise texture ── */
+        /* ── Animated background grid (same as nlp.html) ── */
         body::before {
             content: '';
             position: fixed;
             inset: 0;
-            background:
-                radial-gradient(ellipse 80% 50% at 10% 0%, rgba(8,145,178,0.08) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 40% at 90% 100%, rgba(5,150,105,0.06) 0%, transparent 60%);
+            background-image:
+                linear-gradient(rgba(139,92,246,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(139,92,246,0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
             pointer-events: none;
             z-index: 0;
         }
@@ -65,7 +65,7 @@
         .login-box {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 20px;
+            border-radius: 16px;
             padding: 48px 40px;
             width: 420px;
             max-width: 95vw;
@@ -80,7 +80,7 @@
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 3px;
-            background: linear-gradient(90deg, var(--teal), var(--emerald-l));
+            background: linear-gradient(90deg, var(--primary), var(--accent));
         }
 
         .login-logo {
@@ -91,18 +91,27 @@
         }
 
         .login-logo-icon {
-            width: 48px; height: 48px;
-            background: linear-gradient(135deg, var(--teal), var(--emerald));
-            border-radius: 12px;
+            width: 46px; height: 46px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 22px;
         }
 
-        .login-logo-text { font-family: var(--font-head); }
-        .login-logo-text h1 { font-size: 20px; font-weight: 800; color: var(--text); line-height: 1; }
-        .login-logo-text span { font-size: 12px; color: var(--text-dim); }
+        .login-logo-text h1 {
+            font-family: var(--mono);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            line-height: 1;
+        }
+        .login-logo-text span {
+            font-family: var(--sans);
+            font-size: 12px;
+            color: var(--primary-light);
+        }
 
         /* Auth tabs */
         .auth-tabs {
@@ -120,7 +129,7 @@
             background: none;
             border: none;
             color: var(--text-dim);
-            font-family: var(--font-body);
+            font-family: var(--sans);
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
@@ -129,7 +138,7 @@
         }
 
         .auth-tab.active {
-            background: var(--teal);
+            background: var(--primary);
             color: white;
         }
 
@@ -140,30 +149,31 @@
 
         .form-group label {
             display: block;
-            font-size: 12px;
-            font-weight: 600;
+            font-family: var(--mono);
+            font-size: 10px;
+            font-weight: 700;
             color: var(--text-dim);
-            letter-spacing: 0.06em;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
             margin-bottom: 8px;
         }
 
         .form-group input {
             width: 100%;
-            padding: 13px 16px;
+            padding: 12px 16px;
             background: var(--bg);
             border: 1px solid var(--border);
-            border-radius: 10px;
+            border-radius: 8px;
             color: var(--text);
-            font-family: var(--font-body);
+            font-family: var(--sans);
             font-size: 14px;
             transition: all 0.2s;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: var(--teal);
-            box-shadow: 0 0 0 3px rgba(8,145,178,0.15);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139,92,246,0.15);
         }
 
         .form-group input::placeholder { color: var(--text-dim); }
@@ -172,13 +182,13 @@
 
         .auth-submit {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, var(--teal), #0e7490);
+            padding: 13px;
+            background: var(--primary);
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             color: white;
-            font-family: var(--font-body);
-            font-size: 15px;
+            font-family: var(--sans);
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
@@ -186,11 +196,10 @@
         }
 
         .auth-submit:hover {
+            background: var(--primary-dark);
             transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(8,145,178,0.4);
+            box-shadow: 0 6px 20px rgba(139,92,246,0.35);
         }
-
-        .auth-submit:active { transform: translateY(0); }
 
         .auth-msg {
             margin-top: 14px;
@@ -200,8 +209,8 @@
             text-align: center;
             display: none;
         }
-        .auth-msg.error { background: rgba(220,38,38,0.12); border: 1px solid rgba(220,38,38,0.3); color: var(--danger-l); display: block; }
-        .auth-msg.success { background: rgba(5,150,105,0.12); border: 1px solid rgba(5,150,105,0.3); color: var(--emerald-l); display: block; }
+        .auth-msg.error   { background: rgba(239,68,68,0.1);  border: 1px solid rgba(239,68,68,0.3);  color: var(--danger-l); display: block; }
+        .auth-msg.success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #34d399; display: block; }
 
         /* ── APP SHELL ── */
         #app { display: none; position: relative; z-index: 1; }
@@ -212,7 +221,7 @@
             top: 0;
             z-index: 100;
             height: 64px;
-            background: rgba(5,13,16,0.9);
+            background: rgba(8,8,26,0.85);
             backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--border);
             display: flex;
@@ -221,39 +230,35 @@
             padding: 0 32px;
         }
 
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-        }
+        .nav-brand { display: flex; align-items: center; gap: 12px; }
 
         .nav-brand-icon {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, var(--teal), var(--emerald));
-            border-radius: 9px;
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 17px;
         }
 
         .nav-brand-name {
-            font-family: var(--font-head);
-            font-size: 18px;
-            font-weight: 800;
+            font-family: var(--mono);
+            font-size: 16px;
+            font-weight: 700;
             color: var(--text);
         }
 
         .nav-brand-name span {
-            font-size: 12px;
+            font-family: var(--sans);
+            font-size: 11px;
             font-weight: 400;
-            color: var(--teal-light);
+            color: var(--primary-light);
             display: block;
             line-height: 1;
         }
 
-        .nav-right { display: flex; align-items: center; gap: 16px; }
+        .nav-right { display: flex; align-items: center; gap: 12px; }
 
         .nav-user {
             display: flex;
@@ -262,34 +267,34 @@
             padding: 6px 14px;
             background: var(--bg-card2);
             border: 1px solid var(--border);
-            border-radius: 10px;
+            border-radius: 8px;
         }
 
         .nav-avatar {
             width: 30px; height: 30px;
-            background: linear-gradient(135deg, var(--teal), var(--emerald));
+            background: var(--primary);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-family: var(--mono);
             font-weight: 700;
-            font-size: 13px;
+            font-size: 12px;
             color: white;
         }
 
-        .nav-user-info { line-height: 1.2; }
-        .nav-user-name { font-size: 13px; font-weight: 600; }
-        .nav-user-role { font-size: 11px; color: var(--teal-light); }
+        .nav-user-name  { font-size: 13px; font-weight: 600; line-height: 1.3; }
+        .nav-user-role  { font-size: 11px; color: var(--primary-light); }
 
         .logout-btn {
-            padding: 8px 16px;
+            padding: 8px 14px;
             background: transparent;
             border: 1px solid var(--border);
             border-radius: 8px;
             color: var(--text-dim);
             font-size: 13px;
             cursor: pointer;
-            font-family: var(--font-body);
+            font-family: var(--sans);
             transition: all 0.2s;
             display: flex;
             align-items: center;
@@ -315,18 +320,38 @@
         }
 
         .page-title {
-            font-family: var(--font-head);
-            font-size: 32px;
-            font-weight: 800;
+            font-family: var(--mono);
+            font-size: 28px;
+            font-weight: 700;
             line-height: 1.1;
         }
 
-        .page-title span { color: var(--teal-light); }
+        .page-title span { color: var(--primary-light); }
 
         .page-subtitle {
             font-size: 14px;
             color: var(--text-dim);
-            margin-top: 6px;
+            margin-top: 8px;
+            font-family: var(--sans);
+        }
+
+        /* ── Section title ── */
+        .section-title {
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
         }
 
         /* ── Stats row ── */
@@ -340,91 +365,100 @@
         .stat-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 14px;
+            border-radius: 12px;
             padding: 20px;
             position: relative;
             overflow: hidden;
             animation: fadeUp 0.4s ease both;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+        .stat-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--glow);
         }
 
-        .stat-card::after {
+        .stat-card::before {
             content: '';
             position: absolute;
-            bottom: 0; left: 0; right: 0;
+            top: 0; left: 0; right: 0;
             height: 2px;
-            background: var(--stat-color, var(--teal));
+            background: var(--stat-color, var(--primary));
         }
 
         .stat-num {
-            font-family: var(--font-head);
-            font-size: 36px;
-            font-weight: 800;
+            font-family: var(--mono);
+            font-size: 30px;
+            font-weight: 700;
             color: var(--text);
             line-height: 1;
             margin-bottom: 4px;
         }
 
-        .stat-lbl { font-size: 12px; color: var(--text-dim); }
-        .stat-icon { font-size: 24px; margin-bottom: 8px; }
+        .stat-lbl  { font-size: 12px; color: var(--text-dim); }
+        .stat-icon { font-size: 22px; margin-bottom: 10px; }
 
         /* ── Upload panel ── */
         .upload-panel {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 18px;
+            border-radius: 14px;
             padding: 28px;
             margin-bottom: 28px;
             animation: fadeUp 0.4s ease both;
         }
 
         .panel-title {
-            font-family: var(--font-head);
-            font-size: 18px;
+            font-family: var(--mono);
+            font-size: 13px;
             font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
+            color: var(--primary-light);
         }
 
         .panel-title-icon {
-            width: 36px; height: 36px;
-            background: rgba(8,145,178,0.15);
-            border: 1px solid rgba(8,145,178,0.3);
-            border-radius: 9px;
+            width: 34px; height: 34px;
+            background: rgba(139,92,246,0.15);
+            border: 1px solid rgba(139,92,246,0.3);
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-
         @media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
 
         .field-group { display: flex; flex-direction: column; gap: 8px; }
 
         .field-group label {
-            font-size: 12px;
-            font-weight: 600;
+            font-family: var(--mono);
+            font-size: 10px;
+            font-weight: 700;
             color: var(--text-dim);
-            letter-spacing: 0.06em;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
         }
 
         .field-input, .field-select, .field-textarea {
-            padding: 12px 16px;
+            padding: 11px 14px;
             background: var(--bg);
             border: 1px solid var(--border);
-            border-radius: 10px;
+            border-radius: 8px;
             color: var(--text);
-            font-family: var(--font-body);
+            font-family: var(--sans);
             font-size: 14px;
             transition: all 0.2s;
         }
         .field-input:focus, .field-select:focus, .field-textarea:focus {
             outline: none;
-            border-color: var(--teal);
-            box-shadow: 0 0 0 3px rgba(8,145,178,0.12);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139,92,246,0.12);
         }
         .field-select { cursor: pointer; }
         .field-select option { background: var(--bg-card2); }
@@ -433,7 +467,7 @@
         /* ── Drop zone ── */
         .dropzone {
             border: 2px dashed var(--border);
-            border-radius: 14px;
+            border-radius: 12px;
             padding: 40px 20px;
             text-align: center;
             cursor: pointer;
@@ -443,8 +477,8 @@
         }
 
         .dropzone:hover, .dropzone.dragging {
-            border-color: var(--teal);
-            background: rgba(8,145,178,0.04);
+            border-color: var(--primary);
+            background: rgba(139,92,246,0.05);
         }
 
         .dropzone input[type="file"] {
@@ -455,9 +489,10 @@
             width: 100%;
         }
 
-        .dz-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
-        .dz-title { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
-        .dz-sub { font-size: 13px; color: var(--text-dim); }
+        .dz-icon { font-size: 38px; margin-bottom: 12px; opacity: 0.4; }
+        .dz-title { font-family: var(--mono); font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+        .dz-sub   { font-size: 13px; color: var(--text-dim); }
+
         .dz-formats {
             display: flex;
             justify-content: center;
@@ -467,16 +502,16 @@
         }
 
         .format-chip {
-            padding: 4px 10px;
-            background: var(--bg-card2);
-            border: 1px solid var(--border);
+            padding: 3px 10px;
+            background: rgba(139,92,246,0.1);
+            border: 1px solid rgba(139,92,246,0.2);
             border-radius: 20px;
-            font-size: 11px;
-            color: var(--text-dim);
-            font-family: monospace;
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--primary-light);
         }
 
-        /* ── File selected preview ── */
+        /* ── Selected files ── */
         .selected-files { margin-bottom: 16px; display: none; }
         .selected-files.visible { display: block; }
 
@@ -484,39 +519,39 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px 16px;
-            background: rgba(8,145,178,0.07);
-            border: 1px solid rgba(8,145,178,0.2);
-            border-radius: 10px;
+            padding: 11px 14px;
+            background: rgba(139,92,246,0.07);
+            border: 1px solid rgba(139,92,246,0.2);
+            border-radius: 8px;
             margin-bottom: 8px;
             animation: fadeIn 0.2s ease;
         }
 
-        .sf-icon { font-size: 24px; }
+        .sf-icon { font-size: 22px; }
         .sf-info { flex: 1; }
-        .sf-name { font-size: 14px; font-weight: 500; }
-        .sf-size { font-size: 12px; color: var(--text-dim); }
+        .sf-name { font-size: 13px; font-weight: 500; }
+        .sf-size { font-family: var(--mono); font-size: 11px; color: var(--text-dim); }
         .sf-remove {
             background: none;
             border: none;
             color: var(--text-dim);
             cursor: pointer;
-            font-size: 18px;
+            font-size: 16px;
             padding: 4px 8px;
             border-radius: 5px;
             transition: all 0.2s;
         }
-        .sf-remove:hover { color: var(--danger-l); background: rgba(220,38,38,0.1); }
+        .sf-remove:hover { color: var(--danger-l); background: rgba(239,68,68,0.1); }
 
         /* ── Upload button ── */
         .upload-btn {
-            padding: 14px 28px;
-            background: linear-gradient(135deg, var(--teal), #0e7490);
+            padding: 13px 26px;
+            background: var(--primary);
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             color: white;
-            font-family: var(--font-body);
-            font-size: 15px;
+            font-family: var(--sans);
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
@@ -524,14 +559,14 @@
             align-items: center;
             gap: 8px;
         }
-        .upload-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(8,145,178,0.35); }
-        .upload-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .upload-btn:hover  { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(139,92,246,0.35); }
+        .upload-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
 
         /* ── Progress bar ── */
         .progress-wrap {
             background: var(--border);
             border-radius: 10px;
-            height: 8px;
+            height: 6px;
             overflow: hidden;
             margin: 12px 0;
             display: none;
@@ -539,7 +574,7 @@
         .progress-wrap.active { display: block; }
         .progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, var(--teal), var(--teal-light));
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
             border-radius: 10px;
             transition: width 0.3s ease;
             width: 0%;
@@ -551,10 +586,11 @@
             bottom: 32px;
             right: 32px;
             z-index: 9999;
-            padding: 14px 20px;
-            border-radius: 12px;
+            padding: 13px 18px;
+            border-radius: 10px;
             font-size: 14px;
             font-weight: 500;
+            font-family: var(--sans);
             display: flex;
             align-items: center;
             gap: 10px;
@@ -564,11 +600,11 @@
             transition: all 0.3s ease;
             pointer-events: none;
         }
-        .toast.show { transform: translateY(0); opacity: 1; }
-        .toast.success { background: rgba(5,150,105,0.95); color: white; border: 1px solid var(--emerald); }
-        .toast.error { background: rgba(220,38,38,0.95); color: white; border: 1px solid var(--danger); }
+        .toast.show    { transform: translateY(0); opacity: 1; }
+        .toast.success { background: rgba(16,185,129,0.95); color: white; border: 1px solid #10b981; }
+        .toast.error   { background: rgba(239,68,68,0.95);  color: white; border: 1px solid var(--danger); }
 
-        /* ── Meeting cards grid ── */
+        /* ── Meetings section ── */
         .meetings-section { animation: fadeUp 0.5s ease both; }
 
         .meetings-header {
@@ -581,103 +617,103 @@
         }
 
         .section-label {
-            font-family: var(--font-head);
-            font-size: 20px;
+            font-family: var(--mono);
+            font-size: 13px;
             font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--primary-light);
         }
 
-        .search-filter {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
+        .search-filter { display: flex; gap: 10px; align-items: center; }
 
         .search-input {
-            padding: 10px 16px;
+            padding: 9px 14px;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 10px;
+            border-radius: 8px;
             color: var(--text);
-            font-family: var(--font-body);
+            font-family: var(--sans);
             font-size: 13px;
             width: 220px;
             transition: all 0.2s;
         }
-        .search-input:focus { outline: none; border-color: var(--teal); }
+        .search-input:focus { outline: none; border-color: var(--primary); }
         .search-input::placeholder { color: var(--text-dim); }
 
         .filter-select {
-            padding: 10px 14px;
+            padding: 9px 13px;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 10px;
+            border-radius: 8px;
             color: var(--text);
-            font-family: var(--font-body);
+            font-family: var(--sans);
             font-size: 13px;
             cursor: pointer;
         }
-        .filter-select:focus { outline: none; border-color: var(--teal); }
+        .filter-select:focus { outline: none; border-color: var(--primary); }
         .filter-select option { background: var(--bg-card2); }
 
         /* ── Meeting accordion ── */
         .meeting-group {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 14px;
-            margin-bottom: 14px;
+            border-radius: 12px;
+            margin-bottom: 12px;
             overflow: hidden;
-            transition: box-shadow 0.2s;
+            transition: box-shadow 0.2s, border-color 0.2s;
         }
-        .meeting-group:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .meeting-group:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.3); border-color: rgba(139,92,246,0.25); }
 
         .meeting-header {
             display: flex;
             align-items: center;
-            gap: 16px;
-            padding: 18px 24px;
+            gap: 14px;
+            padding: 16px 22px;
             cursor: pointer;
             transition: background 0.2s;
         }
-        .meeting-header:hover { background: rgba(8,145,178,0.05); }
+        .meeting-header:hover { background: rgba(139,92,246,0.05); }
 
         .meeting-num {
-            width: 40px; height: 40px;
-            background: rgba(8,145,178,0.12);
-            border: 1px solid rgba(8,145,178,0.25);
-            border-radius: 10px;
+            width: 38px; height: 38px;
+            background: rgba(139,92,246,0.12);
+            border: 1px solid rgba(139,92,246,0.25);
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: var(--font-head);
-            font-size: 14px;
-            font-weight: 800;
-            color: var(--teal-light);
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary-light);
             flex-shrink: 0;
         }
 
         .meeting-info { flex: 1; }
-        .meeting-title-text { font-size: 15px; font-weight: 600; }
-        .meeting-meta { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+        .meeting-title-text { font-size: 14px; font-weight: 600; }
+        .meeting-meta { font-family: var(--mono); font-size: 11px; color: var(--text-dim); margin-top: 2px; }
 
         .meeting-badge {
-            padding: 4px 12px;
-            background: rgba(8,145,178,0.12);
-            border: 1px solid rgba(8,145,178,0.2);
+            padding: 3px 10px;
+            background: rgba(139,92,246,0.12);
+            border: 1px solid rgba(139,92,246,0.2);
             border-radius: 20px;
-            font-size: 12px;
-            color: var(--teal-light);
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--primary-light);
         }
 
         .meeting-toggle {
             color: var(--text-dim);
-            font-size: 18px;
+            font-size: 16px;
             transition: transform 0.3s;
         }
         .meeting-group.open .meeting-toggle { transform: rotate(180deg); }
 
         .meeting-body {
             display: none;
-            padding: 0 24px 20px;
+            padding: 0 22px 18px;
             border-top: 1px solid var(--border);
         }
         .meeting-group.open .meeting-body { display: block; }
@@ -685,25 +721,24 @@
         /* ── Material cards ── */
         .materials-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
             gap: 12px;
-            margin-top: 16px;
+            margin-top: 14px;
         }
 
         .material-card {
             background: var(--bg-card2);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
+            border-radius: 10px;
+            padding: 15px;
             display: flex;
             flex-direction: column;
             gap: 10px;
             transition: all 0.2s;
             animation: fadeIn 0.3s ease;
-            position: relative;
         }
         .material-card:hover {
-            border-color: rgba(8,145,178,0.4);
+            border-color: rgba(139,92,246,0.4);
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
@@ -711,66 +746,64 @@
         .mat-header { display: flex; align-items: flex-start; gap: 10px; }
 
         .mat-file-icon {
-            width: 40px; height: 40px;
-            border-radius: 10px;
+            width: 38px; height: 38px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 19px;
             flex-shrink: 0;
         }
 
-        .mat-file-icon.pdf { background: rgba(220,38,38,0.12); border: 1px solid rgba(220,38,38,0.2); }
-        .mat-file-icon.docx { background: rgba(8,109,220,0.12); border: 1px solid rgba(8,109,220,0.2); }
-        .mat-file-icon.xlsx { background: rgba(5,150,105,0.12); border: 1px solid rgba(5,150,105,0.2); }
-        .mat-file-icon.txt, .mat-file-icon.default { background: rgba(107,143,160,0.12); border: 1px solid rgba(107,143,160,0.2); }
+        .mat-file-icon.pdf     { background: rgba(239,68,68,0.12);   border: 1px solid rgba(239,68,68,0.2); }
+        .mat-file-icon.docx    { background: rgba(139,92,246,0.12);  border: 1px solid rgba(139,92,246,0.2); }
+        .mat-file-icon.xlsx    { background: rgba(16,185,129,0.12);  border: 1px solid rgba(16,185,129,0.2); }
+        .mat-file-icon.default { background: rgba(136,136,170,0.12); border: 1px solid rgba(136,136,170,0.2); }
 
         .mat-info { flex: 1; overflow: hidden; }
         .mat-name { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .mat-desc { font-size: 12px; color: var(--text-dim); margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .mat-desc { font-size: 12px; color: var(--text-dim); margin-top: 3px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 
         .mat-footer { display: flex; align-items: center; justify-content: space-between; }
-
-        .mat-meta { font-size: 11px; color: var(--text-dim); }
+        .mat-meta   { font-family: var(--mono); font-size: 10px; color: var(--text-dim); }
 
         .mat-actions { display: flex; gap: 6px; }
 
         .mat-btn {
-            padding: 6px 12px;
-            border-radius: 7px;
+            padding: 5px 11px;
+            border-radius: 6px;
             border: 1px solid var(--border);
             background: transparent;
-            font-size: 12px;
-            font-family: var(--font-body);
+            font-size: 11px;
+            font-family: var(--sans);
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
             color: var(--text-dim);
         }
-        .mat-btn:hover { border-color: var(--teal); color: var(--teal-light); }
+        .mat-btn:hover        { border-color: var(--primary); color: var(--primary-light); }
         .mat-btn.delete:hover { border-color: var(--danger); color: var(--danger-l); }
 
-        /* ── Empty meeting ── */
+        /* ── Empty / No-results ── */
         .meeting-empty {
             text-align: center;
-            padding: 32px 20px;
+            padding: 30px 20px;
             color: var(--text-dim);
-            font-size: 14px;
+            font-size: 13px;
         }
-        .meeting-empty span { font-size: 32px; display: block; margin-bottom: 10px; opacity: 0.4; }
+        .meeting-empty span { font-size: 28px; display: block; margin-bottom: 10px; opacity: 0.4; }
 
-        /* ── No results ── */
         .no-results {
             text-align: center;
             padding: 60px 20px;
             color: var(--text-dim);
         }
-        .no-results span { font-size: 48px; display: block; margin-bottom: 16px; opacity: 0.3; }
-        .no-results p { font-size: 16px; }
+        .no-results span { font-size: 46px; display: block; margin-bottom: 14px; opacity: 0.3; }
+        .no-results p    { font-size: 15px; }
 
-        /* ── Confirm modal ── */
+        /* ── Confirm delete modal ── */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -788,7 +821,7 @@
         .modal-box {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 16px;
+            border-radius: 14px;
             padding: 28px;
             max-width: 380px;
             width: 90%;
@@ -798,60 +831,70 @@
         }
         .modal-overlay.open .modal-box { transform: scale(1); }
 
-        .modal-title { font-family: var(--font-head); font-size: 18px; font-weight: 700; margin-bottom: 10px; }
-        .modal-desc { font-size: 14px; color: var(--text-dim); line-height: 1.5; margin-bottom: 24px; }
+        .modal-title {
+            font-family: var(--mono);
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .modal-desc {
+            font-size: 14px;
+            color: var(--text-dim);
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
 
         .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
 
         .modal-btn {
-            padding: 10px 20px;
-            border-radius: 9px;
+            padding: 9px 18px;
+            border-radius: 8px;
             border: none;
-            font-family: var(--font-body);
+            font-family: var(--sans);
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
         }
-        .modal-btn.cancel { background: var(--bg-card2); color: var(--text-dim); border: 1px solid var(--border); }
-        .modal-btn.cancel:hover { color: var(--text); }
+        .modal-btn.cancel      { background: var(--bg-card2); color: var(--text-dim); border: 1px solid var(--border); }
+        .modal-btn.cancel:hover{ color: var(--text); }
         .modal-btn.confirm-del { background: var(--danger); color: white; }
         .modal-btn.confirm-del:hover { background: #b91c1c; }
 
         /* ── Animations ── */
-        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-        @keyframes slideUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
-        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+        @keyframes fadeUp  { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes slideUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes fadeIn  { from { opacity:0; } to { opacity:1; } }
 
         /* ── Scrollbar ── */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: var(--bg); }
-        ::-webkit-scrollbar-thumb { background: #1a3040; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--teal); }
+        ::-webkit-scrollbar-thumb { background: #2d2d50; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary-dark); }
 
         /* ── Responsive ── */
         @media (max-width: 768px) {
-            .navbar { padding: 0 16px; }
-            .container { padding: 20px 12px 48px; }
-            .page-title { font-size: 24px; }
-            .form-grid { grid-template-columns: 1fr; }
+            .navbar     { padding: 0 16px; }
+            .container  { padding: 20px 12px 48px; }
+            .page-title { font-size: 22px; }
+            .form-grid  { grid-template-columns: 1fr; }
             .search-filter { flex-wrap: wrap; }
-            .search-input { width: 100%; }
-            .stats-row { grid-template-columns: repeat(2,1fr); }
-            .meeting-header { padding: 14px 16px; }
-            .meeting-body { padding: 0 16px 16px; }
+            .search-input  { width: 100%; }
+            .stats-row     { grid-template-columns: repeat(2,1fr); }
+            .meeting-header{ padding: 12px 14px; }
+            .meeting-body  { padding: 0 14px 14px; }
         }
     </style>
 </head>
 <body>
 
-<!-- ── LOGIN SCREEN ─────────────────────────────────────────────────────────── -->
+<!-- ── LOGIN SCREEN ────────────────────────────────────────────────────────── -->
 <div id="loginScreen">
     <div class="login-box">
         <div class="login-logo">
             <div class="login-logo-icon">📚</div>
             <div class="login-logo-text">
-                <h1>Phobos Edu</h1>
+                <h1>PHOBOS EDU</h1>
                 <span>Portal Guru</span>
             </div>
         </div>
@@ -909,7 +952,7 @@
     </div>
 </div>
 
-<!-- ── APP SHELL ─────────────────────────────────────────────────────────────── -->
+<!-- ── APP SHELL ──────────────────────────────────────────────────────────── -->
 <div id="app">
 
     <!-- Navbar -->
@@ -917,14 +960,14 @@
         <div class="nav-brand">
             <div class="nav-brand-icon">📚</div>
             <div class="nav-brand-name">
-                Phobos Edu
+                PHOBOS EDU
                 <span>Portal Guru</span>
             </div>
         </div>
         <div class="nav-right">
             <div class="nav-user">
                 <div class="nav-avatar" id="navAvatar">G</div>
-                <div class="nav-user-info">
+                <div>
                     <div class="nav-user-name" id="navName">Guru</div>
                     <div class="nav-user-role" id="navSubject">—</div>
                 </div>
@@ -944,23 +987,24 @@
         </div>
 
         <!-- Stats -->
+        <div class="section-title">Ringkasan</div>
         <div class="stats-row" id="statsRow">
-            <div class="stat-card" style="--stat-color: var(--teal);">
+            <div class="stat-card" style="--stat-color: var(--primary);">
                 <div class="stat-icon">📋</div>
                 <div class="stat-num" id="statMeetings">0</div>
                 <div class="stat-lbl">Pertemuan Aktif</div>
             </div>
-            <div class="stat-card" style="--stat-color: var(--emerald);">
+            <div class="stat-card" style="--stat-color: var(--accent2);">
                 <div class="stat-icon">📁</div>
                 <div class="stat-num" id="statFiles">0</div>
                 <div class="stat-lbl">Total Materi</div>
             </div>
-            <div class="stat-card" style="--stat-color: var(--amber);">
+            <div class="stat-card" style="--stat-color: var(--danger);">
                 <div class="stat-icon">📄</div>
                 <div class="stat-num" id="statPDFs">0</div>
                 <div class="stat-lbl">File PDF</div>
             </div>
-            <div class="stat-card" style="--stat-color: var(--teal-light);">
+            <div class="stat-card" style="--stat-color: var(--warn);">
                 <div class="stat-icon">💾</div>
                 <div class="stat-num" id="statSize">0 MB</div>
                 <div class="stat-lbl">Total Ukuran</div>
@@ -979,7 +1023,6 @@
                     <label>Pertemuan Ke-</label>
                     <select class="field-select" id="meetingNum">
                         <option value="">Pilih pertemuan...</option>
-                        <!-- Generated by JS -->
                     </select>
                 </div>
                 <div class="field-group">
@@ -997,7 +1040,7 @@
             <div class="dropzone" id="dropzone">
                 <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.md">
                 <div class="dz-icon">📂</div>
-                <div class="dz-title">Tarik & Lepas file di sini</div>
+                <div class="dz-title">Tarik &amp; Lepas file di sini</div>
                 <div class="dz-sub">atau klik untuk memilih file</div>
                 <div class="dz-formats">
                     <span class="format-chip">.pdf</span>
@@ -1009,7 +1052,7 @@
                 </div>
             </div>
 
-            <!-- Selected files preview -->
+            <!-- Selected files -->
             <div class="selected-files" id="selectedFiles"></div>
 
             <!-- Progress -->
@@ -1021,7 +1064,7 @@
                 <button class="upload-btn" id="uploadBtn" disabled>
                     <span>⬆</span> Upload Materi
                 </button>
-                <span id="uploadStatus" style="font-size:13px;color:var(--text-dim);"></span>
+                <span id="uploadStatus" style="font-family:var(--mono);font-size:12px;color:var(--text-dim);"></span>
             </div>
         </div>
 
@@ -1065,26 +1108,20 @@
 
 <script>
 // ── Storage Keys ──────────────────────────────────────────────────────────────
-const TEACHERS_KEY   = 'phobosTeachers';
-const MATERIALS_KEY  = 'phobosMaterials';
-const SESSION_KEY    = 'phobosTeacherSession';
+const TEACHERS_KEY  = 'phobosTeachers';
+const MATERIALS_KEY = 'phobosMaterials';
+const SESSION_KEY   = 'phobosTeacherSession';
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
-function loadTeachers() {
-    try { return JSON.parse(localStorage.getItem(TEACHERS_KEY)) || {}; } catch { return {}; }
-}
+function loadTeachers()  { try { return JSON.parse(localStorage.getItem(TEACHERS_KEY))  || {}; } catch { return {}; } }
 function saveTeachers(t) { localStorage.setItem(TEACHERS_KEY, JSON.stringify(t)); }
 
-function loadMaterials() {
-    try { return JSON.parse(localStorage.getItem(MATERIALS_KEY)) || []; } catch { return []; }
-}
+function loadMaterials()  { try { return JSON.parse(localStorage.getItem(MATERIALS_KEY)) || []; } catch { return []; } }
 function saveMaterials(m) { localStorage.setItem(MATERIALS_KEY, JSON.stringify(m)); }
 
-function getSession() {
-    try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch { return null; }
-}
-function setSession(user) { localStorage.setItem(SESSION_KEY, JSON.stringify(user)); }
-function clearSession() { localStorage.removeItem(SESSION_KEY); }
+function getSession()       { try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch { return null; } }
+function setSession(user)   { localStorage.setItem(SESSION_KEY, JSON.stringify(user)); }
+function clearSession()     { localStorage.removeItem(SESSION_KEY); }
 
 let currentUser = getSession();
 
@@ -1101,19 +1138,11 @@ function formatSize(bytes) {
     if (bytes < 1048576) return (bytes/1024).toFixed(1) + ' KB';
     return (bytes/1048576).toFixed(1) + ' MB';
 }
-
-function formatTotalMB(bytes) {
-    return (bytes / 1048576).toFixed(1) + ' MB';
-}
+function formatTotalMB(bytes) { return (bytes / 1048576).toFixed(1) + ' MB'; }
 
 function getFileIcon(filename) {
     const ext = filename.split('.').pop().toLowerCase();
-    const map = {
-        pdf: '📕', doc: '📘', docx: '📘',
-        xls: '📗', xlsx: '📗', ppt: '📙',
-        pptx: '📙', txt: '📄', csv: '📊',
-        md: '📝'
-    };
+    const map = { pdf:'📕', doc:'📘', docx:'📘', xls:'📗', xlsx:'📗', ppt:'📙', pptx:'📙', txt:'📄', csv:'📊', md:'📝' };
     return map[ext] || '📄';
 }
 
@@ -1131,11 +1160,11 @@ function formatDate(ts) {
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
-const authTabs      = document.querySelectorAll('.auth-tab');
-const loginForm     = document.getElementById('loginForm');
-const registerForm  = document.getElementById('registerForm');
-const loginMsg      = document.getElementById('loginMsg');
-const registerMsg   = document.getElementById('registerMsg');
+const authTabs     = document.querySelectorAll('.auth-tab');
+const loginForm    = document.getElementById('loginForm');
+const registerForm = document.getElementById('registerForm');
+const loginMsg     = document.getElementById('loginMsg');
+const registerMsg  = document.getElementById('registerMsg');
 
 authTabs.forEach(tab => {
     tab.addEventListener('click', () => {
@@ -1149,10 +1178,7 @@ authTabs.forEach(tab => {
     });
 });
 
-function showMsg(el, msg, type) {
-    el.textContent = msg;
-    el.className = `auth-msg ${type}`;
-}
+function showMsg(el, msg, type) { el.textContent = msg; el.className = `auth-msg ${type}`; }
 
 document.getElementById('loginSubmit').addEventListener('click', () => {
     const email = document.getElementById('loginEmail').value.trim().toLowerCase();
@@ -1174,11 +1200,9 @@ document.getElementById('registerSubmit').addEventListener('click', () => {
     const pass      = document.getElementById('regPassword').value;
     const confirm   = document.getElementById('regConfirm').value;
 
-    if (!firstName || !lastName || !email || !pass || !confirm) {
-        showMsg(registerMsg, 'Harap isi semua field yang wajib.', 'error'); return;
-    }
-    if (pass.length < 6) { showMsg(registerMsg, 'Password minimal 6 karakter.', 'error'); return; }
-    if (pass !== confirm) { showMsg(registerMsg, 'Password tidak cocok.', 'error'); return; }
+    if (!firstName || !lastName || !email || !pass || !confirm) { showMsg(registerMsg, 'Harap isi semua field yang wajib.', 'error'); return; }
+    if (pass.length < 6)  { showMsg(registerMsg, 'Password minimal 6 karakter.', 'error'); return; }
+    if (pass !== confirm)  { showMsg(registerMsg, 'Password tidak cocok.', 'error'); return; }
 
     const teachers = loadTeachers();
     if (teachers[email]) { showMsg(registerMsg, 'Email sudah terdaftar.', 'error'); return; }
@@ -1192,17 +1216,11 @@ document.getElementById('registerSubmit').addEventListener('click', () => {
     teachers[email] = user;
     saveTeachers(teachers);
     showMsg(registerMsg, 'Akun berhasil dibuat! Silakan masuk.', 'success');
-    setTimeout(() => {
-        authTabs[0].click();
-        document.getElementById('loginEmail').value = email;
-    }, 1500);
+    setTimeout(() => { authTabs[0].click(); document.getElementById('loginEmail').value = email; }, 1500);
 });
 
-// Allow Enter key in login form
 ['loginEmail','loginPassword'].forEach(id => {
-    document.getElementById(id).addEventListener('keydown', e => {
-        if (e.key === 'Enter') document.getElementById('loginSubmit').click();
-    });
+    document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('loginSubmit').click(); });
 });
 
 // ── App Entry ─────────────────────────────────────────────────────────────────
@@ -1220,40 +1238,25 @@ function enterApp() {
     renderMeetings();
 }
 
-document.getElementById('logoutBtn').addEventListener('click', () => {
-    clearSession();
-    currentUser = null;
-    location.reload();
-});
+document.getElementById('logoutBtn').addEventListener('click', () => { clearSession(); currentUser = null; location.reload(); });
 
 // ── Meeting Select ─────────────────────────────────────────────────────────────
 function populateMeetingSelect() {
     const sel = document.getElementById('meetingNum');
     sel.innerHTML = '<option value="">Pilih pertemuan...</option>';
-    for (let i = 1; i <= 16; i++) {
-        sel.innerHTML += `<option value="${i}">Pertemuan ${i}</option>`;
-    }
+    for (let i = 1; i <= 16; i++) sel.innerHTML += `<option value="${i}">Pertemuan ${i}</option>`;
 }
 
 // ── File handling ─────────────────────────────────────────────────────────────
 let selectedFiles = [];
-
-const dropzone   = document.getElementById('dropzone');
-const fileInput  = document.getElementById('fileInput');
+const dropzone    = document.getElementById('dropzone');
+const fileInput   = document.getElementById('fileInput');
 const sfContainer = document.getElementById('selectedFiles');
 
 dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('dragging'); });
 dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragging'));
-dropzone.addEventListener('drop', e => {
-    e.preventDefault();
-    dropzone.classList.remove('dragging');
-    handleFiles(Array.from(e.dataTransfer.files));
-});
-
-fileInput.addEventListener('change', () => {
-    handleFiles(Array.from(fileInput.files));
-    fileInput.value = '';
-});
+dropzone.addEventListener('drop', e => { e.preventDefault(); dropzone.classList.remove('dragging'); handleFiles(Array.from(e.dataTransfer.files)); });
+fileInput.addEventListener('change', () => { handleFiles(Array.from(fileInput.files)); fileInput.value = ''; });
 
 const ALLOWED_EXTS = ['pdf','doc','docx','xls','xlsx','ppt','pptx','txt','csv','md'];
 
@@ -1285,11 +1288,7 @@ function renderSelectedFiles() {
         sfContainer.appendChild(div);
     });
     sfContainer.querySelectorAll('.sf-remove').forEach(btn => {
-        btn.addEventListener('click', () => {
-            selectedFiles.splice(+btn.dataset.idx, 1);
-            renderSelectedFiles();
-            checkUploadReady();
-        });
+        btn.addEventListener('click', () => { selectedFiles.splice(+btn.dataset.idx, 1); renderSelectedFiles(); checkUploadReady(); });
     });
 }
 
@@ -1302,12 +1301,11 @@ function checkUploadReady() {
 document.getElementById('meetingNum').addEventListener('change', checkUploadReady);
 document.getElementById('meetingTopic').addEventListener('input', checkUploadReady);
 
-// ── Upload (simulated with FileReader for local-only demo) ────────────────────
+// ── Upload ────────────────────────────────────────────────────────────────────
 document.getElementById('uploadBtn').addEventListener('click', async () => {
     const meetingNum = document.getElementById('meetingNum').value;
     const topic      = document.getElementById('meetingTopic').value.trim();
     const desc       = document.getElementById('matDesc').value.trim();
-
     if (!meetingNum || !topic || selectedFiles.length === 0) return;
 
     const progressWrap = document.getElementById('progressWrap');
@@ -1326,7 +1324,6 @@ document.getElementById('uploadBtn').addEventListener('click', async () => {
         uploadStatus.textContent = `Memproses ${i + 1}/${selectedFiles.length}: ${file.name}`;
         progressBar.style.width = ((i / selectedFiles.length) * 100) + '%';
 
-        // Read file as base64 for local storage
         const b64 = await new Promise(res => {
             const r = new FileReader();
             r.onload = () => res(r.result);
@@ -1334,32 +1331,25 @@ document.getElementById('uploadBtn').addEventListener('click', async () => {
         });
 
         materials.push({
-            id:          'mat_' + Date.now() + '_' + i,
-            teacherId:   currentUser.id,
+            id: 'mat_' + Date.now() + '_' + i,
+            teacherId: currentUser.id,
             teacherName: currentUser.name,
-            meetingNum:  +meetingNum,
-            topic,
-            desc,
-            filename:    file.name,
-            size:        file.size,
-            dataUrl:     b64,
-            uploadedAt:  Date.now()
+            meetingNum: +meetingNum,
+            topic, desc,
+            filename: file.name,
+            size: file.size,
+            dataUrl: b64,
+            uploadedAt: Date.now()
         });
 
-        // small delay for UX
         await new Promise(r => setTimeout(r, 180));
     }
 
     saveMaterials(materials);
     progressBar.style.width = '100%';
     uploadStatus.textContent = '';
+    setTimeout(() => { progressWrap.classList.remove('active'); progressBar.style.width = '0%'; }, 600);
 
-    setTimeout(() => {
-        progressWrap.classList.remove('active');
-        progressBar.style.width = '0%';
-    }, 600);
-
-    // Reset form
     selectedFiles = [];
     renderSelectedFiles();
     document.getElementById('meetingTopic').value = '';
@@ -1367,7 +1357,6 @@ document.getElementById('uploadBtn').addEventListener('click', async () => {
     document.getElementById('meetingNum').value = '';
     uploadBtn.disabled = true;
 
-    showToast(`${materials.filter(m => m.teacherId === currentUser.id).length > 0 ? selectedFiles.length === 0 ? 'Materi berhasil diunggah!' : '' : 'Materi berhasil diunggah!'}`);
     showToast('Materi berhasil diunggah!');
     refreshStats();
     renderMeetings();
@@ -1376,14 +1365,14 @@ document.getElementById('uploadBtn').addEventListener('click', async () => {
 // ── Stats ─────────────────────────────────────────────────────────────────────
 function refreshStats() {
     const all = loadMaterials().filter(m => m.teacherId === currentUser.id);
-    const meetings = new Set(all.map(m => m.meetingNum)).size;
-    const pdfs = all.filter(m => m.filename.toLowerCase().endsWith('.pdf')).length;
+    const meetings   = new Set(all.map(m => m.meetingNum)).size;
+    const pdfs       = all.filter(m => m.filename.toLowerCase().endsWith('.pdf')).length;
     const totalBytes = all.reduce((s, m) => s + (m.size || 0), 0);
 
     document.getElementById('statMeetings').textContent = meetings;
-    document.getElementById('statFiles').textContent = all.length;
-    document.getElementById('statPDFs').textContent = pdfs;
-    document.getElementById('statSize').textContent = formatTotalMB(totalBytes);
+    document.getElementById('statFiles').textContent    = all.length;
+    document.getElementById('statPDFs').textContent     = pdfs;
+    document.getElementById('statSize').textContent     = formatTotalMB(totalBytes);
 }
 
 // ── Render Meetings ───────────────────────────────────────────────────────────
@@ -1395,7 +1384,6 @@ function renderMeetings() {
 
     let all = loadMaterials().filter(m => m.teacherId === currentUser.id);
 
-    // Apply search
     if (search) {
         all = all.filter(m =>
             m.filename.toLowerCase().includes(search) ||
@@ -1403,11 +1391,8 @@ function renderMeetings() {
             (m.desc && m.desc.toLowerCase().includes(search))
         );
     }
-
-    // Apply meeting filter
     if (filterNum) all = all.filter(m => m.meetingNum === +filterNum);
 
-    // Group by meeting
     const grouped = {};
     all.forEach(m => {
         if (!grouped[m.meetingNum]) grouped[m.meetingNum] = { topic: m.topic, items: [] };
@@ -1416,7 +1401,7 @@ function renderMeetings() {
 
     // Rebuild filter dropdown
     const allMaterials = loadMaterials().filter(m => m.teacherId === currentUser.id);
-    const allMeetings = [...new Set(allMaterials.map(m => m.meetingNum))].sort((a,b) => a-b);
+    const allMeetings  = [...new Set(allMaterials.map(m => m.meetingNum))].sort((a,b) => a-b);
     const filterSel = document.getElementById('filterMeeting');
     const prevVal = filterSel.value;
     filterSel.innerHTML = '<option value="">Semua Pertemuan</option>';
@@ -1439,10 +1424,9 @@ function renderMeetings() {
     container.innerHTML = sortedNums.map(num => {
         const group = grouped[num];
         const items = group.items;
-        const isOpen = items.length > 0;
 
         return `
-        <div class="meeting-group ${isOpen ? 'open' : ''}" data-meeting="${num}">
+        <div class="meeting-group open" data-meeting="${num}">
             <div class="meeting-header">
                 <div class="meeting-num">${num}</div>
                 <div class="meeting-info">
@@ -1482,17 +1466,15 @@ function renderMeetings() {
 
     // Toggle accordion
     container.querySelectorAll('.meeting-header').forEach(header => {
-        header.addEventListener('click', () => {
-            header.closest('.meeting-group').classList.toggle('open');
-        });
+        header.addEventListener('click', () => header.closest('.meeting-group').classList.toggle('open'));
     });
 
-    // Download buttons
+    // Download
     container.querySelectorAll('.download-btn').forEach(btn => {
         btn.addEventListener('click', e => { e.stopPropagation(); downloadMaterial(btn.dataset.id); });
     });
 
-    // Delete buttons
+    // Delete
     container.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', e => { e.stopPropagation(); openDeleteModal(btn.dataset.id); });
     });
@@ -1503,8 +1485,7 @@ function escHtml(str) {
 }
 
 function downloadMaterial(id) {
-    const materials = loadMaterials();
-    const mat = materials.find(m => m.id === id);
+    const mat = loadMaterials().find(m => m.id === id);
     if (!mat || !mat.dataUrl) { showToast('File tidak ditemukan.', 'error'); return; }
     const a = document.createElement('a');
     a.href = mat.dataUrl;
@@ -1514,10 +1495,7 @@ function downloadMaterial(id) {
 }
 
 // ── Delete ────────────────────────────────────────────────────────────────────
-function openDeleteModal(id) {
-    deleteTargetId = id;
-    document.getElementById('deleteModal').classList.add('open');
-}
+function openDeleteModal(id) { deleteTargetId = id; document.getElementById('deleteModal').classList.add('open'); }
 
 document.getElementById('cancelDelete').addEventListener('click', () => {
     document.getElementById('deleteModal').classList.remove('open');
@@ -1526,8 +1504,7 @@ document.getElementById('cancelDelete').addEventListener('click', () => {
 
 document.getElementById('confirmDelete').addEventListener('click', () => {
     if (!deleteTargetId) return;
-    const materials = loadMaterials().filter(m => m.id !== deleteTargetId);
-    saveMaterials(materials);
+    saveMaterials(loadMaterials().filter(m => m.id !== deleteTargetId));
     deleteTargetId = null;
     document.getElementById('deleteModal').classList.remove('open');
     showToast('Materi berhasil dihapus.');
@@ -1540,9 +1517,7 @@ document.getElementById('searchInput').addEventListener('input', renderMeetings)
 document.getElementById('filterMeeting').addEventListener('change', renderMeetings);
 
 // ── Init ──────────────────────────────────────────────────────────────────────
-if (currentUser) {
-    enterApp();
-}
+if (currentUser) enterApp();
 </script>
 </body>
 </html>
