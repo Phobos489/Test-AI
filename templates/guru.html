@@ -88,6 +88,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 .nav-item .ni-label{flex:1}
 .nav-item .ni-badge{font-family:var(--mono);font-size:10px;font-weight:600;padding:1px 7px;border-radius:10px;background:rgba(255,255,255,.08)}
 .nav-profil{color:#9090c0}.nav-profil.active{color:var(--amber);background:var(--amber-bg);border-color:rgba(245,158,11,.25)}
+.nav-akun{color:#9090c0}.nav-akun.active{color:var(--purple);background:var(--purple-bg);border-color:rgba(139,92,246,.25)}
 .nav-kelas{color:#9090c0}.nav-kelas.active{color:var(--cyan);background:var(--cyan-bg);border-color:rgba(6,182,212,.25)}
 .nav-siswa{color:#9090c0}.nav-siswa.active{color:var(--emerald);background:var(--emerald-bg);border-color:rgba(16,185,129,.25)}
 .nav-mapel{color:#9090c0}.nav-mapel.active{color:var(--purple);background:var(--purple-bg);border-color:rgba(139,92,246,.25)}
@@ -97,12 +98,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 .main{flex:1;overflow-y:auto;position:relative}
 
 /* SECTION */
-.section{display:none;min-height:100%;flex-direction:column}
+.section{display:none;height:100%;flex-direction:column}
 .section.active{display:flex}
-.sec-header{padding:28px 32px 22px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;flex-shrink:0}
-.sec-header-left h2{font-family:var(--mono);font-size:22px;font-weight:700;line-height:1.1}
-.sec-header-left p{font-size:13px;color:var(--dim);margin-top:6px}
-.sec-body{flex:1;padding:28px 32px;overflow-y:auto}
+.sec-header{padding:22px 32px 18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;flex-shrink:0}
+.sec-header-left h2{font-family:var(--mono);font-size:20px;font-weight:700;line-height:1.1}
+.sec-header-left p{font-size:13px;color:var(--dim);margin-top:4px}
+.sec-body{flex:1;padding:24px 32px;overflow-y:auto}
 
 /* BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border:none;border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
@@ -124,6 +125,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 .field select{cursor:pointer}.field select option{background:var(--bg3)}
 .field textarea{resize:vertical;min-height:72px}
 .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:currentColor}
+.field input[readonly]{cursor:not-allowed;opacity:.65;background:var(--bg3)}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 
@@ -182,6 +184,15 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 
 @keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ═══ AKUN ═══ */
+#sec-akun .sec-header{border-left:3px solid var(--purple)}
+.akun-tbl-wrap{overflow-y:auto;max-height:calc(100vh - 260px)}
+.akun-role-you{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:20px;font-family:var(--mono);font-size:10px;font-weight:700;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.25);color:var(--purple)}
+.akun-role-other{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:20px;font-family:var(--mono);font-size:10px;background:rgba(96,96,160,.1);border:1px solid rgba(96,96,160,.2);color:var(--dim)}
+.akun-subject-pill{display:inline-flex;padding:3px 10px;border-radius:20px;font-size:11px;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.2);color:var(--orange)}
+.akun-search-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.akun-count{font-family:var(--mono);font-size:12px;color:var(--dim);padding:6px 12px;background:var(--bg3);border-radius:6px;white-space:nowrap}
 
 /* PROFIL */
 #sec-profil .sec-header{border-left:3px solid var(--amber)}
@@ -259,11 +270,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 .jadwal-day-badge{padding:3px 10px;border-radius:6px;font-family:var(--mono);font-size:11px;background:var(--blue-bg);color:var(--blue);border:1px solid rgba(59,130,246,.2);white-space:nowrap}
 .jadwal-date-badge{padding:3px 10px;border-radius:6px;font-family:var(--mono);font-size:11px;background:rgba(139,92,246,.1);color:var(--purple);border:1px solid rgba(139,92,246,.2);white-space:nowrap}
 .jadwal-time-text{font-family:var(--mono);font-size:12px;color:var(--dim);white-space:nowrap}
+.hari-readonly-box{padding:10px 13px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--dim);font-family:var(--sans);font-size:13px;cursor:not-allowed;min-height:40px}
+.hari-readonly-box.filled{color:var(--text);background:rgba(59,130,246,.05);border-color:rgba(59,130,246,.3)}
 
 /* MATERI */
 #sec-materi .sec-header{border-left:3px solid var(--orange)}
 .materi-layout{display:grid;grid-template-columns:300px 1fr;gap:24px;align-items:start}
-.materi-upload-panel{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:22px;position:sticky;top:0}
+.materi-upload-panel{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:22px;position:sticky;top:0;max-height:calc(100vh - 160px);overflow-y:auto}
 .materi-upload-title{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);margin-bottom:16px}
 .drop-zone{border:2px dashed var(--border2);border-radius:10px;padding:24px 16px;text-align:center;cursor:pointer;transition:all .2s;position:relative;margin:12px 0}
 .drop-zone:hover,.drop-zone.drag{border-color:var(--orange);background:var(--orange-bg)}
@@ -295,6 +308,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 .file-dl:hover{color:var(--orange);background:var(--orange-bg)}
 .file-del{background:none;border:none;color:var(--dim);cursor:pointer;font-size:14px;padding:4px;border-radius:5px;transition:all .2s}
 .file-del:hover{color:#f87171;background:rgba(244,63,94,.1)}
+.materi-mapel-tag{display:inline-flex;align-items:center;gap:5px;padding:2px 10px;border-radius:20px;font-size:11px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);color:var(--purple);margin-top:4px}
 
 /* NILAI */
 #sec-nilai .sec-header{border-left:3px solid var(--rose)}
@@ -307,10 +321,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 .nilai-grade.C{background:rgba(245,158,11,.15);color:var(--amber)}
 .nilai-grade.D{background:rgba(244,63,94,.15);color:#f87171}
 .nilai-avg{font-family:var(--mono);font-size:13px;font-weight:700}
-.siswa-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
-.siswa-name-col{display:flex;align-items:center;gap:10px}
-.siswa-name-info .name{font-weight:600;font-size:13px}
-.siswa-name-info .nis{font-family:var(--mono);font-size:10px;color:var(--dim)}
 </style>
 </head>
 <body>
@@ -374,6 +384,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
     <nav class="sidebar">
       <div class="sidebar-label">Akun</div>
       <div class="nav-item nav-profil active" data-sec="profil"><span class="ni-icon">👤</span><span class="ni-label">Profil Guru</span></div>
+      <div class="nav-item nav-akun" data-sec="akun"><span class="ni-icon">🧑</span><span class="ni-label">Daftar Akun</span><span class="ni-badge" id="badge-akun">0</span></div>
       <div class="sidebar-label">Akademik</div>
       <div class="nav-item nav-kelas" data-sec="kelas"><span class="ni-icon">🏫</span><span class="ni-label">Data Kelas</span><span class="ni-badge" id="badge-kelas">0</span></div>
       <div class="nav-item nav-siswa" data-sec="siswa"><span class="ni-icon">👥</span><span class="ni-label">Data Siswa</span><span class="ni-badge" id="badge-siswa">0</span></div>
@@ -386,7 +397,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 
     <div class="main">
 
-      <!-- PROFIL -->
+      <!-- ═══ PROFIL ═══ -->
       <div class="section active" id="sec-profil">
         <div class="sec-header">
           <div class="sec-header-left"><h2 style="color:var(--amber)">Profil Guru</h2><p>Informasi akun dan data diri Anda</p></div>
@@ -424,7 +435,41 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
         </div>
       </div>
 
-      <!-- KELAS -->
+      <!-- ═══ DAFTAR AKUN ═══ -->
+      <div class="section" id="sec-akun">
+        <div class="sec-header">
+          <div class="sec-header-left"><h2 style="color:var(--purple)">Daftar Akun Guru</h2><p>Semua akun guru yang terdaftar di sistem</p></div>
+        </div>
+        <div class="sec-body">
+          <div class="akun-search-row">
+            <div class="searchbar" style="flex:1;max-width:320px">
+              <span>🔍</span>
+              <input type="text" id="akunSearch" placeholder="Cari nama, email, atau mata pelajaran...">
+            </div>
+            <span class="akun-count" id="akunCount">0 akun</span>
+          </div>
+          <div class="panel">
+            <div class="akun-tbl-wrap">
+              <table class="tbl" id="akunTbl">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Nama Guru</th>
+                    <th>Email</th>
+                    <th>NIP</th>
+                    <th>Mata Pelajaran</th>
+                    <th>Bergabung</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="akunBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ KELAS ═══ -->
       <div class="section" id="sec-kelas">
         <div class="sec-header">
           <div class="sec-header-left"><h2 style="color:var(--cyan)">Data Kelas</h2><p>Kelola data kelas dan jurusan</p></div>
@@ -448,7 +493,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
         </div>
       </div>
 
-      <!-- SISWA -->
+      <!-- ═══ SISWA ═══ -->
       <div class="section" id="sec-siswa">
         <div class="sec-header">
           <div class="sec-header-left"><h2 style="color:var(--emerald)">Data Siswa</h2><p>Kelola data siswa berdasarkan kelas</p></div>
@@ -471,7 +516,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
         </div>
       </div>
 
-      <!-- MAPEL -->
+      <!-- ═══ MAPEL ═══ -->
       <div class="section" id="sec-mapel">
         <div class="sec-header">
           <div class="sec-header-left"><h2 style="color:var(--purple)">Mata Pelajaran</h2><p>Kelola daftar mata pelajaran yang diajarkan</p></div>
@@ -480,7 +525,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
         <div class="sec-body"><div class="mapel-grid" id="mapelGrid"></div></div>
       </div>
 
-      <!-- JADWAL -->
+      <!-- ═══ JADWAL ═══ -->
       <div class="section" id="sec-jadwal">
         <div class="sec-header">
           <div class="sec-header-left"><h2 style="color:var(--blue)">Jadwal Pelajaran</h2><p>Atur jadwal mengajar per hari dan pertemuan</p></div>
@@ -495,13 +540,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
               <option>Kamis</option><option>Jumat</option><option>Sabtu</option>
             </select>
             <input type="date" id="jadwalFilterTanggal" title="Filter berdasarkan tanggal" style="color-scheme:dark">
-            <button class="btn btn-ghost btn-sm" id="jadwalFilterReset" title="Reset filter tanggal">✕ Reset Tanggal</button>
+            <button class="btn btn-ghost btn-sm" id="jadwalFilterReset">✕ Reset Tanggal</button>
           </div>
           <div id="jadwalList"></div>
         </div>
       </div>
 
-      <!-- MATERI -->
+      <!-- ═══ MATERI ═══ -->
       <div class="section" id="sec-materi">
         <div class="sec-header">
           <div class="sec-header-left"><h2 style="color:var(--orange)">Materi Pembelajaran</h2><p>Upload dan kelola materi per pertemuan</p></div>
@@ -513,6 +558,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
               <div class="field" style="color:var(--orange)"><label>Judul Materi</label><input type="text" id="matJudul" placeholder="cth: Pengenalan Bilangan Bulat"></div>
               <div style="height:10px"></div>
               <div class="field" style="color:var(--orange)"><label>Kelas</label><select id="matKelas"><option value="">Pilih kelas...</option></select></div>
+              <div style="height:10px"></div>
+              <div class="field" style="color:var(--orange)"><label>Mata Pelajaran</label><select id="matMapel"><option value="">Pilih mata pelajaran...</option></select></div>
               <div style="height:10px"></div>
               <div class="field" style="color:var(--orange)"><label>Pertemuan Ke-</label><select id="matPertemuan"><option value="">Pilih pertemuan...</option></select></div>
               <div style="height:10px"></div>
@@ -526,14 +573,17 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
               <button class="btn btn-orange" style="width:100%" id="matUploadBtn" disabled>⬆ Upload Materi</button>
             </div>
             <div>
-              <div class="field" style="color:var(--orange);margin-bottom:16px"><label>Filter Kelas</label><select id="matFilterKelas"><option value="">Semua Kelas</option></select></div>
+              <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+                <div class="field" style="color:var(--orange);flex:1;min-width:160px"><label>Filter Kelas</label><select id="matFilterKelas"><option value="">Semua Kelas</option></select></div>
+                <div class="field" style="color:var(--orange);flex:1;min-width:160px"><label>Filter Mata Pelajaran</label><select id="matFilterMapel"><option value="">Semua Mapel</option></select></div>
+              </div>
               <div class="materi-accordion" id="materiAccordion"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- NILAI -->
+      <!-- ═══ NILAI ═══ -->
       <div class="section" id="sec-nilai">
         <div class="sec-header">
           <div class="sec-header-left"><h2 style="color:var(--rose)">Nilai Siswa</h2><p>Input dan kelola nilai siswa per mata pelajaran</p></div>
@@ -555,13 +605,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
         </div>
       </div>
 
-    </div>
-  </div>
-</div>
+    </div><!-- /main -->
+  </div><!-- /shell -->
+</div><!-- /app -->
 
-<!-- MODALS -->
-
-<!-- Modal Kelas -->
+<!-- ═══ MODAL: Kelas ═══ -->
 <div class="modal-bg" id="modalKelas">
   <div class="modal">
     <div class="modal-head"><h3 style="color:var(--cyan)">🏫 Tambah / Edit Kelas</h3><button class="modal-close" data-close="modalKelas">✕</button></div>
@@ -572,7 +620,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
         <div class="field" style="color:var(--cyan)"><label>Tingkat Kelas</label><select id="kelasLevel"><option value="">Pilih...</option><option>10</option><option>11</option><option>12</option></select></div>
       </div>
       <div class="field" style="color:var(--cyan)"><label>Jurusan</label><select id="kelasJurusan"><option value="">Pilih jurusan...</option><option value="TKJ">TKJ — Teknik Komputer Jaringan</option><option value="MM">MM — Multimedia</option><option value="TKR">TKR — Teknik Kendaraan Ringan</option><option value="TSM">TSM — Teknik Sepeda Motor</option><option value="AP">AP — Administrasi Perkantoran</option><option value="AK">AK — Akuntansi</option></select></div>
-      <div class="field" style="color:var(--cyan)"><label>Wali Kelas</label><input type="text" id="kelasWali" placeholder="Nama wali kelas"></div>
+      <!-- Wali Kelas: select dari daftar guru terdaftar -->
+      <div class="field" style="color:var(--cyan)"><label>Wali Kelas <span style="font-size:10px;color:var(--dim);text-transform:none">(pilih dari guru terdaftar)</span></label><select id="kelasWali"><option value="">Pilih wali kelas...</option></select></div>
       <div class="field" style="color:var(--cyan)"><label>Tahun Ajaran</label><input type="text" id="kelasTahun" placeholder="2024/2025"></div>
     </div>
     <div class="modal-foot">
@@ -582,7 +631,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
   </div>
 </div>
 
-<!-- Modal Siswa -->
+<!-- ═══ MODAL: Siswa ═══ -->
 <div class="modal-bg" id="modalSiswa">
   <div class="modal modal-wide">
     <div class="modal-head"><h3 style="color:var(--emerald)">👥 Tambah / Edit Siswa</h3><button class="modal-close" data-close="modalSiswa">✕</button></div>
@@ -607,7 +656,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
   </div>
 </div>
 
-<!-- Modal Mapel -->
+<!-- ═══ MODAL: Mapel ═══ -->
 <div class="modal-bg" id="modalMapel">
   <div class="modal">
     <div class="modal-head"><h3 style="color:var(--purple)">📚 Tambah / Edit Mata Pelajaran</h3><button class="modal-close" data-close="modalMapel">✕</button></div>
@@ -615,7 +664,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
       <input type="hidden" id="mapelEditId">
       <div class="grid-2">
         <div class="field" style="color:var(--purple)"><label>Kode Mata Pelajaran</label><input type="text" id="mapelKode" placeholder="cth: MTK-10"></div>
-        <div class="field" style="color:var(--purple)"><label>Nama Mata Pelajaran</label><input type="text" id="mapelNama" placeholder="Matematika"></div>
+        <!-- Nama Mata Pelajaran: select dari mata pelajaran guru terdaftar -->
+        <div class="field" style="color:var(--purple)"><label>Nama Mata Pelajaran <span style="font-size:10px;color:var(--dim);text-transform:none">(dari data guru)</span></label><select id="mapelNama"><option value="">Pilih nama mapel...</option></select></div>
       </div>
       <div class="field" style="color:var(--purple)"><label>Kelas Terkait</label><select id="mapelKelas"><option value="">Pilih kelas (opsional)...</option></select></div>
     </div>
@@ -626,7 +676,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
   </div>
 </div>
 
-<!-- Modal Jadwal — dengan field Tanggal -->
+<!-- ═══ MODAL: Jadwal ═══ -->
 <div class="modal-bg" id="modalJadwal">
   <div class="modal">
     <div class="modal-head"><h3 style="color:var(--blue)">📅 Tambah / Edit Jadwal</h3><button class="modal-close" data-close="modalJadwal">✕</button></div>
@@ -634,20 +684,14 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
       <input type="hidden" id="jadwalEditId">
       <div class="field" style="color:var(--blue)"><label>Mata Pelajaran</label><select id="jadwalMapel"><option value="">Pilih mata pelajaran...</option></select></div>
       <div class="field" style="color:var(--blue)"><label>Kelas &amp; Jurusan</label><select id="jadwalKelas"><option value="">Pilih kelas...</option></select></div>
-
-      <!-- ★ NEW: Tanggal field — auto-fills Hari -->
       <div class="field" style="color:var(--blue)">
-        <label>Tanggal</label>
-        <input type="date" id="jadwalTanggal" style="color-scheme:dark">
+        <label>Tanggal <span style="font-size:10px;color:var(--dim);text-transform:none">(wajib — hari terisi otomatis)</span></label>
+        <input type="date" id="jadwalTanggal" style="color-scheme:dark" required>
       </div>
-
       <div class="field" style="color:var(--blue)">
-        <label>Hari</label>
-        <select id="jadwalHari">
-          <option value="">Pilih hari (atau pilih tanggal di atas)...</option>
-          <option>Senin</option><option>Selasa</option><option>Rabu</option>
-          <option>Kamis</option><option>Jumat</option><option>Sabtu</option>
-        </select>
+        <label>Hari <span style="font-size:10px;color:var(--dim);text-transform:none">(otomatis dari tanggal)</span></label>
+        <div class="hari-readonly-box" id="jadwalHariDisplay">— Pilih tanggal terlebih dahulu —</div>
+        <input type="hidden" id="jadwalHari">
       </div>
       <div class="grid-2">
         <div class="field" style="color:var(--blue)"><label>Jam Mulai</label><input type="time" id="jadwalMulai"></div>
@@ -662,7 +706,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
   </div>
 </div>
 
-<!-- Modal Nilai -->
+<!-- ═══ MODAL: Nilai ═══ -->
 <div class="modal-bg" id="modalNilai">
   <div class="modal modal-wide">
     <div class="modal-head"><h3 style="color:var(--rose)">📊 Input / Edit Nilai Siswa</h3><button class="modal-close" data-close="modalNilai">✕</button></div>
@@ -691,7 +735,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 <div class="toast" id="toast"></div>
 
 <script>
-// ═══════════════ STORAGE ═══════════════
+// ═══════════════════ STORAGE ═══════════════════
 const SK = {
   teachers: 'pEdu_teachers',
   session:  'pEdu_session',
@@ -722,7 +766,7 @@ const saveMaterials = d => save(SK.materials(CU.id), d);
 const saveGrades    = d => save(SK.grades(CU.id), d);
 const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
 
-// ═══════════════ TOAST ═══════════════
+// ═══════════════════ TOAST ═══════════════════
 function toast(msg, type='ok') {
   const el = document.getElementById('toast');
   el.textContent = (type==='ok'?'✓ ':'✕ ') + msg;
@@ -730,7 +774,7 @@ function toast(msg, type='ok') {
   setTimeout(() => el.classList.remove('show'), 3000);
 }
 
-// ═══════════════ AUTH ═══════════════
+// ═══════════════════ AUTH ═══════════════════
 const authTabEls = document.querySelectorAll('.auth-tab');
 authTabEls.forEach(t => t.addEventListener('click', () => {
   authTabEls.forEach(x => x.classList.remove('active'));
@@ -789,7 +833,7 @@ function enterApp() {
   refreshAll();
 }
 
-// ═══════════════ NAVIGATION ═══════════════
+// ═══════════════════ NAVIGATION ═══════════════════
 const navItems = document.querySelectorAll('.nav-item');
 navItems.forEach(item => {
   item.addEventListener('click', () => {
@@ -798,25 +842,28 @@ navItems.forEach(item => {
     const sec = item.dataset.sec;
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     document.getElementById(`sec-${sec}`).classList.add('active');
-    if (sec==='kelas') renderKelas();
-    if (sec==='siswa') renderSiswa();
-    if (sec==='mapel') renderMapel();
+    if (sec==='akun')   renderAkun();
+    if (sec==='kelas')  renderKelas();
+    if (sec==='siswa')  renderSiswa();
+    if (sec==='mapel')  renderMapel();
     if (sec==='jadwal') renderJadwal();
     if (sec==='materi') renderMateri();
-    if (sec==='nilai') renderNilai();
+    if (sec==='nilai')  renderNilai();
     if (sec==='profil') renderProfil();
   });
 });
 
-// ═══════════════ MODALS ═══════════════
+// ═══════════════════ MODALS ═══════════════════
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', () => closeModal(el.dataset.close)));
 document.querySelectorAll('.modal-bg').forEach(bg => bg.addEventListener('click', e => { if (e.target===bg) closeModal(bg.id); }));
 
-// ═══════════════ BADGES ═══════════════
+// ═══════════════════ BADGES ═══════════════════
 function updateBadges() {
   if (!CU) return;
+  const teachers = Object.values(loadO(SK.teachers));
+  document.getElementById('badge-akun').textContent = teachers.length;
   document.getElementById('badge-kelas').textContent = getClasses().length;
   document.getElementById('badge-siswa').textContent = getStudents().length;
   document.getElementById('badge-mapel').textContent = getSubjects().length;
@@ -826,7 +873,7 @@ function updateBadges() {
 }
 function refreshAll() { updateBadges(); renderProfil(); }
 
-// ═══════════════ HELPERS ═══════════════
+// ═══════════════════ HELPERS ═══════════════════
 const JURUSAN_COLORS = { TKJ:'var(--cyan)', MM:'var(--purple)', TKR:'var(--orange)', TSM:'var(--amber)', AP:'var(--emerald)', AK:'var(--rose)' };
 const DAYS_ID = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
 
@@ -862,6 +909,7 @@ function formatBytes(b) {
 function gradeClass(v) { if(v>=85)return'A'; if(v>=70)return'B'; if(v>=55)return'C'; return'D'; }
 function emptyState(icon,text) { return `<div class="empty"><span class="ei">${icon}</span><p>${text}</p></div>`; }
 
+// Populate helpers
 function populateKelasSelect(sel, includeEmpty=true) {
   sel.innerHTML = includeEmpty ? '<option value="">Pilih kelas...</option>' : '';
   getClasses().forEach(c => {
@@ -888,7 +936,37 @@ function populatePertemuanSelect(sel) {
   for(let i=1;i<=16;i++){const o=document.createElement('option');o.value=i;o.textContent=`Pertemuan ${i}`;sel.appendChild(o);}
 }
 
-// ═══════════════ PROFIL ═══════════════
+// Populate wali kelas from registered teachers
+function populateWaliKelasSelect(sel, currentValue) {
+  const teachers = Object.values(loadO(SK.teachers));
+  sel.innerHTML = '<option value="">Pilih wali kelas...</option>';
+  teachers.forEach(t => {
+    const o = document.createElement('option');
+    o.value = t.name;
+    o.textContent = `${t.name}${t.subject && t.subject !== 'Umum' ? ' (' + t.subject + ')' : ''}`;
+    sel.appendChild(o);
+  });
+  if (currentValue) sel.value = currentValue;
+}
+
+// Populate mapel name from teachers' subjects
+function populateMapelNamaSelect(sel, currentValue) {
+  const teachers = Object.values(loadO(SK.teachers));
+  const subjects = [...new Set(
+    teachers.map(t => t.subject).filter(s => s && s.trim() && s !== 'Umum')
+  )].sort();
+  const prev = currentValue || sel.value;
+  sel.innerHTML = '<option value="">Pilih nama mapel...</option>';
+  subjects.forEach(s => {
+    const o = document.createElement('option');
+    o.value = s;
+    o.textContent = s;
+    sel.appendChild(o);
+  });
+  if (prev) sel.value = prev;
+}
+
+// ═══════════════════ PROFIL ═══════════════════
 function renderProfil() {
   document.getElementById('profilHex').textContent = CU.name.charAt(0).toUpperCase();
   document.getElementById('profilName').textContent = CU.name;
@@ -923,15 +1001,77 @@ document.getElementById('profilSaveBtn').addEventListener('click', () => {
   document.getElementById('topAvatar').textContent=CU.name.charAt(0).toUpperCase();
   document.getElementById('topName').textContent=CU.name;
   document.getElementById('editPass').value='';
-  renderProfil(); toast('Profil berhasil disimpan!');
+  renderProfil(); updateBadges(); toast('Profil berhasil disimpan!');
 });
 
-// ═══════════════ KELAS ═══════════════
+// ═══════════════════ DAFTAR AKUN ═══════════════════
+let akunSearchQuery = '';
+
+function renderAkun() {
+  const all = Object.values(loadO(SK.teachers));
+  const q = akunSearchQuery.toLowerCase();
+  const filtered = q
+    ? all.filter(t =>
+        t.name.toLowerCase().includes(q) ||
+        t.email.toLowerCase().includes(q) ||
+        (t.subject||'').toLowerCase().includes(q) ||
+        (t.nip||'').includes(q)
+      )
+    : all;
+
+  document.getElementById('akunCount').textContent = `${filtered.length} akun`;
+  document.getElementById('badge-akun').textContent = all.length;
+
+  const tbody = document.getElementById('akunBody');
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--dim)">${q ? 'Tidak ada hasil untuk pencarian ini' : 'Belum ada akun guru terdaftar'}</td></tr>`;
+    return;
+  }
+
+  // Sort: current user first, then by name
+  const sorted = [...filtered].sort((a, b) => {
+    if (a.id === CU.id) return -1;
+    if (b.id === CU.id) return 1;
+    return a.name.localeCompare(b.name);
+  });
+
+  tbody.innerHTML = sorted.map((t, i) => {
+    const isMe = t.id === CU.id;
+    const joinDate = t.createdAt ? formatDate(t.createdAt) : '—';
+    const subj = t.subject && t.subject !== 'Umum' ? t.subject : null;
+    return `<tr style="${isMe ? 'background:rgba(139,92,246,.04)' : ''}">
+      <td style="font-family:var(--mono);font-size:11px;color:var(--dim)">${i+1}</td>
+      <td>
+        <div class="siswa-name-col">
+          <div class="siswa-avatar" style="background:${avatarColor(t.name)}">${t.name.charAt(0).toUpperCase()}</div>
+          <div class="siswa-name-info">
+            <div class="name">${t.name}</div>
+            <div class="nis">${t.email}</div>
+          </div>
+        </div>
+      </td>
+      <td style="font-size:12px;color:var(--dim)">${t.email}</td>
+      <td style="font-family:var(--mono);font-size:12px;color:var(--dim)">${t.nip||'—'}</td>
+      <td>${subj ? `<span class="akun-subject-pill">${subj}</span>` : '<span style="color:var(--dim);font-size:12px">—</span>'}</td>
+      <td style="font-size:12px;color:var(--dim);white-space:nowrap">${joinDate}</td>
+      <td>${isMe ? '<span class="akun-role-you">● Anda</span>' : '<span class="akun-role-other">Guru</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+
+document.getElementById('akunSearch').addEventListener('input', function() {
+  akunSearchQuery = this.value.trim();
+  renderAkun();
+});
+
+// ═══════════════════ KELAS ═══════════════════
 document.getElementById('openAddKelas').addEventListener('click', () => {
   document.getElementById('kelasEditId').value='';
-  ['kelasKode','kelasWali','kelasTahun'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('kelasKode').value='';
+  document.getElementById('kelasTahun').value='';
   document.getElementById('kelasLevel').value='';
   document.getElementById('kelasJurusan').value='';
+  populateWaliKelasSelect(document.getElementById('kelasWali'));
   openModal('modalKelas');
 });
 document.getElementById('kelasSubmit').addEventListener('click', () => {
@@ -939,7 +1079,7 @@ document.getElementById('kelasSubmit').addEventListener('click', () => {
   const kode=document.getElementById('kelasKode').value.trim();
   const level=document.getElementById('kelasLevel').value;
   const jurusan=document.getElementById('kelasJurusan').value;
-  const wali=document.getElementById('kelasWali').value.trim();
+  const wali=document.getElementById('kelasWali').value;
   const tahun=document.getElementById('kelasTahun').value.trim();
   if(!kode||!level||!jurusan||!wali||!tahun){toast('Semua field wajib diisi!','err');return;}
   const classes=getClasses();
@@ -967,8 +1107,8 @@ function editKelas(id) {
   document.getElementById('kelasKode').value=c.kodeKelas;
   document.getElementById('kelasLevel').value=c.kelas;
   document.getElementById('kelasJurusan').value=c.jurusan;
-  document.getElementById('kelasWali').value=c.waliKelas;
   document.getElementById('kelasTahun').value=c.tahunAjar;
+  populateWaliKelasSelect(document.getElementById('kelasWali'), c.waliKelas);
   openModal('modalKelas');
 }
 function deleteKelas(id) {
@@ -976,7 +1116,7 @@ function deleteKelas(id) {
   saveClasses(getClasses().filter(c=>c.id!==id));renderKelas();updateBadges();toast('Kelas dihapus.');
 }
 
-// ═══════════════ SISWA ═══════════════
+// ═══════════════════ SISWA ═══════════════════
 document.getElementById('openAddSiswa').addEventListener('click', () => {
   document.getElementById('siswaEditId').value='';
   ['siswaNis','siswaNama','siswaEmail','siswaTelp','siswaTinggal','siswaTglLahir'].forEach(id=>document.getElementById(id).value='');
@@ -1048,18 +1188,18 @@ function deleteSiswa(id) {
 document.getElementById('siswaSearch').addEventListener('input',renderSiswa);
 document.getElementById('siswaFilterKelas').addEventListener('change',renderSiswa);
 
-// ═══════════════ MAPEL ═══════════════
+// ═══════════════════ MAPEL ═══════════════════
 document.getElementById('openAddMapel').addEventListener('click', () => {
   document.getElementById('mapelEditId').value='';
   document.getElementById('mapelKode').value='';
-  document.getElementById('mapelNama').value='';
+  populateMapelNamaSelect(document.getElementById('mapelNama'));
   populateKelasSelect(document.getElementById('mapelKelas'),true);
   openModal('modalMapel');
 });
 document.getElementById('mapelSubmit').addEventListener('click', () => {
   const id=document.getElementById('mapelEditId').value;
   const kode=document.getElementById('mapelKode').value.trim();
-  const nama=document.getElementById('mapelNama').value.trim();
+  const nama=document.getElementById('mapelNama').value;
   const kelasId=document.getElementById('mapelKelas').value;
   if(!kode||!nama){toast('Kode dan nama mapel wajib diisi!','err');return;}
   const subjects=getSubjects();
@@ -1087,7 +1227,7 @@ function editMapel(id) {
   const s=getSubjects().find(x=>x.id===id); if(!s)return;
   document.getElementById('mapelEditId').value=s.id;
   document.getElementById('mapelKode').value=s.kodeMapel;
-  document.getElementById('mapelNama').value=s.mataPelajaran;
+  populateMapelNamaSelect(document.getElementById('mapelNama'), s.mataPelajaran);
   populateKelasSelect(document.getElementById('mapelKelas'),true);
   document.getElementById('mapelKelas').value=s.kelasId||'';
   openModal('modalMapel');
@@ -1097,30 +1237,45 @@ function deleteMapel(id) {
   saveSubjects(getSubjects().filter(s=>s.id!==id));renderMapel();updateBadges();toast('Mata pelajaran dihapus.');
 }
 
-// ═══════════════ JADWAL ═══════════════
-// Auto-fill Hari from Tanggal
-document.getElementById('jadwalTanggal').addEventListener('change', function() {
-  const val = this.value;
-  if (!val) return;
-  const dt = new Date(val + 'T00:00:00');
-  if (isNaN(dt)) return;
-  const dayIdx = dt.getDay(); // 0=Minggu, 1=Senin, ...
-  const hariSelect = document.getElementById('jadwalHari');
-  if (dayIdx === 0) {
-    // Minggu — not in list, clear selection
-    hariSelect.value = '';
-    toast('Minggu tidak tersedia dalam daftar hari. Pilih hari manual.','err');
-  } else {
-    hariSelect.value = DAYS_ID[dayIdx];
+// ═══════════════════ JADWAL ═══════════════════
+// Auto-fill Hari from Tanggal (readonly display)
+function updateHariFromTanggal(val) {
+  const display = document.getElementById('jadwalHariDisplay');
+  const hidden  = document.getElementById('jadwalHari');
+  if (!val) {
+    display.textContent = '— Pilih tanggal terlebih dahulu —';
+    display.classList.remove('filled');
+    hidden.value = '';
+    return;
   }
+  const dt = new Date(val + 'T00:00:00');
+  if (isNaN(dt)) { hidden.value = ''; return; }
+  const dayIdx = dt.getDay(); // 0=Minggu
+  if (dayIdx === 0) {
+    display.textContent = '⚠ Minggu — tidak tersedia sebagai hari ajar';
+    display.classList.add('filled');
+    display.style.color = 'var(--rose)';
+    hidden.value = '';
+    toast('Hari Minggu tidak tersedia sebagai hari ajar.','err');
+  } else {
+    const hariName = DAYS_ID[dayIdx];
+    display.textContent = `📅 ${hariName}`;
+    display.classList.add('filled');
+    display.style.color = '';
+    hidden.value = hariName;
+  }
+}
+
+document.getElementById('jadwalTanggal').addEventListener('change', function() {
+  updateHariFromTanggal(this.value);
 });
 
 document.getElementById('openAddJadwal').addEventListener('click', () => {
   document.getElementById('jadwalEditId').value='';
-  document.getElementById('jadwalHari').value='';
   document.getElementById('jadwalMulai').value='';
   document.getElementById('jadwalSelesai').value='';
   document.getElementById('jadwalTanggal').value='';
+  updateHariFromTanggal('');
   populateMapelSelect(document.getElementById('jadwalMapel'));
   populateKelasSelect(document.getElementById('jadwalKelas'));
   populatePertemuanSelect(document.getElementById('jadwalPertemuan'));
@@ -1131,14 +1286,14 @@ document.getElementById('jadwalSubmit').addEventListener('click', () => {
   const id       = document.getElementById('jadwalEditId').value;
   const mapelId  = document.getElementById('jadwalMapel').value;
   const kelasId  = document.getElementById('jadwalKelas').value;
-  const tanggal  = document.getElementById('jadwalTanggal').value;  // ★ NEW
+  const tanggal  = document.getElementById('jadwalTanggal').value;
   const hari     = document.getElementById('jadwalHari').value;
   const mulai    = document.getElementById('jadwalMulai').value;
   const selesai  = document.getElementById('jadwalSelesai').value;
   const pertemuan= document.getElementById('jadwalPertemuan').value;
-  if(!mapelId||!kelasId||!hari||!mulai||!selesai||!pertemuan){toast('Semua field wajib diisi!','err');return;}
+  if(!mapelId||!kelasId||!tanggal||!hari||!mulai||!selesai||!pertemuan){toast('Semua field wajib diisi! Pastikan tanggal valid (bukan hari Minggu).','err');return;}
   const schedules=getSchedules();
-  const entry={mapelId,kelasId,tanggal:tanggal||null,hari,jamMulai:mulai,jamSelesai:selesai,pertemuan:+pertemuan};
+  const entry={mapelId,kelasId,tanggal,hari,jamMulai:mulai,jamSelesai:selesai,pertemuan:+pertemuan};
   if(id){const idx=schedules.findIndex(s=>s.id===id);if(idx>=0)schedules[idx]={...schedules[idx],...entry};}
   else schedules.push({id:uid(),...entry});
   saveSchedules(schedules);closeModal('modalJadwal');renderJadwal();updateBadges();toast('Jadwal berhasil disimpan!');
@@ -1147,46 +1302,36 @@ document.getElementById('jadwalSubmit').addEventListener('click', () => {
 function renderJadwal() {
   const filterK=document.getElementById('jadwalFilterKelas').value;
   const filterH=document.getElementById('jadwalFilterHari').value;
-  const filterT=document.getElementById('jadwalFilterTanggal').value; // ★ NEW
+  const filterT=document.getElementById('jadwalFilterTanggal').value;
   const classes=getClasses();
   const subjects=getSubjects();
-
-  // Rebuild kelas filter
   const jfk=document.getElementById('jadwalFilterKelas');
   const prevK=jfk.value;
   jfk.innerHTML='<option value="">Semua Kelas</option>';
   classes.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=`${c.kelas} ${c.jurusan} — ${c.kodeKelas}`;jfk.appendChild(o);});
   jfk.value=prevK;
-
   let schedules=getSchedules();
   if(filterK) schedules=schedules.filter(s=>s.kelasId===filterK);
   if(filterH) schedules=schedules.filter(s=>s.hari===filterH);
-  if(filterT) schedules=schedules.filter(s=>s.tanggal===filterT); // ★ NEW exact date match
-
+  if(filterT) schedules=schedules.filter(s=>s.tanggal===filterT);
   const container=document.getElementById('jadwalList');
   if(!schedules.length){container.innerHTML=emptyState('📅','Belum ada jadwal pelajaran');return;}
-
   const DAYS=['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
   const dayColor=['var(--blue)','var(--purple)','var(--emerald)','var(--amber)','var(--rose)','var(--cyan)'];
-
-  // Sort by tanggal (if available) then by hari
   schedules.sort((a,b)=>{
     if(a.tanggal&&b.tanggal) return a.tanggal.localeCompare(b.tanggal);
     if(a.tanggal&&!b.tanggal) return -1;
     if(!a.tanggal&&b.tanggal) return 1;
     return DAYS.indexOf(a.hari)-DAYS.indexOf(b.hari);
   });
-
-  // Group by tanggal then hari
   const grouped = {};
   schedules.forEach(sch=>{
     const key = sch.tanggal ? `date_${sch.tanggal}` : `day_${sch.hari}`;
     if(!grouped[key]) grouped[key]={type:sch.tanggal?'date':'day', label:sch.tanggal?sch.tanggal:sch.hari, items:[]};
     grouped[key].items.push(sch);
   });
-
   container.innerHTML = Object.values(grouped).map(group=>{
-    const di = DAYS.indexOf(group.type==='date' ? (group.items[0]?.hari||'') : group.label);
+    const di = DAYS.indexOf(group.items[0]?.hari||'');
     const color = dayColor[di>=0?di:0]||'var(--blue)';
     const headLabel = group.type==='date'
       ? `📅 ${formatDateShort(group.label)||group.label} <span style="font-size:10px;opacity:.7">(${group.items[0]?.hari||''})</span>`
@@ -1219,12 +1364,11 @@ function renderJadwal() {
     </div>`;
   }).join('');
 }
-
 function editJadwal(id) {
   const s=getSchedules().find(x=>x.id===id); if(!s)return;
   document.getElementById('jadwalEditId').value=s.id;
-  document.getElementById('jadwalTanggal').value=s.tanggal||''; // ★ NEW
-  document.getElementById('jadwalHari').value=s.hari;
+  document.getElementById('jadwalTanggal').value=s.tanggal||'';
+  updateHariFromTanggal(s.tanggal||'');
   document.getElementById('jadwalMulai').value=s.jamMulai;
   document.getElementById('jadwalSelesai').value=s.jamSelesai;
   populateMapelSelect(document.getElementById('jadwalMapel'));
@@ -1239,16 +1383,14 @@ function deleteJadwal(id) {
   if(!confirm('Hapus jadwal ini?'))return;
   saveSchedules(getSchedules().filter(s=>s.id!==id));renderJadwal();updateBadges();toast('Jadwal dihapus.');
 }
-
 document.getElementById('jadwalFilterKelas').addEventListener('change',renderJadwal);
 document.getElementById('jadwalFilterHari').addEventListener('change',renderJadwal);
-document.getElementById('jadwalFilterTanggal').addEventListener('change',renderJadwal); // ★ NEW
-document.getElementById('jadwalFilterReset').addEventListener('click',()=>{ // ★ NEW
-  document.getElementById('jadwalFilterTanggal').value='';
-  renderJadwal();
+document.getElementById('jadwalFilterTanggal').addEventListener('change',renderJadwal);
+document.getElementById('jadwalFilterReset').addEventListener('click',()=>{
+  document.getElementById('jadwalFilterTanggal').value='';renderJadwal();
 });
 
-// ═══════════════ MATERI ═══════════════
+// ═══════════════════ MATERI ═══════════════════
 let matSelectedFiles=[];
 const matDropzone=document.getElementById('matDropzone');
 const matFileInput=document.getElementById('matFile');
@@ -1268,43 +1410,79 @@ function removeMatFile(i){matSelectedFiles.splice(i,1);renderMatFileChips();chec
 function checkMatReady(){
   document.getElementById('matUploadBtn').disabled=!(matSelectedFiles.length&&document.getElementById('matJudul').value.trim()&&document.getElementById('matKelas').value&&document.getElementById('matPertemuan').value);
 }
-['matJudul','matKelas','matPertemuan'].forEach(id=>{document.getElementById(id).addEventListener('input',checkMatReady);document.getElementById(id).addEventListener('change',checkMatReady);});
+['matJudul','matKelas','matPertemuan','matMapel'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(el){ el.addEventListener('input',checkMatReady); el.addEventListener('change',checkMatReady); }
+});
+
 document.getElementById('matUploadBtn').addEventListener('click',async()=>{
   const judul=document.getElementById('matJudul').value.trim();
   const kelasId=document.getElementById('matKelas').value;
+  const mapelId=document.getElementById('matMapel').value||null;
   const pertemuan=+document.getElementById('matPertemuan').value;
   const desc=document.getElementById('matDesc').value.trim();
   if(!judul||!kelasId||!pertemuan||!matSelectedFiles.length)return;
   const btn=document.getElementById('matUploadBtn');btn.disabled=true;btn.textContent='⏳ Memproses...';
   const materials=getMaterials();
   let entry=materials.find(m=>m.kelasId===kelasId&&m.pertemuan===pertemuan&&m.judul===judul);
-  if(!entry){entry={id:uid(),judul,kelasId,pertemuan,desc,files:[],uploadedAt:Date.now()};materials.push(entry);}
-  else entry.desc=desc;
+  if(!entry){entry={id:uid(),judul,kelasId,mapelId,pertemuan,desc,files:[],uploadedAt:Date.now()};materials.push(entry);}
+  else{entry.desc=desc; entry.mapelId=mapelId;}
   for(const f of matSelectedFiles){const b64=await new Promise(res=>{const r=new FileReader();r.onload=()=>res(r.result);r.readAsDataURL(f);});entry.files.push({name:f.name,size:f.size,dataUrl:b64});}
   saveMaterials(materials);matSelectedFiles=[];renderMatFileChips();
-  document.getElementById('matJudul').value='';document.getElementById('matDesc').value='';document.getElementById('matKelas').value='';document.getElementById('matPertemuan').value='';
+  ['matJudul','matDesc','matKelas','matPertemuan','matMapel'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   btn.textContent='⬆ Upload Materi';renderMateri();updateBadges();toast('Materi berhasil diunggah!');
 });
+
+function populateMateriMapelSelect(sel, currentValue) {
+  const prev = currentValue !== undefined ? currentValue : sel.value;
+  sel.innerHTML = '<option value="">Pilih mata pelajaran...</option>';
+  getSubjects().forEach(s => {
+    const o=document.createElement('option');
+    o.value=s.id;
+    o.textContent=`[${s.kodeMapel}] ${s.mataPelajaran}`;
+    sel.appendChild(o);
+  });
+  if (prev) sel.value = prev;
+}
+
 function renderMateri(){
-  const classes=getClasses();
+  const classes=getClasses(); const subjects=getSubjects();
   populateKelasSelect(document.getElementById('matKelas'));
   populatePertemuanSelect(document.getElementById('matPertemuan'));
+  populateMateriMapelSelect(document.getElementById('matMapel'));
+
+  // Filter Kelas
   const mfk=document.getElementById('matFilterKelas');const prevK=mfk.value;
   mfk.innerHTML='<option value="">Semua Kelas</option>';
   classes.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=`${c.kelas} ${c.jurusan} — ${c.kodeKelas}`;mfk.appendChild(o);});
   mfk.value=prevK;
+
+  // Filter Mapel
+  const mfm=document.getElementById('matFilterMapel');const prevM=mfm.value;
+  mfm.innerHTML='<option value="">Semua Mapel</option>';
+  subjects.forEach(s=>{const o=document.createElement('option');o.value=s.id;o.textContent=s.mataPelajaran;mfm.appendChild(o);});
+  mfm.value=prevM;
+
   const filterK=mfk.value;
-  let materials=getMaterials();if(filterK)materials=materials.filter(m=>m.kelasId===filterK);
+  const filterM=mfm.value;
+  let materials=getMaterials();
+  if(filterK) materials=materials.filter(m=>m.kelasId===filterK);
+  if(filterM) materials=materials.filter(m=>m.mapelId===filterM);
+
   const accordion=document.getElementById('materiAccordion');
   if(!materials.length){accordion.innerHTML=emptyState('📁','Belum ada materi diunggah');return;}
   materials.sort((a,b)=>a.pertemuan-b.pertemuan);
   accordion.innerHTML=materials.map(m=>{
     const cls=classes.find(c=>c.id===m.kelasId);
+    const mapel=subjects.find(s=>s.id===m.mapelId);
     return `<div class="materi-group open" id="mg_${m.id}">
       <div class="materi-group-header" onclick="toggleMatGroup('${m.id}')">
         <div class="materi-group-num">P${m.pertemuan}</div>
-        <div class="materi-group-info"><div class="materi-group-title">${m.judul}</div>
-          <div class="materi-group-meta">${cls?`${cls.kelas} ${cls.jurusan} — ${cls.kodeKelas}`:'—'} · ${(m.files||[]).length} file · ${formatDate(m.uploadedAt)}</div></div>
+        <div class="materi-group-info">
+          <div class="materi-group-title">${m.judul}</div>
+          <div class="materi-group-meta">${cls?`${cls.kelas} ${cls.jurusan} — ${cls.kodeKelas}`:'—'} · ${(m.files||[]).length} file · ${formatDate(m.uploadedAt)}</div>
+          ${mapel?`<div class="materi-mapel-tag">📚 ${mapel.mataPelajaran}</div>`:''}
+        </div>
         <button class="icon-btn del btn-sm" style="opacity:1" onclick="event.stopPropagation();deleteMateri('${m.id}')">🗑</button>
         <span class="materi-group-toggle">▾</span>
       </div>
@@ -1314,7 +1492,8 @@ function renderMateri(){
           <div class="file-info"><div class="file-name" title="${f.name}">${f.name}</div><div class="file-size">${formatBytes(f.size)}</div></div>
           <button class="file-dl" onclick="downloadFile('${m.id}',${fi})" title="Unduh">⬇</button>
           <button class="file-del" onclick="deleteFile('${m.id}',${fi})" title="Hapus">🗑</button></div>`).join('')}
-      </div></div>`;
+      </div>
+    </div>`;
   }).join('');
 }
 function toggleMatGroup(id){document.getElementById('mg_'+id).classList.toggle('open');}
@@ -1330,8 +1509,9 @@ function deleteMateri(id){
   saveMaterials(getMaterials().filter(m=>m.id!==id));renderMateri();updateBadges();toast('Materi dihapus.');
 }
 document.getElementById('matFilterKelas').addEventListener('change',renderMateri);
+document.getElementById('matFilterMapel').addEventListener('change',renderMateri);
 
-// ═══════════════ NILAI ═══════════════
+// ═══════════════════ NILAI ═══════════════════
 document.getElementById('openAddNilai').addEventListener('click',()=>{
   document.getElementById('nilaiEditId').value='';
   ['nilaiTugas','nilaiUH','nilaiUTS','nilaiUAS','nilaiKeaktifan'].forEach(id=>document.getElementById(id).value='');
@@ -1411,7 +1591,7 @@ function deleteNilai(id){
 document.getElementById('nilaiFilterMapel').addEventListener('change',renderNilai);
 document.getElementById('nilaiFilterKelas').addEventListener('change',renderNilai);
 
-// ═══════════════ INIT ═══════════════
+// ═══════════════════ INIT ═══════════════════
 const session=load(SK.session);
 if(session){
   const teachers=loadO(SK.teachers);
