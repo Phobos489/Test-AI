@@ -187,11 +187,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 
 /* ═══ AKUN ═══ */
 #sec-akun .sec-header{border-left:3px solid var(--purple)}
-.akun-tbl-wrap{overflow-y:auto;max-height:calc(100vh - 260px)}
+/* Fix: sec-body for akun should stack its children, panel handles its own scroll */
+#sec-akun .sec-body{display:flex;flex-direction:column;}
+.akun-tbl-wrap{overflow-x:auto;}
 .akun-role-you{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:20px;font-family:var(--mono);font-size:10px;font-weight:700;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.25);color:var(--purple)}
 .akun-role-other{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:20px;font-family:var(--mono);font-size:10px;background:rgba(96,96,160,.1);border:1px solid rgba(96,96,160,.2);color:var(--dim)}
 .akun-subject-pill{display:inline-flex;padding:3px 10px;border-radius:20px;font-size:11px;background:rgba(249,115,22,.1);border:1px solid rgba(249,115,22,.2);color:var(--orange)}
-.akun-search-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.akun-search-row{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;flex-shrink:0}
 .akun-count{font-family:var(--mono);font-size:12px;color:var(--dim);padding:6px 12px;background:var(--bg3);border-radius:6px;white-space:nowrap}
 
 /* PROFIL */
@@ -384,7 +386,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
     <nav class="sidebar">
       <div class="sidebar-label">Akun</div>
       <div class="nav-item nav-profil active" data-sec="profil"><span class="ni-icon">👤</span><span class="ni-label">Profil Guru</span></div>
-      <div class="nav-item nav-akun" data-sec="akun"><span class="ni-icon">🧑</span><span class="ni-label">Daftar Akun</span><span class="ni-badge" id="badge-akun">0</span></div>
+      <div class="nav-item nav-akun" data-sec="akun"><span class="ni-icon">🧑</span><span class="ni-label">Daftar Guru</span><span class="ni-badge" id="badge-akun">0</span></div>
       <div class="sidebar-label">Akademik</div>
       <div class="nav-item nav-kelas" data-sec="kelas"><span class="ni-icon">🏫</span><span class="ni-label">Data Kelas</span><span class="ni-badge" id="badge-kelas">0</span></div>
       <div class="nav-item nav-siswa" data-sec="siswa"><span class="ni-icon">👥</span><span class="ni-label">Data Siswa</span><span class="ni-badge" id="badge-siswa">0</span></div>
@@ -435,10 +437,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
         </div>
       </div>
 
-      <!-- ═══ DAFTAR AKUN ═══ -->
+      <!-- ═══ DAFTAR GURU ═══ -->
       <div class="section" id="sec-akun">
         <div class="sec-header">
-          <div class="sec-header-left"><h2 style="color:var(--purple)">Daftar Akun Guru</h2><p>Semua akun guru yang terdaftar di sistem</p></div>
+          <div class="sec-header-left"><h2 style="color:var(--purple)">Daftar Guru</h2><p>Semua guru yang terdaftar di sistem</p></div>
         </div>
         <div class="sec-body">
           <div class="akun-search-row">
@@ -448,8 +450,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
             </div>
             <span class="akun-count" id="akunCount">0 akun</span>
           </div>
-          <div class="panel">
-            <div class="akun-tbl-wrap">
+          <div class="panel" style="flex:1;overflow:hidden;display:flex;flex-direction:column;">
+            <div class="akun-tbl-wrap" style="flex:1;overflow-y:auto;">
               <table class="tbl" id="akunTbl">
                 <thead>
                   <tr>
@@ -460,6 +462,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
                     <th>Mata Pelajaran</th>
                     <th>Bergabung</th>
                     <th>Status</th>
+                    <th>Aksi</th>
                   </tr>
                 </thead>
                 <tbody id="akunBody"></tbody>
@@ -620,7 +623,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
         <div class="field" style="color:var(--cyan)"><label>Tingkat Kelas</label><select id="kelasLevel"><option value="">Pilih...</option><option>10</option><option>11</option><option>12</option></select></div>
       </div>
       <div class="field" style="color:var(--cyan)"><label>Jurusan</label><select id="kelasJurusan"><option value="">Pilih jurusan...</option><option value="TKJ">TKJ — Teknik Komputer Jaringan</option><option value="MM">MM — Multimedia</option><option value="TKR">TKR — Teknik Kendaraan Ringan</option><option value="TSM">TSM — Teknik Sepeda Motor</option><option value="AP">AP — Administrasi Perkantoran</option><option value="AK">AK — Akuntansi</option></select></div>
-      <!-- Wali Kelas: select dari daftar guru terdaftar -->
       <div class="field" style="color:var(--cyan)"><label>Wali Kelas <span style="font-size:10px;color:var(--dim);text-transform:none">(pilih dari guru terdaftar)</span></label><select id="kelasWali"><option value="">Pilih wali kelas...</option></select></div>
       <div class="field" style="color:var(--cyan)"><label>Tahun Ajaran</label><input type="text" id="kelasTahun" placeholder="2024/2025"></div>
     </div>
@@ -664,8 +666,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
       <input type="hidden" id="mapelEditId">
       <div class="grid-2">
         <div class="field" style="color:var(--purple)"><label>Kode Mata Pelajaran</label><input type="text" id="mapelKode" placeholder="cth: MTK-10"></div>
-        <!-- Nama Mata Pelajaran: select dari mata pelajaran guru terdaftar -->
-        <div class="field" style="color:var(--purple)"><label>Nama Mata Pelajaran <span style="font-size:10px;color:var(--dim);text-transform:none">(dari data guru)</span></label><select id="mapelNama"><option value="">Pilih nama mapel...</option></select></div>
+        <div class="field" style="color:var(--purple)"><label>Nama Mata Pelajaran</label><select id="mapelNama"><option value="">Pilih nama mapel...</option></select></div>
       </div>
       <div class="field" style="color:var(--purple)"><label>Kelas Terkait</label><select id="mapelKelas"><option value="">Pilih kelas (opsional)...</option></select></div>
     </div>
@@ -728,6 +729,27 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
     <div class="modal-foot">
       <button class="btn btn-ghost" data-close="modalNilai">Batal</button>
       <button class="btn btn-rose" id="nilaiSubmit">Simpan Nilai</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Konfirmasi Hapus Akun ═══ -->
+<div class="modal-bg" id="modalHapusAkun">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-head"><h3 style="color:var(--rose)">🗑 Hapus Akun Guru</h3><button class="modal-close" data-close="modalHapusAkun">✕</button></div>
+    <div class="modal-body">
+      <div style="text-align:center;padding:8px 0">
+        <div style="font-size:48px;margin-bottom:16px;opacity:.7">⚠️</div>
+        <div style="font-weight:600;font-size:15px;margin-bottom:8px" id="hapusAkunNama">—</div>
+        <div style="font-size:13px;color:var(--dim)" id="hapusAkunEmail">—</div>
+        <div style="margin-top:16px;padding:12px 16px;background:rgba(244,63,94,.06);border:1px solid rgba(244,63,94,.2);border-radius:8px;font-size:13px;color:#f87171;line-height:1.6">
+          Tindakan ini akan menghapus akun guru secara permanen.<br>Data kelas, siswa, jadwal, dan materi yang dibuat oleh guru ini <strong>tidak</strong> akan ikut terhapus.
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close="modalHapusAkun">Batal</button>
+      <button class="btn btn-rose" id="hapusAkunConfirm">🗑 Hapus Akun</button>
     </div>
   </div>
 </div>
@@ -935,8 +957,6 @@ function populatePertemuanSelect(sel) {
   sel.innerHTML='<option value="">Pilih pertemuan...</option>';
   for(let i=1;i<=16;i++){const o=document.createElement('option');o.value=i;o.textContent=`Pertemuan ${i}`;sel.appendChild(o);}
 }
-
-// Populate wali kelas from registered teachers
 function populateWaliKelasSelect(sel, currentValue) {
   const teachers = Object.values(loadO(SK.teachers));
   sel.innerHTML = '<option value="">Pilih wali kelas...</option>';
@@ -948,8 +968,6 @@ function populateWaliKelasSelect(sel, currentValue) {
   });
   if (currentValue) sel.value = currentValue;
 }
-
-// Populate mapel name from teachers' subjects
 function populateMapelNamaSelect(sel, currentValue) {
   const teachers = Object.values(loadO(SK.teachers));
   const subjects = [...new Set(
@@ -1004,8 +1022,9 @@ document.getElementById('profilSaveBtn').addEventListener('click', () => {
   renderProfil(); updateBadges(); toast('Profil berhasil disimpan!');
 });
 
-// ═══════════════════ DAFTAR AKUN ═══════════════════
+// ═══════════════════ DAFTAR GURU ═══════════════════
 let akunSearchQuery = '';
+let akunToDelete = null;
 
 function renderAkun() {
   const all = Object.values(loadO(SK.teachers));
@@ -1024,11 +1043,10 @@ function renderAkun() {
 
   const tbody = document.getElementById('akunBody');
   if (!filtered.length) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--dim)">${q ? 'Tidak ada hasil untuk pencarian ini' : 'Belum ada akun guru terdaftar'}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--dim)">${q ? 'Tidak ada hasil untuk pencarian ini' : 'Belum ada akun guru terdaftar'}</td></tr>`;
     return;
   }
 
-  // Sort: current user first, then by name
   const sorted = [...filtered].sort((a, b) => {
     if (a.id === CU.id) return -1;
     if (b.id === CU.id) return 1;
@@ -1055,12 +1073,43 @@ function renderAkun() {
       <td>${subj ? `<span class="akun-subject-pill">${subj}</span>` : '<span style="color:var(--dim);font-size:12px">—</span>'}</td>
       <td style="font-size:12px;color:var(--dim);white-space:nowrap">${joinDate}</td>
       <td>${isMe ? '<span class="akun-role-you">● Anda</span>' : '<span class="akun-role-other">Guru</span>'}</td>
+      <td>
+        ${!isMe
+          ? `<button class="btn btn-danger btn-sm" onclick="confirmHapusAkun('${t.email}')">🗑 Hapus</button>`
+          : '<span style="color:var(--dim);font-size:11px;font-family:var(--mono)">—</span>'
+        }
+      </td>
     </tr>`;
   }).join('');
 }
 
 document.getElementById('akunSearch').addEventListener('input', function() {
   akunSearchQuery = this.value.trim();
+  renderAkun();
+});
+
+// ── Hapus Akun ────────────────────────────────────────────────────────────────
+function confirmHapusAkun(email) {
+  const teachers = loadO(SK.teachers);
+  const teacher = teachers[email];
+  if (!teacher) { toast('Akun tidak ditemukan.', 'err'); return; }
+  if (email === CU.email) { toast('Tidak dapat menghapus akun sendiri!', 'err'); return; }
+  akunToDelete = email;
+  document.getElementById('hapusAkunNama').textContent = teacher.name;
+  document.getElementById('hapusAkunEmail').textContent = teacher.email;
+  openModal('modalHapusAkun');
+}
+
+document.getElementById('hapusAkunConfirm').addEventListener('click', () => {
+  if (!akunToDelete) return;
+  const teachers = loadO(SK.teachers);
+  const name = teachers[akunToDelete]?.name || akunToDelete;
+  delete teachers[akunToDelete];
+  save(SK.teachers, teachers);
+  akunToDelete = null;
+  closeModal('modalHapusAkun');
+  toast(`Akun ${name} berhasil dihapus.`);
+  updateBadges();
   renderAkun();
 });
 
@@ -1238,7 +1287,6 @@ function deleteMapel(id) {
 }
 
 // ═══════════════════ JADWAL ═══════════════════
-// Auto-fill Hari from Tanggal (readonly display)
 function updateHariFromTanggal(val) {
   const display = document.getElementById('jadwalHariDisplay');
   const hidden  = document.getElementById('jadwalHari');
@@ -1250,7 +1298,7 @@ function updateHariFromTanggal(val) {
   }
   const dt = new Date(val + 'T00:00:00');
   if (isNaN(dt)) { hidden.value = ''; return; }
-  const dayIdx = dt.getDay(); // 0=Minggu
+  const dayIdx = dt.getDay();
   if (dayIdx === 0) {
     display.textContent = '⚠ Minggu — tidak tersedia sebagai hari ajar';
     display.classList.add('filled');
@@ -1451,13 +1499,11 @@ function renderMateri(){
   populatePertemuanSelect(document.getElementById('matPertemuan'));
   populateMateriMapelSelect(document.getElementById('matMapel'));
 
-  // Filter Kelas
   const mfk=document.getElementById('matFilterKelas');const prevK=mfk.value;
   mfk.innerHTML='<option value="">Semua Kelas</option>';
   classes.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=`${c.kelas} ${c.jurusan} — ${c.kodeKelas}`;mfk.appendChild(o);});
   mfk.value=prevK;
 
-  // Filter Mapel
   const mfm=document.getElementById('matFilterMapel');const prevM=mfm.value;
   mfm.innerHTML='<option value="">Semua Mapel</option>';
   subjects.forEach(s=>{const o=document.createElement('option');o.value=s.id;o.textContent=s.mataPelajaran;mfm.appendChild(o);});
