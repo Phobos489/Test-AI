@@ -143,15 +143,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 
 /* BADGE */
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;font-family:var(--mono)}
-.badge-tkj{background:rgba(6,182,212,.15);color:var(--cyan);border:1px solid rgba(6,182,212,.25)}
-.badge-mm{background:rgba(139,92,246,.15);color:var(--purple);border:1px solid rgba(139,92,246,.25)}
-.badge-tkr{background:rgba(249,115,22,.15);color:var(--orange);border:1px solid rgba(249,115,22,.25)}
-.badge-tsm{background:rgba(245,158,11,.15);color:var(--amber);border:1px solid rgba(245,158,11,.25)}
-.badge-ap{background:rgba(16,185,129,.15);color:var(--emerald);border:1px solid rgba(16,185,129,.25)}
-.badge-ak{background:rgba(244,63,94,.15);color:var(--rose);border:1px solid rgba(244,63,94,.25)}
-.badge-10{background:rgba(59,130,246,.12);color:var(--blue);border:1px solid rgba(59,130,246,.2)}
-.badge-11{background:rgba(139,92,246,.12);color:var(--purple);border:1px solid rgba(139,92,246,.2)}
-.badge-12{background:rgba(244,63,94,.12);color:var(--rose);border:1px solid rgba(244,63,94,.2)}
 
 /* MODAL */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:center;justify-content:center}
@@ -621,7 +612,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
         <div class="field" style="color:var(--cyan)"><label>Kode Kelas</label><input type="text" id="kelasKode" placeholder="cth: 10-TKJ-1"></div>
         <div class="field" style="color:var(--cyan)"><label>Tingkat Kelas</label><select id="kelasLevel"><option value="">Pilih...</option><option>10</option><option>11</option><option>12</option></select></div>
       </div>
-      <div class="field" style="color:var(--cyan)"><label>Jurusan</label><select id="kelasJurusan"><option value="">Pilih jurusan...</option><option value="TKJ">TKJ — Teknik Komputer Jaringan</option><option value="MM">MM — Multimedia</option><option value="TKR">TKR — Teknik Kendaraan Ringan</option><option value="TSM">TSM — Teknik Sepeda Motor</option><option value="AP">AP — Administrasi Perkantoran</option><option value="AK">AK — Akuntansi</option></select></div>
+      <!-- ▼ JURUSAN: diketik bebas, bukan dropdown ▼ -->
+      <div class="field" style="color:var(--cyan)">
+        <label>Jurusan</label>
+        <input type="text" id="kelasJurusan" placeholder="cth: Teknik Komputer Jaringan, Multimedia...">
+      </div>
       <div class="field" style="color:var(--cyan)"><label>Wali Kelas <span style="font-size:10px;color:var(--dim);text-transform:none">(pilih dari guru terdaftar)</span></label><select id="kelasWali"><option value="">Pilih wali kelas...</option></select></div>
       <div class="field" style="color:var(--cyan)"><label>Tahun Ajaran</label><input type="text" id="kelasTahun" placeholder="2024/2025"></div>
     </div>
@@ -899,13 +894,37 @@ function updateBadges() {
 function refreshAll() { updateBadges(); renderProfil(); }
 
 // ═══════════════════ HELPERS ═══════════════════
-const JURUSAN_COLORS = { TKJ:'var(--cyan)', MM:'var(--purple)', TKR:'var(--orange)', TSM:'var(--amber)', AP:'var(--emerald)', AK:'var(--rose)' };
+
+// Palet warna untuk jurusan — dipilih dinamis berdasarkan hash nama jurusan
+const JURUSAN_PALETTE = [
+  { color: 'var(--cyan)',    rgb: 'rgba(6,182,212'   },
+  { color: 'var(--purple)',  rgb: 'rgba(139,92,246'  },
+  { color: 'var(--orange)',  rgb: 'rgba(249,115,22'  },
+  { color: 'var(--amber)',   rgb: 'rgba(245,158,11'  },
+  { color: 'var(--emerald)', rgb: 'rgba(16,185,129'  },
+  { color: 'var(--rose)',    rgb: 'rgba(244,63,94'   },
+  { color: 'var(--blue)',    rgb: 'rgba(59,130,246'  },
+];
+
+function getJurusanPalette(jurusan) {
+  if (!jurusan) return JURUSAN_PALETTE[0];
+  let h = 0;
+  for (const c of jurusan.toUpperCase()) h = (h * 31 + c.charCodeAt(0)) % JURUSAN_PALETTE.length;
+  return JURUSAN_PALETTE[h];
+}
+
+// Warna CSS var untuk kelas card accent line
+function getJurusanColor(jurusan) { return getJurusanPalette(jurusan).color; }
+
+// Badge pill — sepenuhnya dinamis, warna otomatis dari nama jurusan
+function jurusanBadge(j) {
+  if (!j) return '';
+  const p = getJurusanPalette(j);
+  return `<span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;font-family:var(--mono);background:${p.rgb},.15);border:1px solid ${p.rgb},.3);color:${p.color}">${j}</span>`;
+}
+
 const DAYS_ID = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
 
-function jurusanBadge(j) {
-  const cls = {TKJ:'tkj',MM:'mm',TKR:'tkr',TSM:'tsm',AP:'ap',AK:'ak'}[j]||'tkj';
-  return `<span class="badge badge-${cls}">${j}</span>`;
-}
 function avatarColor(name) {
   const colors=['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#f43f5e'];
   let h=0; for(const c of name) h=(h*31+c.charCodeAt(0))%colors.length; return colors[h];
@@ -1119,9 +1138,9 @@ document.getElementById('hapusAkunConfirm').addEventListener('click', () => {
 document.getElementById('openAddKelas').addEventListener('click', () => {
   document.getElementById('kelasEditId').value='';
   document.getElementById('kelasKode').value='';
+  document.getElementById('kelasJurusan').value='';
   document.getElementById('kelasTahun').value='';
   document.getElementById('kelasLevel').value='';
-  document.getElementById('kelasJurusan').value='';
   populateWaliKelasSelect(document.getElementById('kelasWali'));
   openModal('modalKelas');
 });
@@ -1129,7 +1148,7 @@ document.getElementById('kelasSubmit').addEventListener('click', () => {
   const id=document.getElementById('kelasEditId').value;
   const kode=document.getElementById('kelasKode').value.trim();
   const level=document.getElementById('kelasLevel').value;
-  const jurusan=document.getElementById('kelasJurusan').value;
+  const jurusan=document.getElementById('kelasJurusan').value.trim();
   const wali=document.getElementById('kelasWali').value;
   const tahun=document.getElementById('kelasTahun').value.trim();
   if(!kode||!level||!jurusan||!wali||!tahun){toast('Semua field wajib diisi!','err');return;}
@@ -1145,8 +1164,8 @@ function renderKelas() {
     const group=getClasses().filter(c=>c.kelas===lv);
     cnt.textContent=group.length+' kelas';
     if(!group.length){col.innerHTML=emptyState('🏫','Belum ada kelas '+lv);return;}
-    col.innerHTML=group.map(c=>`<div class="kelas-card" style="--kelas-card-color:${JURUSAN_COLORS[c.jurusan]||'var(--cyan)'}">
-      <div class="kelas-card-top"><span class="kelas-card-kode" style="color:${JURUSAN_COLORS[c.jurusan]||'var(--cyan)'}">${c.kodeKelas}</span>
+    col.innerHTML=group.map(c=>`<div class="kelas-card" style="--kelas-card-color:${getJurusanColor(c.jurusan)}">
+      <div class="kelas-card-top"><span class="kelas-card-kode" style="color:${getJurusanColor(c.jurusan)}">${c.kodeKelas}</span>
       <div class="kelas-card-actions"><button class="icon-btn" onclick="editKelas('${c.id}')">✏</button><button class="icon-btn del" onclick="deleteKelas('${c.id}')">🗑</button></div></div>
       ${jurusanBadge(c.jurusan)}<div class="kelas-card-wali">👤 ${c.waliKelas}</div><div class="kelas-card-tahun">📅 ${c.tahunAjar}</div>
     </div>`).join('');
@@ -1220,7 +1239,7 @@ function renderSiswa() {
   if(!students.length){tbody.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--dim)">Belum ada siswa</td></tr>`;return;}
   tbody.innerHTML=students.map((s,i)=>{
     const cls=classes.find(c=>c.id===s.kelasId);
-    const color=cls?JURUSAN_COLORS[cls.jurusan]||'var(--purple)':'var(--dim)';
+    const color=cls?getJurusanColor(cls.jurusan):'var(--dim)';
     const hasPass = s.password ? '<span style="font-family:var(--mono);font-size:12px;color:var(--emerald)">✓ Sudah diset</span>' : '<span style="font-family:var(--mono);font-size:11px;color:var(--dim)">— Belum diset</span>';
     return `<tr>
       <td style="font-family:var(--mono);font-size:11px;color:var(--dim)">${i+1}</td>
