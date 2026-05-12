@@ -265,6 +265,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 .hari-readonly-box{padding:10px 13px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--dim);font-family:var(--sans);font-size:13px;cursor:not-allowed;min-height:40px}
 .hari-readonly-box.filled{color:var(--text);background:rgba(59,130,246,.05);border-color:rgba(59,130,246,.3)}
 
+/* Readonly Kelas box (sama gaya dengan hari-readonly-box tapi warna biru) */
+.kelas-readonly-box{padding:10px 13px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--dim);font-family:var(--sans);font-size:13px;cursor:not-allowed;min-height:40px;transition:all .2s}
+.kelas-readonly-box.filled{color:var(--text);background:rgba(59,130,246,.05);border-color:rgba(59,130,246,.35)}
+.kelas-readonly-box.warn{color:#f87171;background:rgba(244,63,94,.05);border-color:rgba(244,63,94,.3)}
+
 /* MATERI */
 #sec-materi .sec-header{border-left:3px solid var(--orange)}
 .materi-layout{display:grid;grid-template-columns:300px 1fr;gap:24px;align-items:start}
@@ -612,7 +617,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
         <div class="field" style="color:var(--cyan)"><label>Kode Kelas</label><input type="text" id="kelasKode" placeholder="cth: 10-TKJ-1"></div>
         <div class="field" style="color:var(--cyan)"><label>Tingkat Kelas</label><select id="kelasLevel"><option value="">Pilih...</option><option>10</option><option>11</option><option>12</option></select></div>
       </div>
-      <!-- ▼ JURUSAN: diketik bebas, bukan dropdown ▼ -->
       <div class="field" style="color:var(--cyan)">
         <label>Jurusan</label>
         <input type="text" id="kelasJurusan" placeholder="cth: Teknik Komputer Jaringan, Multimedia...">
@@ -681,8 +685,20 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
     <div class="modal-head"><h3 style="color:var(--blue)">📅 Tambah / Edit Jadwal</h3><button class="modal-close" data-close="modalJadwal">✕</button></div>
     <div class="modal-body">
       <input type="hidden" id="jadwalEditId">
-      <div class="field" style="color:var(--blue)"><label>Mata Pelajaran</label><select id="jadwalMapel"><option value="">Pilih mata pelajaran...</option></select></div>
-      <div class="field" style="color:var(--blue)"><label>Kelas &amp; Jurusan</label><select id="jadwalKelas"><option value="">Pilih kelas...</option></select></div>
+
+      <!-- Mata Pelajaran — dipilih duluan, menentukan kelas -->
+      <div class="field" style="color:var(--blue)">
+        <label>Mata Pelajaran <span style="font-size:10px;color:var(--dim);text-transform:none">(pilih dulu untuk mengisi kelas otomatis)</span></label>
+        <select id="jadwalMapel"><option value="">Pilih mata pelajaran...</option></select>
+      </div>
+
+      <!-- Kelas & Jurusan — read-only, terisi otomatis dari mapel -->
+      <div class="field" style="color:var(--blue)">
+        <label>Kelas &amp; Jurusan <span style="font-size:10px;color:var(--dim);text-transform:none">(terisi otomatis dari mata pelajaran)</span></label>
+        <div class="kelas-readonly-box" id="jadwalKelasDisplay">— Pilih mata pelajaran terlebih dahulu —</div>
+        <input type="hidden" id="jadwalKelas">
+      </div>
+
       <div class="field" style="color:var(--blue)">
         <label>Tanggal <span style="font-size:10px;color:var(--dim);text-transform:none">(wajib — hari terisi otomatis)</span></label>
         <input type="date" id="jadwalTanggal" style="color-scheme:dark" required>
@@ -895,7 +911,6 @@ function refreshAll() { updateBadges(); renderProfil(); }
 
 // ═══════════════════ HELPERS ═══════════════════
 
-// Palet warna untuk jurusan — dipilih dinamis berdasarkan hash nama jurusan
 const JURUSAN_PALETTE = [
   { color: 'var(--cyan)',    rgb: 'rgba(6,182,212'   },
   { color: 'var(--purple)',  rgb: 'rgba(139,92,246'  },
@@ -913,10 +928,8 @@ function getJurusanPalette(jurusan) {
   return JURUSAN_PALETTE[h];
 }
 
-// Warna CSS var untuk kelas card accent line
 function getJurusanColor(jurusan) { return getJurusanPalette(jurusan).color; }
 
-// Badge pill — sepenuhnya dinamis, warna otomatis dari nama jurusan
 function jurusanBadge(j) {
   if (!j) return '';
   const p = getJurusanPalette(j);
@@ -1326,6 +1339,8 @@ function deleteMapel(id) {
 }
 
 // ═══════════════════ JADWAL ═══════════════════
+
+// ── Auto-fill Hari dari Tanggal ──────────────────────────────────────────────
 function updateHariFromTanggal(val) {
   const display = document.getElementById('jadwalHariDisplay');
   const hidden  = document.getElementById('jadwalHari');
@@ -1353,8 +1368,52 @@ function updateHariFromTanggal(val) {
   }
 }
 
+// ── Auto-fill Kelas dari Mata Pelajaran ──────────────────────────────────────
+function updateKelasFromMapel(mapelId) {
+  const display = document.getElementById('jadwalKelasDisplay');
+  const hidden  = document.getElementById('jadwalKelas');
+
+  // Reset state
+  display.classList.remove('filled', 'warn');
+  display.style.color = '';
+
+  if (!mapelId) {
+    display.textContent = '— Pilih mata pelajaran terlebih dahulu —';
+    hidden.value = '';
+    return;
+  }
+
+  const subject = getSubjects().find(s => s.id === mapelId);
+
+  if (!subject || !subject.kelasId) {
+    display.textContent = '⚠ Mata pelajaran ini belum terkait dengan kelas';
+    display.classList.add('warn');
+    hidden.value = '';
+    toast('Mata pelajaran ini belum terkait kelas. Hubungkan dulu di menu Mata Pelajaran.', 'err');
+    return;
+  }
+
+  const cls = getClasses().find(c => c.id === subject.kelasId);
+
+  if (!cls) {
+    display.textContent = '⚠ Kelas terkait tidak ditemukan';
+    display.classList.add('warn');
+    hidden.value = '';
+    return;
+  }
+
+  display.textContent = `📋 ${cls.kelas} ${cls.jurusan} — ${cls.kodeKelas} (${cls.tahunAjar})`;
+  display.classList.add('filled');
+  hidden.value = cls.id;
+}
+
+// ── Event listeners Jadwal Modal ─────────────────────────────────────────────
 document.getElementById('jadwalTanggal').addEventListener('change', function() {
   updateHariFromTanggal(this.value);
+});
+
+document.getElementById('jadwalMapel').addEventListener('change', function() {
+  updateKelasFromMapel(this.value);
 });
 
 document.getElementById('openAddJadwal').addEventListener('click', () => {
@@ -1364,7 +1423,7 @@ document.getElementById('openAddJadwal').addEventListener('click', () => {
   document.getElementById('jadwalTanggal').value='';
   updateHariFromTanggal('');
   populateMapelSelect(document.getElementById('jadwalMapel'));
-  populateKelasSelect(document.getElementById('jadwalKelas'));
+  updateKelasFromMapel('');   // reset kelas display
   populatePertemuanSelect(document.getElementById('jadwalPertemuan'));
   openModal('modalJadwal');
 });
@@ -1372,13 +1431,19 @@ document.getElementById('openAddJadwal').addEventListener('click', () => {
 document.getElementById('jadwalSubmit').addEventListener('click', () => {
   const id       = document.getElementById('jadwalEditId').value;
   const mapelId  = document.getElementById('jadwalMapel').value;
-  const kelasId  = document.getElementById('jadwalKelas').value;
+  const kelasId  = document.getElementById('jadwalKelas').value;   // dari hidden input
   const tanggal  = document.getElementById('jadwalTanggal').value;
   const hari     = document.getElementById('jadwalHari').value;
   const mulai    = document.getElementById('jadwalMulai').value;
   const selesai  = document.getElementById('jadwalSelesai').value;
   const pertemuan= document.getElementById('jadwalPertemuan').value;
-  if(!mapelId||!kelasId||!tanggal||!hari||!mulai||!selesai||!pertemuan){toast('Semua field wajib diisi! Pastikan tanggal valid (bukan hari Minggu).','err');return;}
+
+  if (!mapelId) { toast('Pilih mata pelajaran terlebih dahulu!', 'err'); return; }
+  if (!kelasId) { toast('Mata pelajaran belum terkait kelas. Hubungkan dulu di menu Mata Pelajaran.', 'err'); return; }
+  if (!tanggal || !hari) { toast('Pilih tanggal yang valid (bukan hari Minggu)!', 'err'); return; }
+  if (!mulai || !selesai) { toast('Jam mulai dan selesai wajib diisi!', 'err'); return; }
+  if (!pertemuan) { toast('Pilih pertemuan!', 'err'); return; }
+
   const schedules=getSchedules();
   const entry={mapelId,kelasId,tanggal,hari,jamMulai:mulai,jamSelesai:selesai,pertemuan:+pertemuan};
   if(id){const idx=schedules.findIndex(s=>s.id===id);if(idx>=0)schedules[idx]={...schedules[idx],...entry};}
@@ -1451,6 +1516,7 @@ function renderJadwal() {
     </div>`;
   }).join('');
 }
+
 function editJadwal(id) {
   const s=getSchedules().find(x=>x.id===id); if(!s)return;
   document.getElementById('jadwalEditId').value=s.id;
@@ -1458,14 +1524,15 @@ function editJadwal(id) {
   updateHariFromTanggal(s.tanggal||'');
   document.getElementById('jadwalMulai').value=s.jamMulai;
   document.getElementById('jadwalSelesai').value=s.jamSelesai;
+  // Populate mapel select lalu set nilai, kemudian auto-fill kelas
   populateMapelSelect(document.getElementById('jadwalMapel'));
   document.getElementById('jadwalMapel').value=s.mapelId;
-  populateKelasSelect(document.getElementById('jadwalKelas'));
-  document.getElementById('jadwalKelas').value=s.kelasId;
+  updateKelasFromMapel(s.mapelId);   // kelas terisi otomatis dari mapel
   populatePertemuanSelect(document.getElementById('jadwalPertemuan'));
   document.getElementById('jadwalPertemuan').value=s.pertemuan;
   openModal('modalJadwal');
 }
+
 function deleteJadwal(id) {
   if(!confirm('Hapus jadwal ini?'))return;
   saveSchedules(getSchedules().filter(s=>s.id!==id));renderJadwal();updateBadges();toast('Jadwal dihapus.');
