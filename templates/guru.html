@@ -187,7 +187,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 
 /* ═══ AKUN ═══ */
 #sec-akun .sec-header{border-left:3px solid var(--purple)}
-/* Fix: sec-body for akun should stack its children, panel handles its own scroll */
 #sec-akun .sec-body{display:flex;flex-direction:column;}
 .akun-tbl-wrap{overflow-x:auto;}
 .akun-role-you{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:20px;font-family:var(--mono);font-size:10px;font-weight:700;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.25);color:var(--purple)}
@@ -511,7 +510,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
           <div class="panel">
             <div style="overflow-x:auto">
               <table class="tbl" id="siswaTbl">
-                <thead><tr><th>#</th><th>Siswa</th><th>Kelas</th><th>Email</th><th>No. Telepon</th><th>Tgl. Lahir</th><th></th></tr></thead>
+                <thead><tr><th>#</th><th>Siswa</th><th>Kelas</th><th>Email</th><th>No. Telepon</th><th>Tgl. Lahir</th><th>Password</th><th></th></tr></thead>
                 <tbody id="siswaBody"></tbody>
               </table>
             </div>
@@ -650,6 +649,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
       </div>
       <div class="field" style="color:var(--emerald)"><label>Tempat Tinggal</label><input type="text" id="siswaTinggal" placeholder="Jalan / alamat lengkap"></div>
       <div class="field" style="color:var(--emerald)"><label>Tanggal Lahir</label><input type="date" id="siswaTglLahir" style="color-scheme:dark"></div>
+      <div class="grid-2">
+        <div class="field" style="color:var(--emerald)"><label>Password <span style="font-size:10px;color:var(--dim);text-transform:none;font-family:var(--sans)">(kosongkan jika tidak diubah)</span></label><input type="password" id="siswaPassword" placeholder="Min. 6 karakter"></div>
+        <div class="field" style="color:var(--emerald)"><label>Konfirmasi Password</label><input type="password" id="siswaPasswordConfirm" placeholder="Ulangi password"></div>
+      </div>
     </div>
     <div class="modal-foot">
       <button class="btn btn-ghost" data-close="modalSiswa">Batal</button>
@@ -1088,7 +1091,6 @@ document.getElementById('akunSearch').addEventListener('input', function() {
   renderAkun();
 });
 
-// ── Hapus Akun ────────────────────────────────────────────────────────────────
 function confirmHapusAkun(email) {
   const teachers = loadO(SK.teachers);
   const teacher = teachers[email];
@@ -1168,7 +1170,7 @@ function deleteKelas(id) {
 // ═══════════════════ SISWA ═══════════════════
 document.getElementById('openAddSiswa').addEventListener('click', () => {
   document.getElementById('siswaEditId').value='';
-  ['siswaNis','siswaNama','siswaEmail','siswaTelp','siswaTinggal','siswaTglLahir'].forEach(id=>document.getElementById(id).value='');
+  ['siswaNis','siswaNama','siswaEmail','siswaTelp','siswaTinggal','siswaTglLahir','siswaPassword','siswaPasswordConfirm'].forEach(id=>document.getElementById(id).value='');
   populateKelasSelect(document.getElementById('siswaKelas'));
   openModal('modalSiswa');
 });
@@ -1181,10 +1183,24 @@ document.getElementById('siswaSubmit').addEventListener('click', () => {
   const telp=document.getElementById('siswaTelp').value.trim();
   const tinggal=document.getElementById('siswaTinggal').value.trim();
   const tglLahir=document.getElementById('siswaTglLahir').value;
+  const password=document.getElementById('siswaPassword').value;
+  const passwordConfirm=document.getElementById('siswaPasswordConfirm').value;
   if(!nis||!nama||!kelasId){toast('NIS, Nama, dan Kelas wajib diisi!','err');return;}
+  if(password && password.length < 6){toast('Password minimal 6 karakter!','err');return;}
+  if(password && password !== passwordConfirm){toast('Konfirmasi password tidak cocok!','err');return;}
+  if(!id && !password){toast('Password wajib diisi untuk siswa baru!','err');return;}
   const students=getStudents();
-  if(id){const idx=students.findIndex(s=>s.id===id);if(idx>=0)students[idx]={...students[idx],nis,namaLengkap:nama,kelasId,email,noTelepon:telp,tempatTinggal:tinggal,tanggalLahir:tglLahir};}
-  else{if(students.find(s=>s.nis===nis)){toast('NIS sudah terdaftar!','err');return;}students.push({id:uid(),nis,namaLengkap:nama,kelasId,email,noTelepon:telp,tempatTinggal:tinggal,tanggalLahir:tglLahir});}
+  if(id){
+    const idx=students.findIndex(s=>s.id===id);
+    if(idx>=0){
+      const updated={...students[idx],nis,namaLengkap:nama,kelasId,email,noTelepon:telp,tempatTinggal:tinggal,tanggalLahir:tglLahir};
+      if(password) updated.password=password;
+      students[idx]=updated;
+    }
+  } else{
+    if(students.find(s=>s.nis===nis)){toast('NIS sudah terdaftar!','err');return;}
+    students.push({id:uid(),nis,namaLengkap:nama,kelasId,email,noTelepon:telp,tempatTinggal:tinggal,tanggalLahir:tglLahir,password});
+  }
   saveStudents(students);closeModal('modalSiswa');renderSiswa();updateBadges();toast('Data siswa berhasil disimpan!');
 });
 function renderSiswa() {
@@ -1201,10 +1217,11 @@ function renderSiswa() {
   if(filterK)students=students.filter(s=>s.kelasId===filterK);
   document.getElementById('siswaCount').textContent=students.length+' siswa';
   const tbody=document.getElementById('siswaBody');
-  if(!students.length){tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--dim)">Belum ada siswa</td></tr>`;return;}
+  if(!students.length){tbody.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--dim)">Belum ada siswa</td></tr>`;return;}
   tbody.innerHTML=students.map((s,i)=>{
     const cls=classes.find(c=>c.id===s.kelasId);
     const color=cls?JURUSAN_COLORS[cls.jurusan]||'var(--purple)':'var(--dim)';
+    const hasPass = s.password ? '<span style="font-family:var(--mono);font-size:12px;color:var(--emerald)">✓ Sudah diset</span>' : '<span style="font-family:var(--mono);font-size:11px;color:var(--dim)">— Belum diset</span>';
     return `<tr>
       <td style="font-family:var(--mono);font-size:11px;color:var(--dim)">${i+1}</td>
       <td><div class="siswa-name-col"><div class="siswa-avatar" style="background:${avatarColor(s.namaLengkap)}">${s.namaLengkap.charAt(0).toUpperCase()}</div>
@@ -1213,6 +1230,7 @@ function renderSiswa() {
       <td style="font-size:12px;color:var(--dim)">${s.email||'—'}</td>
       <td style="font-family:var(--mono);font-size:12px">${s.noTelepon||'—'}</td>
       <td style="font-size:12px;color:var(--dim)">${s.tanggalLahir?formatDate(s.tanggalLahir):'—'}</td>
+      <td>${hasPass}</td>
       <td><div style="display:flex;gap:4px"><button class="icon-btn" onclick="editSiswa('${s.id}')">✏</button><button class="icon-btn del" onclick="deleteSiswa('${s.id}')">🗑</button></div></td>
     </tr>`;
   }).join('');
@@ -1226,6 +1244,8 @@ function editSiswa(id) {
   document.getElementById('siswaTelp').value=s.noTelepon||'';
   document.getElementById('siswaTinggal').value=s.tempatTinggal||'';
   document.getElementById('siswaTglLahir').value=s.tanggalLahir||'';
+  document.getElementById('siswaPassword').value='';
+  document.getElementById('siswaPasswordConfirm').value='';
   populateKelasSelect(document.getElementById('siswaKelas'));
   document.getElementById('siswaKelas').value=s.kelasId;
   openModal('modalSiswa');
