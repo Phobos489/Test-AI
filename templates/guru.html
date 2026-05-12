@@ -690,45 +690,32 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
     <div class="modal-head"><h3 style="color:var(--blue)">📅 Tambah / Edit Jadwal Semester</h3><button class="modal-close" data-close="modalJadwal">✕</button></div>
     <div class="modal-body">
       <input type="hidden" id="jadwalEditId">
-
-      <!-- Info box -->
       <div class="jadwal-info-box">
         <span style="font-size:20px">⚡</span>
         <span>Isi sekali → otomatis membuat <strong style="color:var(--blue)">16 pertemuan</strong> dengan selisih 7 hari. Pertemuan 8 = <strong style="color:var(--amber)">UTS</strong>, Pertemuan 16 = <strong style="color:var(--rose)">UAS</strong>.</span>
       </div>
-
-      <!-- Mata Pelajaran -->
       <div class="field" style="color:var(--blue)">
         <label>Mata Pelajaran <span style="font-size:10px;color:var(--dim);text-transform:none">(pilih dulu untuk mengisi kelas otomatis)</span></label>
         <select id="jadwalMapel"><option value="">Pilih mata pelajaran...</option></select>
       </div>
-
-      <!-- Kelas — read-only, auto dari mapel -->
       <div class="field" style="color:var(--blue)">
         <label>Kelas &amp; Jurusan <span style="font-size:10px;color:var(--dim);text-transform:none">(terisi otomatis dari mata pelajaran)</span></label>
         <div class="kelas-readonly-box" id="jadwalKelasDisplay">— Pilih mata pelajaran terlebih dahulu —</div>
         <input type="hidden" id="jadwalKelas">
       </div>
-
-      <!-- Tanggal Awal Semester -->
       <div class="field" style="color:var(--blue)">
         <label>Tanggal Awal Semester / Pertemuan 1 <span style="font-size:10px;color:var(--dim);text-transform:none">(hari terisi otomatis — 16 pertemuan dibuat otomatis)</span></label>
         <input type="date" id="jadwalTanggal" style="color-scheme:dark" required>
       </div>
-
-      <!-- Hari — read-only, auto dari tanggal -->
       <div class="field" style="color:var(--blue)">
         <label>Hari <span style="font-size:10px;color:var(--dim);text-transform:none">(otomatis dari tanggal)</span></label>
         <div class="hari-readonly-box" id="jadwalHariDisplay">— Pilih tanggal terlebih dahulu —</div>
         <input type="hidden" id="jadwalHari">
       </div>
-
-      <!-- Jam -->
       <div class="grid-2">
         <div class="field" style="color:var(--blue)"><label>Jam Mulai <span style="font-size:10px;color:var(--dim);text-transform:none">(sama untuk semua pertemuan)</span></label><input type="time" id="jadwalMulai"></div>
         <div class="field" style="color:var(--blue)"><label>Jam Selesai <span style="font-size:10px;color:var(--dim);text-transform:none">(sama untuk semua pertemuan)</span></label><input type="time" id="jadwalSelesai"></div>
       </div>
-      <!-- Pertemuan otomatis 1–16 -->
     </div>
     <div class="modal-foot">
       <button class="btn btn-ghost" data-close="modalJadwal">Batal</button>
@@ -919,7 +906,6 @@ function updateBadges() {
   document.getElementById('badge-kelas').textContent = getClasses().length;
   document.getElementById('badge-siswa').textContent = getStudents().length;
   document.getElementById('badge-mapel').textContent = getSubjects().length;
-  // Badge jadwal = jumlah grup (bukan pertemuan individual)
   const jGroups = [...new Set(getSchedules().map(s => s.groupId || s.id))];
   document.getElementById('badge-jadwal').textContent = jGroups.length;
   document.getElementById('badge-materi').textContent = getMaterials().reduce((s,m) => s+(m.files||[]).length, 0);
@@ -956,6 +942,14 @@ function jurusanBadge(j) {
 
 const DAYS_ID = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
 
+// ─── Helper: format tanggal lokal ke string YYYY-MM-DD tanpa timezone shift ───
+function toLocalDateStr(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 function avatarColor(name) {
   const colors=['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#f43f5e'];
   let h=0; for(const c of name) h=(h*31+c.charCodeAt(0))%colors.length; return colors[h];
@@ -967,6 +961,7 @@ function formatDate(d) {
 }
 function formatDateShort(dateStr) {
   if (!dateStr) return null;
+  // Append T00:00:00 to force local-time parsing (avoids UTC midnight rollback)
   const dt = new Date(dateStr + 'T00:00:00');
   if (isNaN(dt)) return null;
   return dt.toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'});
@@ -1368,6 +1363,9 @@ function updateHariFromTanggal(val) {
     hidden.value = '';
     return;
   }
+  // Append T00:00:00 to force local-time parsing — tanpa ini, browser memparsing
+  // "YYYY-MM-DD" sebagai UTC midnight sehingga .getDay() mengembalikan hari sebelumnya
+  // di timezone UTC+7 (Indonesia).
   const dt = new Date(val + 'T00:00:00');
   if (isNaN(dt)) { hidden.value = ''; return; }
   const dayIdx = dt.getDay();
@@ -1462,18 +1460,25 @@ document.getElementById('jadwalSubmit').addEventListener('click', () => {
 
   let schedules = getSchedules();
 
-  // Hapus grup lama jika sedang edit
   const groupId = editGroupId || uid();
   if (editGroupId) {
     schedules = schedules.filter(s => s.groupId !== editGroupId);
   }
 
-  // Generate 16 pertemuan (selisih 7 hari, jam sama, hari sama secara alami)
+  // ─── FIX: Gunakan T00:00:00 agar parsing lokal, bukan UTC ────────────────
+  // Tanpa ini, new Date("YYYY-MM-DD") diparsing sebagai UTC midnight.
+  // Di Indonesia (UTC+7) itu = jam 07:00 hari SEBELUMNYA waktu lokal,
+  // sehingga toISOString() mengembalikan tanggal yang mundur 1 hari.
   const baseDate = new Date(tanggal + 'T00:00:00');
+
   for (let i = 0; i < 16; i++) {
     const meetDate = new Date(baseDate);
     meetDate.setDate(baseDate.getDate() + i * 7);
-    const dateStr  = meetDate.toISOString().split('T')[0];
+
+    // ── KUNCI FIX: gunakan toLocalDateStr(), bukan toISOString() ──────────
+    // toISOString() mengembalikan UTC, sehingga di timezone UTC+7
+    // tanggal yang tersimpan mundur 1 hari (misal Senin 18 → Minggu 17).
+    const dateStr  = toLocalDateStr(meetDate);
     const hariName = DAYS_ID[meetDate.getDay()];
     const pertemuan = i + 1;
     schedules.push({
@@ -1506,7 +1511,6 @@ function renderJadwal() {
   const classes  = getClasses();
   const subjects = getSubjects();
 
-  // Repopulate kelas filter
   const jfk  = document.getElementById('jadwalFilterKelas');
   const prevK = jfk.value;
   jfk.innerHTML = '<option value="">Semua Kelas</option>';
@@ -1526,7 +1530,6 @@ function renderJadwal() {
   const container = document.getElementById('jadwalList');
   if (!schedules.length) { container.innerHTML = emptyState('📅', 'Belum ada jadwal pelajaran'); return; }
 
-  // Kelompokkan berdasarkan groupId
   const groupMap = {};
   schedules.forEach(sch => {
     const key = sch.groupId || sch.id;
@@ -1534,7 +1537,6 @@ function renderJadwal() {
     groupMap[key].push(sch);
   });
 
-  // Urutkan grup berdasarkan tanggal pertemuan pertama
   const groupList = Object.entries(groupMap).map(([gid, items]) => {
     items.sort((a, b) => a.pertemuan - b.pertemuan);
     return { groupId: gid, items };
