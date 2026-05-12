@@ -258,17 +258,19 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 .jadwal-filter select,.jadwal-filter input[type="date"]{padding:8px 13px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:13px;cursor:pointer}
 .jadwal-filter input[type="date"]{cursor:text}
 .jadwal-filter select option{background:var(--bg3)}
-.jadwal-list-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:8px}
 .jadwal-day-badge{padding:3px 10px;border-radius:6px;font-family:var(--mono);font-size:11px;background:var(--blue-bg);color:var(--blue);border:1px solid rgba(59,130,246,.2);white-space:nowrap}
 .jadwal-date-badge{padding:3px 10px;border-radius:6px;font-family:var(--mono);font-size:11px;background:rgba(139,92,246,.1);color:var(--purple);border:1px solid rgba(139,92,246,.2);white-space:nowrap}
 .jadwal-time-text{font-family:var(--mono);font-size:12px;color:var(--dim);white-space:nowrap}
 .hari-readonly-box{padding:10px 13px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--dim);font-family:var(--sans);font-size:13px;cursor:not-allowed;min-height:40px}
 .hari-readonly-box.filled{color:var(--text);background:rgba(59,130,246,.05);border-color:rgba(59,130,246,.3)}
-
-/* Readonly Kelas box (sama gaya dengan hari-readonly-box tapi warna biru) */
 .kelas-readonly-box{padding:10px 13px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--dim);font-family:var(--sans);font-size:13px;cursor:not-allowed;min-height:40px;transition:all .2s}
 .kelas-readonly-box.filled{color:var(--text);background:rgba(59,130,246,.05);border-color:rgba(59,130,246,.35)}
 .kelas-readonly-box.warn{color:#f87171;background:rgba(244,63,94,.05);border-color:rgba(244,63,94,.3)}
+
+/* Jadwal group card */
+.jadwal-group{margin-bottom:14px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s}
+.jadwal-group:hover{border-color:rgba(59,130,246,.3)}
+.jadwal-info-box{background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);border-radius:8px;padding:12px 16px;font-size:12px;color:var(--dim);display:flex;align-items:center;gap:10px;margin-bottom:0}
 
 /* MATERI */
 #sec-materi .sec-header{border-left:3px solid var(--orange)}
@@ -526,7 +528,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
       <!-- ═══ JADWAL ═══ -->
       <div class="section" id="sec-jadwal">
         <div class="sec-header">
-          <div class="sec-header-left"><h2 style="color:var(--blue)">Jadwal Pelajaran</h2><p>Atur jadwal mengajar per hari dan pertemuan</p></div>
+          <div class="sec-header-left">
+            <h2 style="color:var(--blue)">Jadwal Pelajaran</h2>
+            <p>Isi 1 kali → otomatis 16 pertemuan · Pertemuan 8 = UTS · Pertemuan 16 = UAS</p>
+          </div>
           <button class="btn btn-blue" id="openAddJadwal">＋ Tambah Jadwal</button>
         </div>
         <div class="sec-body">
@@ -682,41 +687,52 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 <!-- ═══ MODAL: Jadwal ═══ -->
 <div class="modal-bg" id="modalJadwal">
   <div class="modal">
-    <div class="modal-head"><h3 style="color:var(--blue)">📅 Tambah / Edit Jadwal</h3><button class="modal-close" data-close="modalJadwal">✕</button></div>
+    <div class="modal-head"><h3 style="color:var(--blue)">📅 Tambah / Edit Jadwal Semester</h3><button class="modal-close" data-close="modalJadwal">✕</button></div>
     <div class="modal-body">
       <input type="hidden" id="jadwalEditId">
 
-      <!-- Mata Pelajaran — dipilih duluan, menentukan kelas -->
+      <!-- Info box -->
+      <div class="jadwal-info-box">
+        <span style="font-size:20px">⚡</span>
+        <span>Isi sekali → otomatis membuat <strong style="color:var(--blue)">16 pertemuan</strong> dengan selisih 7 hari. Pertemuan 8 = <strong style="color:var(--amber)">UTS</strong>, Pertemuan 16 = <strong style="color:var(--rose)">UAS</strong>.</span>
+      </div>
+
+      <!-- Mata Pelajaran -->
       <div class="field" style="color:var(--blue)">
         <label>Mata Pelajaran <span style="font-size:10px;color:var(--dim);text-transform:none">(pilih dulu untuk mengisi kelas otomatis)</span></label>
         <select id="jadwalMapel"><option value="">Pilih mata pelajaran...</option></select>
       </div>
 
-      <!-- Kelas & Jurusan — read-only, terisi otomatis dari mapel -->
+      <!-- Kelas — read-only, auto dari mapel -->
       <div class="field" style="color:var(--blue)">
         <label>Kelas &amp; Jurusan <span style="font-size:10px;color:var(--dim);text-transform:none">(terisi otomatis dari mata pelajaran)</span></label>
         <div class="kelas-readonly-box" id="jadwalKelasDisplay">— Pilih mata pelajaran terlebih dahulu —</div>
         <input type="hidden" id="jadwalKelas">
       </div>
 
+      <!-- Tanggal Awal Semester -->
       <div class="field" style="color:var(--blue)">
-        <label>Tanggal <span style="font-size:10px;color:var(--dim);text-transform:none">(wajib — hari terisi otomatis)</span></label>
+        <label>Tanggal Awal Semester / Pertemuan 1 <span style="font-size:10px;color:var(--dim);text-transform:none">(hari terisi otomatis — 16 pertemuan dibuat otomatis)</span></label>
         <input type="date" id="jadwalTanggal" style="color-scheme:dark" required>
       </div>
+
+      <!-- Hari — read-only, auto dari tanggal -->
       <div class="field" style="color:var(--blue)">
         <label>Hari <span style="font-size:10px;color:var(--dim);text-transform:none">(otomatis dari tanggal)</span></label>
         <div class="hari-readonly-box" id="jadwalHariDisplay">— Pilih tanggal terlebih dahulu —</div>
         <input type="hidden" id="jadwalHari">
       </div>
+
+      <!-- Jam -->
       <div class="grid-2">
-        <div class="field" style="color:var(--blue)"><label>Jam Mulai</label><input type="time" id="jadwalMulai"></div>
-        <div class="field" style="color:var(--blue)"><label>Jam Selesai</label><input type="time" id="jadwalSelesai"></div>
+        <div class="field" style="color:var(--blue)"><label>Jam Mulai <span style="font-size:10px;color:var(--dim);text-transform:none">(sama untuk semua pertemuan)</span></label><input type="time" id="jadwalMulai"></div>
+        <div class="field" style="color:var(--blue)"><label>Jam Selesai <span style="font-size:10px;color:var(--dim);text-transform:none">(sama untuk semua pertemuan)</span></label><input type="time" id="jadwalSelesai"></div>
       </div>
-      <div class="field" style="color:var(--blue)"><label>Pertemuan Ke-</label><select id="jadwalPertemuan"><option value="">Pilih pertemuan...</option></select></div>
+      <!-- Pertemuan otomatis 1–16 -->
     </div>
     <div class="modal-foot">
       <button class="btn btn-ghost" data-close="modalJadwal">Batal</button>
-      <button class="btn btn-blue" id="jadwalSubmit">Simpan Jadwal</button>
+      <button class="btn btn-blue" id="jadwalSubmit">⚡ Buat 16 Pertemuan</button>
     </div>
   </div>
 </div>
@@ -903,7 +919,9 @@ function updateBadges() {
   document.getElementById('badge-kelas').textContent = getClasses().length;
   document.getElementById('badge-siswa').textContent = getStudents().length;
   document.getElementById('badge-mapel').textContent = getSubjects().length;
-  document.getElementById('badge-jadwal').textContent = getSchedules().length;
+  // Badge jadwal = jumlah grup (bukan pertemuan individual)
+  const jGroups = [...new Set(getSchedules().map(s => s.groupId || s.id))];
+  document.getElementById('badge-jadwal').textContent = jGroups.length;
   document.getElementById('badge-materi').textContent = getMaterials().reduce((s,m) => s+(m.files||[]).length, 0);
   document.getElementById('badge-nilai').textContent = getGrades().length;
 }
@@ -1361,7 +1379,7 @@ function updateHariFromTanggal(val) {
     toast('Hari Minggu tidak tersedia sebagai hari ajar.','err');
   } else {
     const hariName = DAYS_ID[dayIdx];
-    display.textContent = `📅 ${hariName}`;
+    display.textContent = `📅 ${hariName} — setiap pertemuan akan jatuh pada hari ${hariName}`;
     display.classList.add('filled');
     display.style.color = '';
     hidden.value = hariName;
@@ -1373,7 +1391,6 @@ function updateKelasFromMapel(mapelId) {
   const display = document.getElementById('jadwalKelasDisplay');
   const hidden  = document.getElementById('jadwalKelas');
 
-  // Reset state
   display.classList.remove('filled', 'warn');
   display.style.color = '';
 
@@ -1407,7 +1424,7 @@ function updateKelasFromMapel(mapelId) {
   hidden.value = cls.id;
 }
 
-// ── Event listeners Jadwal Modal ─────────────────────────────────────────────
+// ── Event listeners ──────────────────────────────────────────────────────────
 document.getElementById('jadwalTanggal').addEventListener('change', function() {
   updateHariFromTanggal(this.value);
 });
@@ -1416,132 +1433,219 @@ document.getElementById('jadwalMapel').addEventListener('change', function() {
   updateKelasFromMapel(this.value);
 });
 
+// ── Buka Modal Tambah ────────────────────────────────────────────────────────
 document.getElementById('openAddJadwal').addEventListener('click', () => {
-  document.getElementById('jadwalEditId').value='';
-  document.getElementById('jadwalMulai').value='';
-  document.getElementById('jadwalSelesai').value='';
-  document.getElementById('jadwalTanggal').value='';
+  document.getElementById('jadwalEditId').value = '';
+  document.getElementById('jadwalMulai').value = '';
+  document.getElementById('jadwalSelesai').value = '';
+  document.getElementById('jadwalTanggal').value = '';
   updateHariFromTanggal('');
   populateMapelSelect(document.getElementById('jadwalMapel'));
-  updateKelasFromMapel('');   // reset kelas display
-  populatePertemuanSelect(document.getElementById('jadwalPertemuan'));
+  updateKelasFromMapel('');
   openModal('modalJadwal');
 });
 
+// ── Submit: Buat 16 Pertemuan Otomatis ───────────────────────────────────────
 document.getElementById('jadwalSubmit').addEventListener('click', () => {
-  const id       = document.getElementById('jadwalEditId').value;
+  const editGroupId = document.getElementById('jadwalEditId').value;
   const mapelId  = document.getElementById('jadwalMapel').value;
-  const kelasId  = document.getElementById('jadwalKelas').value;   // dari hidden input
+  const kelasId  = document.getElementById('jadwalKelas').value;
   const tanggal  = document.getElementById('jadwalTanggal').value;
   const hari     = document.getElementById('jadwalHari').value;
   const mulai    = document.getElementById('jadwalMulai').value;
   const selesai  = document.getElementById('jadwalSelesai').value;
-  const pertemuan= document.getElementById('jadwalPertemuan').value;
 
   if (!mapelId) { toast('Pilih mata pelajaran terlebih dahulu!', 'err'); return; }
   if (!kelasId) { toast('Mata pelajaran belum terkait kelas. Hubungkan dulu di menu Mata Pelajaran.', 'err'); return; }
-  if (!tanggal || !hari) { toast('Pilih tanggal yang valid (bukan hari Minggu)!', 'err'); return; }
+  if (!tanggal || !hari) { toast('Pilih tanggal awal semester yang valid (bukan hari Minggu)!', 'err'); return; }
   if (!mulai || !selesai) { toast('Jam mulai dan selesai wajib diisi!', 'err'); return; }
-  if (!pertemuan) { toast('Pilih pertemuan!', 'err'); return; }
 
-  const schedules=getSchedules();
-  const entry={mapelId,kelasId,tanggal,hari,jamMulai:mulai,jamSelesai:selesai,pertemuan:+pertemuan};
-  if(id){const idx=schedules.findIndex(s=>s.id===id);if(idx>=0)schedules[idx]={...schedules[idx],...entry};}
-  else schedules.push({id:uid(),...entry});
-  saveSchedules(schedules);closeModal('modalJadwal');renderJadwal();updateBadges();toast('Jadwal berhasil disimpan!');
+  let schedules = getSchedules();
+
+  // Hapus grup lama jika sedang edit
+  const groupId = editGroupId || uid();
+  if (editGroupId) {
+    schedules = schedules.filter(s => s.groupId !== editGroupId);
+  }
+
+  // Generate 16 pertemuan (selisih 7 hari, jam sama, hari sama secara alami)
+  const baseDate = new Date(tanggal + 'T00:00:00');
+  for (let i = 0; i < 16; i++) {
+    const meetDate = new Date(baseDate);
+    meetDate.setDate(baseDate.getDate() + i * 7);
+    const dateStr  = meetDate.toISOString().split('T')[0];
+    const hariName = DAYS_ID[meetDate.getDay()];
+    const pertemuan = i + 1;
+    schedules.push({
+      id: uid(),
+      groupId,
+      mapelId,
+      kelasId,
+      tanggal: dateStr,
+      hari: hariName,
+      jamMulai: mulai,
+      jamSelesai: selesai,
+      pertemuan,
+      isUTS: pertemuan === 8,
+      isUAS: pertemuan === 16,
+    });
+  }
+
+  saveSchedules(schedules);
+  closeModal('modalJadwal');
+  renderJadwal();
+  updateBadges();
+  toast(`16 pertemuan berhasil dibuat! (P8=UTS, P16=UAS)`);
 });
 
+// ── Render Jadwal (tampilan grup) ────────────────────────────────────────────
 function renderJadwal() {
-  const filterK=document.getElementById('jadwalFilterKelas').value;
-  const filterH=document.getElementById('jadwalFilterHari').value;
-  const filterT=document.getElementById('jadwalFilterTanggal').value;
-  const classes=getClasses();
-  const subjects=getSubjects();
-  const jfk=document.getElementById('jadwalFilterKelas');
-  const prevK=jfk.value;
-  jfk.innerHTML='<option value="">Semua Kelas</option>';
-  classes.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=`${c.kelas} ${c.jurusan} — ${c.kodeKelas}`;jfk.appendChild(o);});
-  jfk.value=prevK;
-  let schedules=getSchedules();
-  if(filterK) schedules=schedules.filter(s=>s.kelasId===filterK);
-  if(filterH) schedules=schedules.filter(s=>s.hari===filterH);
-  if(filterT) schedules=schedules.filter(s=>s.tanggal===filterT);
-  const container=document.getElementById('jadwalList');
-  if(!schedules.length){container.innerHTML=emptyState('📅','Belum ada jadwal pelajaran');return;}
-  const DAYS=['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-  const dayColor=['var(--blue)','var(--purple)','var(--emerald)','var(--amber)','var(--rose)','var(--cyan)'];
-  schedules.sort((a,b)=>{
-    if(a.tanggal&&b.tanggal) return a.tanggal.localeCompare(b.tanggal);
-    if(a.tanggal&&!b.tanggal) return -1;
-    if(!a.tanggal&&b.tanggal) return 1;
-    return DAYS.indexOf(a.hari)-DAYS.indexOf(b.hari);
+  const filterK = document.getElementById('jadwalFilterKelas').value;
+  const filterH = document.getElementById('jadwalFilterHari').value;
+  const filterT = document.getElementById('jadwalFilterTanggal').value;
+  const classes  = getClasses();
+  const subjects = getSubjects();
+
+  // Repopulate kelas filter
+  const jfk  = document.getElementById('jadwalFilterKelas');
+  const prevK = jfk.value;
+  jfk.innerHTML = '<option value="">Semua Kelas</option>';
+  classes.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c.id;
+    o.textContent = `${c.kelas} ${c.jurusan} — ${c.kodeKelas}`;
+    jfk.appendChild(o);
   });
-  const grouped = {};
-  schedules.forEach(sch=>{
-    const key = sch.tanggal ? `date_${sch.tanggal}` : `day_${sch.hari}`;
-    if(!grouped[key]) grouped[key]={type:sch.tanggal?'date':'day', label:sch.tanggal?sch.tanggal:sch.hari, items:[]};
-    grouped[key].items.push(sch);
+  jfk.value = prevK;
+
+  let schedules = getSchedules();
+  if (filterK) schedules = schedules.filter(s => s.kelasId === filterK);
+  if (filterH) schedules = schedules.filter(s => s.hari === filterH);
+  if (filterT) schedules = schedules.filter(s => s.tanggal === filterT);
+
+  const container = document.getElementById('jadwalList');
+  if (!schedules.length) { container.innerHTML = emptyState('📅', 'Belum ada jadwal pelajaran'); return; }
+
+  // Kelompokkan berdasarkan groupId
+  const groupMap = {};
+  schedules.forEach(sch => {
+    const key = sch.groupId || sch.id;
+    if (!groupMap[key]) groupMap[key] = [];
+    groupMap[key].push(sch);
   });
-  container.innerHTML = Object.values(grouped).map(group=>{
-    const di = DAYS.indexOf(group.items[0]?.hari||'');
-    const color = dayColor[di>=0?di:0]||'var(--blue)';
-    const headLabel = group.type==='date'
-      ? `📅 ${formatDateShort(group.label)||group.label} <span style="font-size:10px;opacity:.7">(${group.items[0]?.hari||''})</span>`
-      : group.label;
-    return `<div style="margin-bottom:20px">
-      <div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:${color};margin-bottom:10px;display:flex;align-items:center;gap:8px">
-        <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${color}"></span>${headLabel}
+
+  // Urutkan grup berdasarkan tanggal pertemuan pertama
+  const groupList = Object.entries(groupMap).map(([gid, items]) => {
+    items.sort((a, b) => a.pertemuan - b.pertemuan);
+    return { groupId: gid, items };
+  }).sort((a, b) =>
+    (a.items[0]?.tanggal || '').localeCompare(b.items[0]?.tanggal || '')
+  );
+
+  container.innerHTML = groupList.map(group => {
+    const first  = group.items[0];
+    const last   = group.items[group.items.length - 1];
+    const mapel  = subjects.find(m => m.id === first.mapelId);
+    const cls    = classes.find(c => c.id === first.kelasId);
+
+    const meetingRows = group.items.map(sch => {
+      const isUTS = sch.isUTS || sch.pertemuan === 8;
+      const isUAS = sch.isUAS || sch.pertemuan === 16;
+      let rowStyle = '';
+      let labelHtml = '';
+      if (isUTS) {
+        rowStyle = 'background:rgba(245,158,11,.07);';
+        labelHtml = `<span style="padding:3px 12px;border-radius:6px;font-family:var(--mono);font-size:11px;font-weight:700;background:rgba(245,158,11,.2);color:var(--amber);border:1px solid rgba(245,158,11,.4)">📝 UTS</span>`;
+      } else if (isUAS) {
+        rowStyle = 'background:rgba(244,63,94,.07);';
+        labelHtml = `<span style="padding:3px 12px;border-radius:6px;font-family:var(--mono);font-size:11px;font-weight:700;background:rgba(244,63,94,.2);color:var(--rose);border:1px solid rgba(244,63,94,.4)">🎓 UAS</span>`;
+      }
+      return `<div style="display:flex;align-items:center;gap:10px;padding:9px 20px;border-bottom:1px solid rgba(30,30,56,.45);${rowStyle}">
+        <span style="font-family:var(--mono);font-size:11px;min-width:28px;color:var(--dim);flex-shrink:0">P${sch.pertemuan}</span>
+        <span class="jadwal-day-badge">${sch.hari}</span>
+        <span class="jadwal-date-badge">🗓 ${formatDateShort(sch.tanggal)||'—'}</span>
+        <span class="jadwal-time-text">⏰ ${sch.jamMulai} – ${sch.jamSelesai}</span>
+        <div style="flex:1"></div>
+        ${labelHtml}
+      </div>`;
+    }).join('');
+
+    return `<div class="jadwal-group" id="jg_${group.groupId}">
+      <div style="display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;transition:background .2s"
+           onclick="toggleJadwalGroup('${group.groupId}')"
+           onmouseover="this.style.background='rgba(59,130,246,.05)'"
+           onmouseout="this.style.background=''">
+        <div style="width:44px;height:44px;border-radius:10px;background:var(--blue-bg);border:1px solid rgba(59,130,246,.25);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📅</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            ${mapel ? mapel.mataPelajaran : '<span style="color:var(--dim)">—</span>'}
+            ${mapel ? `<span style="font-family:var(--mono);font-size:10px;color:var(--dim)">[${mapel.kodeMapel}]</span>` : ''}
+          </div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:3px">
+            ${cls ? `${cls.kelas} ${cls.jurusan} — ${cls.kodeKelas}` : '—'} &nbsp;·&nbsp;
+            ${group.items.length} pertemuan &nbsp;·&nbsp;
+            ${formatDateShort(first.tanggal)||'—'} → ${formatDateShort(last.tanggal)||'—'}
+          </div>
+          <div style="font-family:var(--mono);font-size:11px;color:var(--blue);margin-top:2px">
+            ⏰ ${first.jamMulai} – ${first.jamSelesai} &nbsp;·&nbsp; setiap ${first.hari}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+          <button class="icon-btn" onclick="event.stopPropagation();editJadwal('${group.groupId}')" title="Edit jadwal">✏</button>
+          <button class="icon-btn del" onclick="event.stopPropagation();deleteJadwal('${group.groupId}')" title="Hapus semua pertemuan">🗑</button>
+          <span id="jgtgl_${group.groupId}" style="color:var(--dim);font-size:14px;transition:transform .3s;display:inline-block;flex-shrink:0">▾</span>
+        </div>
       </div>
-      ${group.items.map(sch=>{
-        const mapel=subjects.find(m=>m.id===sch.mapelId);
-        const cls=classes.find(c=>c.id===sch.kelasId);
-        return `<div class="jadwal-list-item">
-          <span class="jadwal-day-badge">${sch.hari}</span>
-          ${sch.tanggal?`<span class="jadwal-date-badge">🗓 ${formatDateShort(sch.tanggal)}</span>`:''}
-          <span class="jadwal-time-text">⏰ ${sch.jamMulai} – ${sch.jamSelesai}</span>
-          <div style="flex:1">
-            <div style="font-weight:600;font-size:13px">${mapel?mapel.mataPelajaran:'<span style="color:var(--dim)">—</span>'}</div>
-            <div style="font-family:var(--mono);font-size:10px;color:var(--dim)">${mapel?`[${mapel.kodeMapel}]`:''}</div>
-          </div>
-          <div style="text-align:right">
-            ${cls?`<div style="font-size:12px;font-weight:500">${cls.kelas} ${cls.jurusan}</div><div style="font-family:var(--mono);font-size:10px;color:var(--dim)">${cls.kodeKelas}</div>`:'<span style="color:var(--dim)">—</span>'}
-          </div>
-          <span style="font-family:var(--mono);font-size:11px;padding:3px 10px;border-radius:6px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.2);color:var(--blue)">P-${sch.pertemuan}</span>
-          <div style="display:flex;gap:4px">
-            <button class="icon-btn" onclick="editJadwal('${sch.id}')">✏</button>
-            <button class="icon-btn del" onclick="deleteJadwal('${sch.id}')">🗑</button>
-          </div>
-        </div>`;
-      }).join('')}
+      <div id="jgb_${group.groupId}" style="border-top:1px solid var(--border);display:none;">
+        ${meetingRows}
+      </div>
     </div>`;
   }).join('');
 }
 
-function editJadwal(id) {
-  const s=getSchedules().find(x=>x.id===id); if(!s)return;
-  document.getElementById('jadwalEditId').value=s.id;
-  document.getElementById('jadwalTanggal').value=s.tanggal||'';
-  updateHariFromTanggal(s.tanggal||'');
-  document.getElementById('jadwalMulai').value=s.jamMulai;
-  document.getElementById('jadwalSelesai').value=s.jamSelesai;
-  // Populate mapel select lalu set nilai, kemudian auto-fill kelas
+// ── Toggle expand/collapse grup ──────────────────────────────────────────────
+function toggleJadwalGroup(groupId) {
+  const body   = document.getElementById('jgb_' + groupId);
+  const toggle = document.getElementById('jgtgl_' + groupId);
+  if (!body) return;
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  if (toggle) toggle.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+
+// ── Edit grup (ambil pertemuan pertama) ──────────────────────────────────────
+function editJadwal(groupId) {
+  const groupItems = getSchedules()
+    .filter(s => s.groupId === groupId)
+    .sort((a, b) => a.pertemuan - b.pertemuan);
+  if (!groupItems.length) return;
+  const first = groupItems[0];
+  document.getElementById('jadwalEditId').value = groupId;
+  document.getElementById('jadwalTanggal').value = first.tanggal || '';
+  updateHariFromTanggal(first.tanggal || '');
+  document.getElementById('jadwalMulai').value = first.jamMulai;
+  document.getElementById('jadwalSelesai').value = first.jamSelesai;
   populateMapelSelect(document.getElementById('jadwalMapel'));
-  document.getElementById('jadwalMapel').value=s.mapelId;
-  updateKelasFromMapel(s.mapelId);   // kelas terisi otomatis dari mapel
-  populatePertemuanSelect(document.getElementById('jadwalPertemuan'));
-  document.getElementById('jadwalPertemuan').value=s.pertemuan;
+  document.getElementById('jadwalMapel').value = first.mapelId;
+  updateKelasFromMapel(first.mapelId);
   openModal('modalJadwal');
 }
 
-function deleteJadwal(id) {
-  if(!confirm('Hapus jadwal ini?'))return;
-  saveSchedules(getSchedules().filter(s=>s.id!==id));renderJadwal();updateBadges();toast('Jadwal dihapus.');
+// ── Hapus semua pertemuan dalam grup ─────────────────────────────────────────
+function deleteJadwal(groupId) {
+  if (!confirm('Hapus semua 16 pertemuan jadwal ini?')) return;
+  saveSchedules(getSchedules().filter(s => s.groupId !== groupId));
+  renderJadwal();
+  updateBadges();
+  toast('Jadwal dihapus.');
 }
-document.getElementById('jadwalFilterKelas').addEventListener('change',renderJadwal);
-document.getElementById('jadwalFilterHari').addEventListener('change',renderJadwal);
-document.getElementById('jadwalFilterTanggal').addEventListener('change',renderJadwal);
-document.getElementById('jadwalFilterReset').addEventListener('click',()=>{
-  document.getElementById('jadwalFilterTanggal').value='';renderJadwal();
+
+document.getElementById('jadwalFilterKelas').addEventListener('change', renderJadwal);
+document.getElementById('jadwalFilterHari').addEventListener('change', renderJadwal);
+document.getElementById('jadwalFilterTanggal').addEventListener('change', renderJadwal);
+document.getElementById('jadwalFilterReset').addEventListener('click', () => {
+  document.getElementById('jadwalFilterTanggal').value = '';
+  renderJadwal();
 });
 
 // ═══════════════════ MATERI ═══════════════════
