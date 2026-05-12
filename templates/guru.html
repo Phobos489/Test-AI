@@ -309,9 +309,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 
 /* NILAI */
 #sec-nilai .sec-header{border-left:3px solid var(--rose)}
-.nilai-filter{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
-.nilai-filter select{padding:8px 13px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:13px;cursor:pointer}
-.nilai-filter select option{background:var(--bg3)}
 .nilai-grade{display:inline-block;min-width:46px;text-align:center;font-family:var(--mono);font-size:12px;font-weight:700;padding:3px 8px;border-radius:5px}
 .nilai-grade.A{background:rgba(16,185,129,.15);color:#34d399}
 .nilai-grade.B{background:rgba(59,130,246,.15);color:var(--blue)}
@@ -517,7 +514,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
       </div>
 
       <!-- ═══ JADWAL ═══ -->
-      <!-- [CHANGE 1] Filter tanggal dihapus, hanya tersisa filter kelas & hari -->
       <div class="section" id="sec-jadwal">
         <div class="sec-header">
           <div class="sec-header-left">
@@ -540,7 +536,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
       </div>
 
       <!-- ═══ MATERI ═══ -->
-      <!-- [CHANGE 2] matMapel difilter berdasarkan matKelas; filter accordion juga ikut -->
       <div class="section" id="sec-materi">
         <div class="sec-header">
           <div class="sec-header-left"><h2 style="color:var(--orange)">Materi Pembelajaran</h2><p>Upload dan kelola materi per pertemuan</p></div>
@@ -570,8 +565,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
               <button class="btn btn-orange" style="width:100%" id="matUploadBtn" disabled>⬆ Upload Materi</button>
             </div>
             <div>
+              <!-- ── FILTER MATERI (accordion): kelas + mapel, sama format dengan upload panel ── -->
               <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
-                <div class="field" style="color:var(--orange);flex:1;min-width:160px"><label>Filter Kelas</label><select id="matFilterKelas"><option value="">Semua Kelas</option></select></div>
+                <div class="field" style="color:var(--orange);flex:1;min-width:160px">
+                  <label>Filter Kelas</label>
+                  <select id="matFilterKelas"><option value="">Semua Kelas</option></select>
+                </div>
                 <div class="field" style="color:var(--orange);flex:1;min-width:160px">
                   <label>Filter Mata Pelajaran <span style="font-size:10px;color:var(--dim);text-transform:none">(pilih kelas dulu)</span></label>
                   <select id="matFilterMapel" disabled><option value="">— Pilih kelas dulu —</option></select>
@@ -590,9 +589,16 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
           <button class="btn btn-rose" id="openAddNilai">＋ Input Nilai</button>
         </div>
         <div class="sec-body">
-          <div class="nilai-filter">
-            <select id="nilaiFilterMapel"><option value="">Semua Mata Pelajaran</option></select>
-            <select id="nilaiFilterKelas"><option value="">Semua Kelas</option></select>
+          <!-- ── FILTER NILAI: sama pola dengan filter Materi — kelas dulu, mapel menyesuaikan ── -->
+          <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+            <div class="field" style="color:var(--rose);flex:1;min-width:160px">
+              <label>Filter Kelas</label>
+              <select id="nilaiFilterKelas"><option value="">Semua Kelas</option></select>
+            </div>
+            <div class="field" style="color:var(--rose);flex:1;min-width:160px">
+              <label>Filter Mata Pelajaran <span style="font-size:10px;color:var(--dim);text-transform:none">(pilih kelas dulu)</span></label>
+              <select id="nilaiFilterMapel" disabled><option value="">— Pilih kelas dulu —</option></select>
+            </div>
           </div>
           <div class="panel">
             <div style="overflow-x:auto">
@@ -719,7 +725,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 </div>
 
 <!-- ═══ MODAL: Nilai ═══ -->
-<!-- [CHANGE 3] Urutan: Kelas → Siswa → Mapel; berurutan & difilter per kelas -->
 <div class="modal-bg" id="modalNilai">
   <div class="modal modal-wide">
     <div class="modal-head"><h3 style="color:var(--rose)">📊 Input / Edit Nilai Siswa</h3><button class="modal-close" data-close="modalNilai">✕</button></div>
@@ -1478,11 +1483,9 @@ document.getElementById('jadwalSubmit').addEventListener('click', () => {
   toast('16 pertemuan berhasil dibuat! (P8=UTS, P16=UAS)');
 });
 
-// ── [CHANGE 1] renderJadwal — filter tanggal dihapus ─────────────────────────
 function renderJadwal() {
   const filterK = document.getElementById('jadwalFilterKelas').value;
   const filterH = document.getElementById('jadwalFilterHari').value;
-  // Filter tanggal dihapus
   const classes  = getClasses();
   const subjects = getSubjects();
 
@@ -1500,7 +1503,6 @@ function renderJadwal() {
   let schedules = getSchedules();
   if (filterK) schedules = schedules.filter(s => s.kelasId === filterK);
   if (filterH) schedules = schedules.filter(s => s.hari === filterH);
-  // Filter tanggal dihapus
 
   const container = document.getElementById('jadwalList');
   if (!schedules.length) { container.innerHTML = emptyState('📅', 'Belum ada jadwal pelajaran'); return; }
@@ -1612,7 +1614,6 @@ function deleteJadwal(groupId) {
   toast('Jadwal dihapus.');
 }
 
-// [CHANGE 1] Hanya filter kelas & hari — event tanggal dihapus
 document.getElementById('jadwalFilterKelas').addEventListener('change', renderJadwal);
 document.getElementById('jadwalFilterHari').addEventListener('change', renderJadwal);
 
@@ -1641,7 +1642,7 @@ function checkMatReady(){
   if(el){ el.addEventListener('input',checkMatReady); el.addEventListener('change',checkMatReady); }
 });
 
-// [CHANGE 2] matKelas → filter matMapel by kelasId
+// matKelas → filter matMapel by kelasId (upload panel)
 document.getElementById('matKelas').addEventListener('change', function() {
   const kelasId = this.value;
   const mapelSel = document.getElementById('matMapel');
@@ -1673,20 +1674,20 @@ function renderMateri(){
   const classes=getClasses(); const subjects=getSubjects();
   populateKelasSelect(document.getElementById('matKelas'));
   populatePertemuanSelect(document.getElementById('matPertemuan'));
-  // matMapel stays disabled until kelas is selected (reset on render)
+  // matMapel stays disabled until kelas is selected
   const mp = document.getElementById('matMapel');
   if (!document.getElementById('matKelas').value) {
     mp.innerHTML = '<option value="">— Pilih kelas dulu —</option>';
     mp.disabled = true;
   }
 
-  // Filter kelas (accordion)
+  // ── Filter kelas accordion: tampilkan tahun ajaran (sama format dengan upload panel) ──
   const mfk=document.getElementById('matFilterKelas');const prevK=mfk.value;
   mfk.innerHTML='<option value="">Semua Kelas</option>';
-  classes.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=`${c.kelas} ${c.jurusan} — ${c.kodeKelas}`;mfk.appendChild(o);});
+  classes.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=`${c.kelas} ${c.jurusan} — ${c.kodeKelas} (${c.tahunAjar})`;mfk.appendChild(o);});
   mfk.value=prevK;
 
-  // [CHANGE 2] Filter mapel: hanya tampil setelah kelas dipilih
+  // Filter mapel: hanya tampil setelah kelas dipilih
   const mfm=document.getElementById('matFilterMapel');const prevM=mfm.value;
   if (mfk.value) {
     populateMapelByKelas(mfm, mfk.value, 'Semua Mapel');
@@ -1742,7 +1743,7 @@ function deleteMateri(id){
   saveMaterials(getMaterials().filter(m=>m.id!==id));renderMateri();updateBadges();toast('Materi dihapus.');
 }
 
-// [CHANGE 2] matFilterKelas → filter matFilterMapel
+// matFilterKelas → filter matFilterMapel (accordion)
 document.getElementById('matFilterKelas').addEventListener('change', function() {
   const kelasId = this.value;
   const mfm = document.getElementById('matFilterMapel');
@@ -1757,7 +1758,6 @@ document.getElementById('matFilterKelas').addEventListener('change', function() 
 document.getElementById('matFilterMapel').addEventListener('change', renderMateri);
 
 // ═══════════════════ NILAI ═══════════════════
-// [CHANGE 3] Urutan: Kelas → Siswa → Mapel; berurutan; mapel difilter per kelas
 
 document.getElementById('openAddNilai').addEventListener('click',()=>{
   document.getElementById('nilaiEditId').value='';
@@ -1774,7 +1774,7 @@ document.getElementById('openAddNilai').addEventListener('click',()=>{
   openModal('modalNilai');
 });
 
-// [CHANGE 3] Kelas change → populate siswa & filter mapel by kelas
+// Kelas change → populate siswa & filter mapel by kelas
 document.getElementById('nilaiKelasSelect').addEventListener('change', function() {
   const kelasId = this.value;
   const siswaSel = document.getElementById('nilaiSiswa');
@@ -1786,10 +1786,8 @@ document.getElementById('nilaiKelasSelect').addEventListener('change', function(
     mapelSel.disabled=true;
     return;
   }
-  // Populate siswa
   siswaSel.disabled=false;
   populateSiswaSelect(siswaSel, kelasId);
-  // Populate mapel filtered by kelas
   populateMapelByKelas(mapelSel, kelasId, 'Pilih mata pelajaran...');
 });
 
@@ -1815,15 +1813,26 @@ document.getElementById('nilaiSubmit').addEventListener('click',()=>{
 
 function renderNilai(){
   const classes=getClasses();const students=getStudents();const subjects=getSubjects();const grades=getGrades();
-  const nmf=document.getElementById('nilaiFilterMapel');const prevM=nmf.value;
-  nmf.innerHTML='<option value="">Semua Mata Pelajaran</option>';
-  subjects.forEach(s=>{const o=document.createElement('option');o.value=s.id;o.textContent=s.mataPelajaran;nmf.appendChild(o);});nmf.value=prevM;
+
+  // ── Filter kelas: tampilkan tahun ajaran (sama format Materi) ──
   const nkf=document.getElementById('nilaiFilterKelas');const prevK=nkf.value;
   nkf.innerHTML='<option value="">Semua Kelas</option>';
-  classes.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=`${c.kelas} ${c.jurusan} — ${c.kodeKelas}`;nkf.appendChild(o);});nkf.value=prevK;
+  classes.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=`${c.kelas} ${c.jurusan} — ${c.kodeKelas} (${c.tahunAjar})`;nkf.appendChild(o);});nkf.value=prevK;
+
+  // ── Filter mapel: difilter berdasarkan kelas terpilih (sama pola Materi) ──
+  const nmf=document.getElementById('nilaiFilterMapel');const prevM=nmf.value;
+  if (nkf.value) {
+    populateMapelByKelas(nmf, nkf.value, 'Semua Mapel');
+    if (prevM) nmf.value = prevM;
+  } else {
+    nmf.innerHTML='<option value="">— Pilih kelas dulu —</option>';
+    nmf.disabled=true;
+  }
+
   let rows=grades;
-  if(nmf.value)rows=rows.filter(g=>g.mapelId===nmf.value);
   if(nkf.value)rows=rows.filter(g=>g.kelasId===nkf.value);
+  if(nmf.value)rows=rows.filter(g=>g.mapelId===nmf.value);
+
   const tbody=document.getElementById('nilaiBody');
   if(!rows.length){tbody.innerHTML=`<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--dim)">Belum ada data nilai</td></tr>`;return;}
   tbody.innerHTML=rows.map((g,i)=>{
@@ -1849,7 +1858,6 @@ function renderNilai(){
   }).join('');
 }
 
-// [CHANGE 3] editNilai: isi dalam urutan Kelas → Siswa → Mapel
 function editNilai(id){
   const g=getGrades().find(x=>x.id===id);if(!g)return;
   document.getElementById('nilaiEditId').value=g.id;
@@ -1858,15 +1866,12 @@ function editNilai(id){
   document.getElementById('nilaiUTS').value=g.nilaiUTS;
   document.getElementById('nilaiUAS').value=g.nilaiUAS;
   document.getElementById('nilaiKeaktifan').value=g.nilaiKeaktifan;
-  // 1. Isi kelas
   populateKelasSelect(document.getElementById('nilaiKelasSelect'));
   document.getElementById('nilaiKelasSelect').value=g.kelasId;
-  // 2. Populate & isi siswa
   const siswaSel=document.getElementById('nilaiSiswa');
   siswaSel.disabled=false;
   populateSiswaSelect(siswaSel,g.kelasId);
   siswaSel.value=g.studentId;
-  // 3. Populate & isi mapel (filtered by kelas)
   const mapelSel=document.getElementById('nilaiMapel');
   populateMapelByKelas(mapelSel,g.kelasId,'Pilih mata pelajaran...');
   mapelSel.value=g.mapelId;
@@ -1877,8 +1882,20 @@ function deleteNilai(id){
   if(!confirm('Hapus data nilai ini?'))return;
   saveGrades(getGrades().filter(g=>g.id!==id));renderNilai();updateBadges();toast('Nilai dihapus.');
 }
-document.getElementById('nilaiFilterMapel').addEventListener('change',renderNilai);
-document.getElementById('nilaiFilterKelas').addEventListener('change',renderNilai);
+
+// ── Filter nilai: kelas dulu → mapel menyesuaikan (sama pola Materi) ──
+document.getElementById('nilaiFilterKelas').addEventListener('change', function() {
+  const kelasId = this.value;
+  const nmf = document.getElementById('nilaiFilterMapel');
+  if (kelasId) {
+    populateMapelByKelas(nmf, kelasId, 'Semua Mapel');
+  } else {
+    nmf.innerHTML = '<option value="">— Pilih kelas dulu —</option>';
+    nmf.disabled = true;
+  }
+  renderNilai();
+});
+document.getElementById('nilaiFilterMapel').addEventListener('change', renderNilai);
 
 // ═══════════════════ INIT ═══════════════════
 const session=load(SK.session);
