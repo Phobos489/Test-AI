@@ -510,7 +510,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
         <div class="sec-body">
           <div class="siswa-toolbar">
             <div class="searchbar" style="flex:1;max-width:300px"><span>🔍</span><input type="text" id="siswaSearch" placeholder="Cari nama atau NIS..."></div>
-            <!-- ── TAMBAHAN: Filter Tahun Ajaran ── -->
             <div class="siswa-filter">
               <select id="siswaFilterTahun">
                 <option value="">Semua Tahun</option>
@@ -542,7 +541,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
               <span>🔍</span>
               <input type="text" id="mapelSearch" placeholder="Cari kode atau nama mapel...">
             </div>
-            <!-- ── TAMBAHAN: Filter Tahun Ajaran ── -->
             <div class="field" style="color:var(--purple);flex:1;min-width:140px;max-width:210px">
               <label>Filter Tahun Ajaran</label>
               <select id="mapelFilterTahun"><option value="">Semua Tahun</option></select>
@@ -789,14 +787,14 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
         <select id="nilaiMapel" disabled><option value="">— Pilih kelas dulu —</option></select>
       </div>
       <div class="grid-2">
-        <div class="field" style="color:var(--rose)"><label>Nilai Tugas (0–100)</label><input type="number" id="nilaiTugas" min="0" max="100" placeholder="0"></div>
-        <div class="field" style="color:var(--rose)"><label>Nilai Ulangan Harian</label><input type="number" id="nilaiUH" min="0" max="100" placeholder="0"></div>
+        <div class="field" style="color:var(--rose)"><label>Nilai Tugas (0–100) <span style="font-size:10px;color:var(--dim);text-transform:none">— kosongkan jika belum</span></label><input type="number" id="nilaiTugas" min="0" max="100" placeholder="—"></div>
+        <div class="field" style="color:var(--rose)"><label>Nilai Ulangan Harian <span style="font-size:10px;color:var(--dim);text-transform:none">— kosongkan jika belum</span></label><input type="number" id="nilaiUH" min="0" max="100" placeholder="—"></div>
       </div>
       <div class="grid-2">
-        <div class="field" style="color:var(--rose)"><label>Nilai UTS</label><input type="number" id="nilaiUTS" min="0" max="100" placeholder="0"></div>
-        <div class="field" style="color:var(--rose)"><label>Nilai UAS</label><input type="number" id="nilaiUAS" min="0" max="100" placeholder="0"></div>
+        <div class="field" style="color:var(--rose)"><label>Nilai UTS <span style="font-size:10px;color:var(--dim);text-transform:none">— kosongkan jika belum</span></label><input type="number" id="nilaiUTS" min="0" max="100" placeholder="—"></div>
+        <div class="field" style="color:var(--rose)"><label>Nilai UAS <span style="font-size:10px;color:var(--dim);text-transform:none">— kosongkan jika belum</span></label><input type="number" id="nilaiUAS" min="0" max="100" placeholder="—"></div>
       </div>
-      <div class="field" style="color:var(--rose)"><label>Nilai Keaktifan (0–100)</label><input type="number" id="nilaiKeaktifan" min="0" max="100" placeholder="0"></div>
+      <div class="field" style="color:var(--rose)"><label>Nilai Keaktifan (0–100) <span style="font-size:10px;color:var(--dim);text-transform:none">— kosongkan jika belum</span></label><input type="number" id="nilaiKeaktifan" min="0" max="100" placeholder="—"></div>
     </div>
     <div class="modal-foot">
       <button class="btn btn-ghost" data-close="modalNilai">Batal</button>
@@ -1030,6 +1028,18 @@ function formatBytes(b) {
   return (b/1048576).toFixed(1)+' MB';
 }
 function gradeClass(v) { if(v>=85)return'A'; if(v>=70)return'B'; if(v>=55)return'C'; return'D'; }
+// ── Null-safe weighted average (only counts filled-in grades) ──
+function calcNilaiAvg(g) {
+  const items=[
+    {val:g.nilaiTugas,w:1},{val:g.nilaiUH,w:1.5},
+    {val:g.nilaiUTS,w:2},{val:g.nilaiUAS,w:2.5},{val:g.nilaiKeaktifan,w:1}
+  ].filter(x=>x.val!==null&&x.val!==undefined);
+  if(!items.length)return null;
+  const tw=items.reduce((s,x)=>s+x.w,0);
+  return Math.round(items.reduce((s,x)=>s+x.val*x.w,0)/tw);
+}
+// ── Format a grade value: null/undefined → dim dash, number → string ──
+function fmtNilai(v){return(v===null||v===undefined)?'<span style="color:var(--dim);font-family:var(--mono)">—</span>':String(v);}
 function emptyState(icon,text) { return `<div class="empty"><span class="ei">${icon}</span><p>${text}</p></div>`; }
 
 function getTeacherForSubject(subjectName) {
@@ -1381,11 +1391,10 @@ document.getElementById('siswaSubmit').addEventListener('click', () => {
 
 function renderSiswa() {
   const search    = document.getElementById('siswaSearch').value.toLowerCase();
-  const filterT   = document.getElementById('siswaFilterTahun').value;   // ← BARU
+  const filterT   = document.getElementById('siswaFilterTahun').value;
   const filterK   = document.getElementById('siswaFilterKelas').value;
   const classes   = getClasses();
 
-  // ── Populate filter Tahun Ajaran ──────────────────────────────────────────
   const stf = document.getElementById('siswaFilterTahun');
   const prevT = stf.value;
   const tahuns = [...new Set(classes.map(c => c.tahunAjar).filter(Boolean))].sort();
@@ -1393,11 +1402,9 @@ function renderSiswa() {
   tahuns.forEach(t => { const o=document.createElement('option');o.value=t;o.textContent=t;stf.appendChild(o); });
   stf.value = prevT;
 
-  // ── Populate filter Kelas (dengan tahun ajaran di teks) ───────────────────
   const sf = document.getElementById('siswaFilterKelas');
   const prev = sf.value;
   sf.innerHTML = '<option value="">Semua Kelas</option>';
-  // Filter kelas berdasarkan tahun ajaran yang dipilih
   const filteredClasses = filterT
     ? classes.filter(c => c.tahunAjar === filterT)
     : classes;
@@ -1407,10 +1414,8 @@ function renderSiswa() {
     o.textContent=`${c.kelas} ${c.jurusan} — ${c.kodeKelas} (${c.tahunAjar})`;
     sf.appendChild(o);
   });
-  // Jaga nilai sebelumnya jika masih valid setelah filter tahun
   if (filteredClasses.find(c => c.id === prev)) sf.value = prev;
 
-  // ── Apply all filters ─────────────────────────────────────────────────────
   let students = getStudents();
   if (search)  students = students.filter(s => s.namaLengkap.toLowerCase().includes(search) || s.nis.includes(search));
   if (filterT) students = students.filter(s => {
@@ -1467,7 +1472,7 @@ function deleteSiswa(id) {
   saveStudents(getStudents().filter(s=>s.id!==id));renderSiswa();updateBadges();toast('Siswa dihapus.');
 }
 document.getElementById('siswaSearch').addEventListener('input', renderSiswa);
-document.getElementById('siswaFilterTahun').addEventListener('change', renderSiswa); // ← BARU
+document.getElementById('siswaFilterTahun').addEventListener('change', renderSiswa);
 document.getElementById('siswaFilterKelas').addEventListener('change', renderSiswa);
 
 // ═══════════════════ MAPEL ═══════════════════
@@ -1496,7 +1501,6 @@ function renderMapel() {
   const classes   = getClasses();
   const grid      = document.getElementById('mapelGrid');
 
-  // ── Populate filter Tahun Ajaran ──────────────────────────────────────────
   const mft = document.getElementById('mapelFilterTahun');
   if (mft) {
     const prevTahun = mft.value;
@@ -1506,7 +1510,6 @@ function renderMapel() {
     mft.value = prevTahun;
   }
 
-  // ── Populate filter Kelas (dibatasi oleh tahun ajaran jika dipilih) ───────
   const mfk = document.getElementById('mapelFilterKelas');
   const mfm = document.getElementById('mapelFilterMapel');
   if (mfk) {
@@ -1519,9 +1522,7 @@ function renderMapel() {
       o.textContent=`${c.kelas} ${c.jurusan} — ${c.kodeKelas} (${c.tahunAjar})`;
       mfk.appendChild(o);
     });
-    // Jaga nilai sebelumnya jika masih valid
     if (filteredByTahun.find(c => c.id === prevK)) mfk.value = prevK;
-    // Sync cascading mapel filter
     if (mfk.value) {
       const prevM = mfm.value;
       populateMapelByKelas(mfm, mfk.value, 'Semua Mapel');
@@ -1532,13 +1533,11 @@ function renderMapel() {
     }
   }
 
-  // ── Read filter values ─────────────────────────────────────────────────────
   const search   = (document.getElementById('mapelSearch')?.value || '').toLowerCase();
   const filterTahun = mft?.value || '';
   const filterK  = mfk?.value || '';
   const filterM  = mfm?.value || '';
 
-  // ── Apply filters ──────────────────────────────────────────────────────────
   let filtered = subjects;
   if (filterTahun) filtered = filtered.filter(s => s.tahunAjar === filterTahun);
   if (filterK)     filtered = filtered.filter(s => s.kelasId === filterK);
@@ -1593,10 +1592,8 @@ function deleteMapel(id) {
   saveSubjects(getSubjects().filter(s=>s.id!==id));renderMapel();updateBadges();toast('Mata pelajaran dihapus.');
 }
 
-// ── Mapel filter event listeners ──────────────────────────────────────────────
 document.getElementById('mapelSearch').addEventListener('input', renderMapel);
-document.getElementById('mapelFilterTahun').addEventListener('change', function() { // ← BARU
-  // Reset kelas & mapel filter saat tahun berubah
+document.getElementById('mapelFilterTahun').addEventListener('change', function() {
   const mfk = document.getElementById('mapelFilterKelas');
   const mfm = document.getElementById('mapelFilterMapel');
   mfk.value = '';
@@ -2017,11 +2014,9 @@ document.getElementById('nilaiSubmit').addEventListener('click',()=>{
   const kelasId=document.getElementById('nilaiKelasSelect').value;
   const studentId=document.getElementById('nilaiSiswa').value;
   const mapelId=document.getElementById('nilaiMapel').value;
-  const tugas=+document.getElementById('nilaiTugas').value;
-  const uh=+document.getElementById('nilaiUH').value;
-  const uts=+document.getElementById('nilaiUTS').value;
-  const uas=+document.getElementById('nilaiUAS').value;
-  const aktif=+document.getElementById('nilaiKeaktifan').value;
+  // Parse: empty string → null, numeric string → Number
+  const pn=eid=>{const v=document.getElementById(eid).value;return v===''?null:Number(v);};
+  const tugas=pn('nilaiTugas'),uh=pn('nilaiUH'),uts=pn('nilaiUTS'),uas=pn('nilaiUAS'),aktif=pn('nilaiKeaktifan');
   if(!kelasId){toast('Pilih kelas terlebih dahulu!','err');return;}
   if(!studentId){toast('Pilih siswa terlebih dahulu!','err');return;}
   if(!mapelId){toast('Pilih mata pelajaran terlebih dahulu!','err');return;}
@@ -2054,20 +2049,21 @@ function renderNilai(){
     const std=students.find(s=>s.id===g.studentId);
     const cls=classes.find(c=>c.id===g.kelasId);
     const subj=subjects.find(s=>s.id===g.mapelId);
-    const avg=Math.round((g.nilaiTugas+g.nilaiUH*1.5+g.nilaiUTS*2+g.nilaiUAS*2.5+g.nilaiKeaktifan)/8);
-    const gc=gradeClass(avg);
+    // Only average the grades that have actually been filled in
+    const avg=calcNilaiAvg(g);
+    const gc=avg!==null?gradeClass(avg):null;
     return `<tr>
       <td style="font-family:var(--mono);font-size:11px;color:var(--dim)">${i+1}</td>
       <td><div class="siswa-name-col"><div class="siswa-avatar" style="background:${std?avatarColor(std.namaLengkap):'var(--dim)'};width:28px;height:28px;font-size:10px">${std?std.namaLengkap.charAt(0).toUpperCase():'?'}</div>
         <div class="siswa-name-info"><div class="name">${std?std.namaLengkap:'—'}</div><div class="nis">${std?std.nis:'—'}</div></div></div></td>
       <td>${cls?`<span style="font-family:var(--mono);font-size:11px;color:var(--dim)">${cls.kelas} ${cls.jurusan}</span>`:'—'}</td>
       <td style="font-size:12px">${subj?subj.mataPelajaran:'—'}</td>
-      <td style="font-family:var(--mono);font-size:12px;text-align:center">${g.nilaiTugas}</td>
-      <td style="font-family:var(--mono);font-size:12px;text-align:center">${g.nilaiUH}</td>
-      <td style="font-family:var(--mono);font-size:12px;text-align:center">${g.nilaiUTS}</td>
-      <td style="font-family:var(--mono);font-size:12px;text-align:center">${g.nilaiUAS}</td>
-      <td style="font-family:var(--mono);font-size:12px;text-align:center">${g.nilaiKeaktifan}</td>
-      <td><span class="nilai-grade ${gc}">${avg} (${gc})</span></td>
+      <td style="font-family:var(--mono);font-size:12px;text-align:center">${fmtNilai(g.nilaiTugas)}</td>
+      <td style="font-family:var(--mono);font-size:12px;text-align:center">${fmtNilai(g.nilaiUH)}</td>
+      <td style="font-family:var(--mono);font-size:12px;text-align:center">${fmtNilai(g.nilaiUTS)}</td>
+      <td style="font-family:var(--mono);font-size:12px;text-align:center">${fmtNilai(g.nilaiUAS)}</td>
+      <td style="font-family:var(--mono);font-size:12px;text-align:center">${fmtNilai(g.nilaiKeaktifan)}</td>
+      <td>${avg!==null?`<span class="nilai-grade ${gc}">${avg} (${gc})</span>`:'<span style="color:var(--dim);font-family:var(--mono);font-size:11px">— belum ada nilai</span>'}</td>
       <td><div style="display:flex;gap:4px"><button class="icon-btn" onclick="editNilai('${g.id}')">✏</button><button class="icon-btn del" onclick="deleteNilai('${g.id}')">🗑</button></div></td>
     </tr>`;
   }).join('');
@@ -2076,11 +2072,13 @@ function renderNilai(){
 function editNilai(id){
   const g=getGrades().find(x=>x.id===id);if(!g)return;
   document.getElementById('nilaiEditId').value=g.id;
-  document.getElementById('nilaiTugas').value=g.nilaiTugas;
-  document.getElementById('nilaiUH').value=g.nilaiUH;
-  document.getElementById('nilaiUTS').value=g.nilaiUTS;
-  document.getElementById('nilaiUAS').value=g.nilaiUAS;
-  document.getElementById('nilaiKeaktifan').value=g.nilaiKeaktifan;
+  // Restore null → empty string so the input shows blank (not "0")
+  const rv=v=>(v===null||v===undefined)?'':v;
+  document.getElementById('nilaiTugas').value=rv(g.nilaiTugas);
+  document.getElementById('nilaiUH').value=rv(g.nilaiUH);
+  document.getElementById('nilaiUTS').value=rv(g.nilaiUTS);
+  document.getElementById('nilaiUAS').value=rv(g.nilaiUAS);
+  document.getElementById('nilaiKeaktifan').value=rv(g.nilaiKeaktifan);
   populateKelasSelect(document.getElementById('nilaiKelasSelect'));
   document.getElementById('nilaiKelasSelect').value=g.kelasId;
   const siswaSel=document.getElementById('nilaiSiswa');
