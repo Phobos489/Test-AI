@@ -174,6 +174,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 .empty .ei{font-size:48px;opacity:.3;display:block;margin-bottom:16px}
 .empty p{font-size:14px}
 
+/* disabled select helper — works for both .field select and bare selects */
+select:disabled{cursor:not-allowed;opacity:.45;background:var(--bg3) !important}
+
 @keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
@@ -230,7 +233,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 #sec-siswa .sec-header{border-left:3px solid var(--emerald)}
 .siswa-toolbar{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
 .siswa-toolbar .searchbar{flex:1;min-width:200px}
-.siswa-filter select{padding:8px 13px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:13px;cursor:pointer}
+.siswa-filter select{padding:8px 13px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:13px;cursor:pointer;transition:all .2s}
 .siswa-filter select option{background:var(--bg3)}
 .siswa-avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
 .siswa-name-col{display:flex;align-items:center;gap:10px}
@@ -261,7 +264,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 .jadwal-filter select option{background:var(--bg3)}
 .jadwal-day-badge{padding:3px 10px;border-radius:6px;font-family:var(--mono);font-size:11px;background:var(--blue-bg);color:var(--blue);border:1px solid rgba(59,130,246,.2);white-space:nowrap}
 .jadwal-date-badge{padding:3px 10px;border-radius:6px;font-family:var(--mono);font-size:11px;background:rgba(139,92,246,.1);color:var(--purple);border:1px solid rgba(139,92,246,.2);white-space:nowrap}
-.jadwal-time-text{font-family:var(--mono);font-size:12px;color:var(--dim);white-space:nowrap}
+.jadwal-time-text{font-family:var(--mono);font-size:11px;color:var(--dim);white-space:nowrap}
 .hari-readonly-box{padding:10px 13px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--dim);font-family:var(--sans);font-size:13px;cursor:not-allowed;min-height:40px}
 .hari-readonly-box.filled{color:var(--text);background:rgba(59,130,246,.05);border-color:rgba(59,130,246,.3)}
 .kelas-readonly-box{padding:10px 13px;background:var(--bg3);border:1px solid var(--border2);border-radius:7px;color:var(--dim);font-family:var(--sans);font-size:13px;cursor:not-allowed;min-height:40px;transition:all .2s}
@@ -1028,7 +1031,6 @@ function formatBytes(b) {
   return (b/1048576).toFixed(1)+' MB';
 }
 function gradeClass(v) { if(v>=85)return'A'; if(v>=70)return'B'; if(v>=55)return'C'; return'D'; }
-// ── Null-safe weighted average (only counts filled-in grades) ──
 function calcNilaiAvg(g) {
   const items=[
     {val:g.nilaiTugas,w:1},{val:g.nilaiUH,w:1.5},
@@ -1038,7 +1040,6 @@ function calcNilaiAvg(g) {
   const tw=items.reduce((s,x)=>s+x.w,0);
   return Math.round(items.reduce((s,x)=>s+x.val*x.w,0)/tw);
 }
-// ── Format a grade value: null/undefined → dim dash, number → string ──
 function fmtNilai(v){return(v===null||v===undefined)?'<span style="color:var(--dim);font-family:var(--mono)">—</span>':String(v);}
 function emptyState(icon,text) { return `<div class="empty"><span class="ei">${icon}</span><p>${text}</p></div>`; }
 
@@ -1395,14 +1396,19 @@ function renderSiswa() {
   const filterK   = document.getElementById('siswaFilterKelas').value;
   const classes   = getClasses();
 
+  // ── Repopulate tahun filter (preserve disabled state) ──
   const stf = document.getElementById('siswaFilterTahun');
+  const wasDisabledT = stf.disabled;
   const prevT = stf.value;
   const tahuns = [...new Set(classes.map(c => c.tahunAjar).filter(Boolean))].sort();
   stf.innerHTML = '<option value="">Semua Tahun</option>';
   tahuns.forEach(t => { const o=document.createElement('option');o.value=t;o.textContent=t;stf.appendChild(o); });
   stf.value = prevT;
+  stf.disabled = wasDisabledT; // restore
 
+  // ── Repopulate kelas filter (filtered by tahun if set) ──
   const sf = document.getElementById('siswaFilterKelas');
+  const wasDisabledK = sf.disabled;
   const prev = sf.value;
   sf.innerHTML = '<option value="">Semua Kelas</option>';
   const filteredClasses = filterT
@@ -1415,7 +1421,9 @@ function renderSiswa() {
     sf.appendChild(o);
   });
   if (filteredClasses.find(c => c.id === prev)) sf.value = prev;
+  sf.disabled = wasDisabledK; // restore
 
+  // ── Filter students ──
   let students = getStudents();
   if (search)  students = students.filter(s => s.namaLengkap.toLowerCase().includes(search) || s.nis.includes(search));
   if (filterT) students = students.filter(s => {
@@ -1471,9 +1479,34 @@ function deleteSiswa(id) {
   if(!confirm('Hapus data siswa ini?'))return;
   saveStudents(getStudents().filter(s=>s.id!==id));renderSiswa();updateBadges();toast('Siswa dihapus.');
 }
+
+// ── SISWA FILTER EVENT LISTENERS (cascading logic) ────────────────────────────
 document.getElementById('siswaSearch').addEventListener('input', renderSiswa);
-document.getElementById('siswaFilterTahun').addEventListener('change', renderSiswa);
-document.getElementById('siswaFilterKelas').addEventListener('change', renderSiswa);
+
+document.getElementById('siswaFilterTahun').addEventListener('change', function() {
+  const kelasSel = document.getElementById('siswaFilterKelas');
+  if (!this.value) {
+    // Reset tahun → reset kelas juga & aktifkan kembali keduanya
+    kelasSel.value = '';
+    kelasSel.disabled = false;
+  } else {
+    // Tahun baru dipilih → reset kelas karena opsinya berubah
+    kelasSel.value = '';
+  }
+  renderSiswa();
+});
+
+document.getElementById('siswaFilterKelas').addEventListener('change', function() {
+  const tahunSel = document.getElementById('siswaFilterTahun');
+  if (this.value && !tahunSel.value) {
+    // Kelas dipilih duluan tanpa tahun → nonaktifkan filter tahun
+    tahunSel.disabled = true;
+  } else if (!this.value) {
+    // Kelas direset → aktifkan kembali filter tahun
+    tahunSel.disabled = false;
+  }
+  renderSiswa();
+});
 
 // ═══════════════════ MAPEL ═══════════════════
 document.getElementById('openAddMapel').addEventListener('click', () => {
@@ -1502,18 +1535,22 @@ function renderMapel() {
   const grid      = document.getElementById('mapelGrid');
 
   const mft = document.getElementById('mapelFilterTahun');
+  const mfk = document.getElementById('mapelFilterKelas');
+  const mfm = document.getElementById('mapelFilterMapel');
+
   if (mft) {
     const prevTahun = mft.value;
+    const wasDisabledTahun = mft.disabled;
     const tahuns = [...new Set(classes.map(c => c.tahunAjar).filter(Boolean))].sort();
     mft.innerHTML = '<option value="">Semua Tahun</option>';
     tahuns.forEach(t => { const o=document.createElement('option');o.value=t;o.textContent=t;mft.appendChild(o); });
     mft.value = prevTahun;
+    mft.disabled = wasDisabledTahun; // restore disabled state
   }
 
-  const mfk = document.getElementById('mapelFilterKelas');
-  const mfm = document.getElementById('mapelFilterMapel');
   if (mfk) {
     const prevK = mfk.value;
+    const wasDisabledK = mfk.disabled;
     const tahunFilter = mft ? mft.value : '';
     const filteredByTahun = tahunFilter ? classes.filter(c => c.tahunAjar === tahunFilter) : classes;
     mfk.innerHTML = '<option value="">Semua Kelas</option>';
@@ -1523,20 +1560,19 @@ function renderMapel() {
       mfk.appendChild(o);
     });
     if (filteredByTahun.find(c => c.id === prevK)) mfk.value = prevK;
-    if (mfk.value) {
+    mfk.disabled = wasDisabledK; // restore disabled state
+    // If kelas still has a value, keep mapel sub-filter populated
+    if (mfk.value && mfm) {
       const prevM = mfm.value;
       populateMapelByKelas(mfm, mfk.value, 'Semua Mapel');
       if (prevM) mfm.value = prevM;
-    } else {
-      mfm.innerHTML = '<option value="">— Pilih kelas dulu —</option>';
-      mfm.disabled = true;
     }
   }
 
-  const search   = (document.getElementById('mapelSearch')?.value || '').toLowerCase();
+  const search      = (document.getElementById('mapelSearch')?.value || '').toLowerCase();
   const filterTahun = mft?.value || '';
-  const filterK  = mfk?.value || '';
-  const filterM  = mfm?.value || '';
+  const filterK     = mfk?.value || '';
+  const filterM     = mfm?.value || '';
 
   let filtered = subjects;
   if (filterTahun) filtered = filtered.filter(s => s.tahunAjar === filterTahun);
@@ -1593,25 +1629,38 @@ function deleteMapel(id) {
 }
 
 document.getElementById('mapelSearch').addEventListener('input', renderMapel);
+
+// ── MAPEL FILTER EVENT LISTENERS (cascading logic) ────────────────────────────
 document.getElementById('mapelFilterTahun').addEventListener('change', function() {
   const mfk = document.getElementById('mapelFilterKelas');
   const mfm = document.getElementById('mapelFilterMapel');
+  // Setiap kali tahun berubah: reset kelas & mapel sub-filter, aktifkan kembali kelas
   mfk.value = '';
+  mfk.disabled = false;
   mfm.innerHTML = '<option value="">— Pilih kelas dulu —</option>';
   mfm.disabled = true;
   renderMapel();
 });
+
 document.getElementById('mapelFilterKelas').addEventListener('change', function() {
-  const kelasId = this.value;
+  const tahunSel = document.getElementById('mapelFilterTahun');
   const mfm = document.getElementById('mapelFilterMapel');
-  if (kelasId) {
-    populateMapelByKelas(mfm, kelasId, 'Semua Mapel');
+  if (this.value && !tahunSel.value) {
+    // Kelas dipilih duluan tanpa tahun → nonaktifkan filter tahun
+    tahunSel.disabled = true;
+  } else if (!this.value) {
+    // Kelas direset → aktifkan kembali filter tahun
+    tahunSel.disabled = false;
+  }
+  if (this.value) {
+    populateMapelByKelas(mfm, this.value, 'Semua Mapel');
   } else {
     mfm.innerHTML = '<option value="">— Pilih kelas dulu —</option>';
     mfm.disabled = true;
   }
   renderMapel();
 });
+
 document.getElementById('mapelFilterMapel').addEventListener('change', renderMapel);
 
 // ═══════════════════ JADWAL ═══════════════════
@@ -2014,7 +2063,6 @@ document.getElementById('nilaiSubmit').addEventListener('click',()=>{
   const kelasId=document.getElementById('nilaiKelasSelect').value;
   const studentId=document.getElementById('nilaiSiswa').value;
   const mapelId=document.getElementById('nilaiMapel').value;
-  // Parse: empty string → null, numeric string → Number
   const pn=eid=>{const v=document.getElementById(eid).value;return v===''?null:Number(v);};
   const tugas=pn('nilaiTugas'),uh=pn('nilaiUH'),uts=pn('nilaiUTS'),uas=pn('nilaiUAS'),aktif=pn('nilaiKeaktifan');
   if(!kelasId){toast('Pilih kelas terlebih dahulu!','err');return;}
@@ -2049,7 +2097,6 @@ function renderNilai(){
     const std=students.find(s=>s.id===g.studentId);
     const cls=classes.find(c=>c.id===g.kelasId);
     const subj=subjects.find(s=>s.id===g.mapelId);
-    // Only average the grades that have actually been filled in
     const avg=calcNilaiAvg(g);
     const gc=avg!==null?gradeClass(avg):null;
     return `<tr>
@@ -2072,7 +2119,6 @@ function renderNilai(){
 function editNilai(id){
   const g=getGrades().find(x=>x.id===id);if(!g)return;
   document.getElementById('nilaiEditId').value=g.id;
-  // Restore null → empty string so the input shows blank (not "0")
   const rv=v=>(v===null||v===undefined)?'':v;
   document.getElementById('nilaiTugas').value=rv(g.nilaiTugas);
   document.getElementById('nilaiUH').value=rv(g.nilaiUH);
