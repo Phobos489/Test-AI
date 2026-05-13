@@ -245,7 +245,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 .mapel-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--blue))}
 .mapel-card:hover{border-color:rgba(139,92,246,.35);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
 .mapel-kode{font-family:var(--mono);font-size:12px;color:var(--purple);margin-bottom:8px;letter-spacing:.06em}
-.mapel-nama{font-size:15px;font-weight:600;margin-bottom:10px}
+.mapel-nama{font-size:15px;font-weight:600;margin-bottom:6px}
+.mapel-guru{display:flex;align-items:center;gap:6px;font-size:12px;color:#a78bfa;margin-bottom:6px;font-weight:500}
 .mapel-tahun{font-family:var(--mono);font-size:10px;color:var(--dim)}
 .mapel-card-actions{display:flex;gap:4px;margin-top:12px;justify-content:flex-end;opacity:0;transition:opacity .2s}
 .mapel-card:hover .mapel-card-actions{opacity:1}
@@ -464,6 +465,26 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
           <button class="btn btn-cyan" id="openAddKelas">＋ Tambah Kelas</button>
         </div>
         <div class="sec-body">
+          <!-- ── TOOLBAR FILTER KELAS ── -->
+          <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:flex-end;">
+            <div class="searchbar" style="flex:1;min-width:200px;max-width:320px">
+              <span>🔍</span>
+              <input type="text" id="kelasSearch" placeholder="Cari kode kelas, jurusan, wali kelas...">
+            </div>
+            <div class="field" style="color:var(--cyan);flex:1;min-width:140px;max-width:210px">
+              <label>Filter Jurusan</label>
+              <select id="kelasFilterJurusan"><option value="">Semua Jurusan</option></select>
+            </div>
+            <div class="field" style="color:var(--cyan);flex:1;min-width:140px;max-width:210px">
+              <label>Filter Wali Kelas</label>
+              <select id="kelasFilterWali"><option value="">Semua Wali</option></select>
+            </div>
+            <div class="field" style="color:var(--cyan);flex:1;min-width:140px;max-width:210px">
+              <label>Filter Tahun Ajaran</label>
+              <select id="kelasFilterTahun"><option value="">Semua Tahun</option></select>
+            </div>
+            <span class="akun-count" id="kelasCount">0 kelas</span>
+          </div>
           <div class="kelas-columns">
             <div>
               <div class="kelas-col-header kelas-col-10">📘 Kelas 10 <span style="margin-left:auto;font-family:var(--mono);font-size:10px" id="count-10">0 kelas</span></div>
@@ -510,7 +531,25 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
           <div class="sec-header-left"><h2 style="color:var(--purple)">Mata Pelajaran</h2><p>Kelola daftar mata pelajaran yang diajarkan</p></div>
           <button class="btn btn-purple" id="openAddMapel">＋ Tambah Mapel</button>
         </div>
-        <div class="sec-body"><div class="mapel-grid" id="mapelGrid"></div></div>
+        <div class="sec-body">
+          <!-- ── TOOLBAR FILTER MAPEL ── -->
+          <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:flex-end;">
+            <div class="searchbar" style="flex:1;min-width:200px;max-width:320px">
+              <span>🔍</span>
+              <input type="text" id="mapelSearch" placeholder="Cari kode atau nama mapel...">
+            </div>
+            <div class="field" style="color:var(--purple);flex:1;min-width:160px;max-width:260px">
+              <label>Filter Kelas</label>
+              <select id="mapelFilterKelas"><option value="">Semua Kelas</option></select>
+            </div>
+            <div class="field" style="color:var(--purple);flex:1;min-width:160px;max-width:260px">
+              <label>Filter Mata Pelajaran <span style="font-size:10px;color:var(--dim);text-transform:none">(pilih kelas dulu)</span></label>
+              <select id="mapelFilterMapel" disabled><option value="">— Pilih kelas dulu —</option></select>
+            </div>
+            <span class="akun-count" id="mapelCount">0 mapel</span>
+          </div>
+          <div class="mapel-grid" id="mapelGrid"></div>
+        </div>
       </div>
 
       <!-- ═══ JADWAL ═══ -->
@@ -565,7 +604,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
               <button class="btn btn-orange" style="width:100%" id="matUploadBtn" disabled>⬆ Upload Materi</button>
             </div>
             <div>
-              <!-- ── FILTER MATERI (accordion): kelas + mapel, sama format dengan upload panel ── -->
               <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
                 <div class="field" style="color:var(--orange);flex:1;min-width:160px">
                   <label>Filter Kelas</label>
@@ -589,7 +627,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
           <button class="btn btn-rose" id="openAddNilai">＋ Input Nilai</button>
         </div>
         <div class="sec-body">
-          <!-- ── FILTER NILAI: sama pola dengan filter Materi — kelas dulu, mapel menyesuaikan ── -->
           <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
             <div class="field" style="color:var(--rose);flex:1;min-width:160px">
               <label>Filter Kelas</label>
@@ -986,6 +1023,14 @@ function formatBytes(b) {
 function gradeClass(v) { if(v>=85)return'A'; if(v>=70)return'B'; if(v>=55)return'C'; return'D'; }
 function emptyState(icon,text) { return `<div class="empty"><span class="ei">${icon}</span><p>${text}</p></div>`; }
 
+// ── Get teacher name for a subject name ──
+function getTeacherForSubject(subjectName) {
+  if (!subjectName) return null;
+  const ts = Object.values(loadO(SK.teachers));
+  const t = ts.find(t => t.subject === subjectName);
+  return t ? t.name : null;
+}
+
 // Populate helpers
 function populateKelasSelect(sel, includeEmpty=true) {
   sel.innerHTML = includeEmpty ? '<option value="">Pilih kelas...</option>' : '';
@@ -994,22 +1039,27 @@ function populateKelasSelect(sel, includeEmpty=true) {
     o.textContent=`${c.kelas} ${c.jurusan} — ${c.kodeKelas} (${c.tahunAjar})`; sel.appendChild(o);
   });
 }
+
+// populateMapelSelect: show [kode] nama — nama guru
 function populateMapelSelect(sel, includeEmpty=true) {
   sel.innerHTML = includeEmpty ? '<option value="">Pilih mata pelajaran...</option>' : '';
   getSubjects().forEach(s => {
+    const guru = getTeacherForSubject(s.mataPelajaran);
     const o=document.createElement('option'); o.value=s.id;
-    o.textContent=`[${s.kodeMapel}] ${s.mataPelajaran}`; sel.appendChild(o);
+    o.textContent=`[${s.kodeMapel}] ${s.mataPelajaran}${guru ? ' — ' + guru : ''}`; sel.appendChild(o);
   });
 }
-// Populate mapel filtered by kelasId
+
+// populateMapelByKelas: filtered by kelasId, show nama mapel — nama guru
 function populateMapelByKelas(sel, kelasId, placeholder) {
   const ph = placeholder || '— Pilih kelas dulu —';
   sel.innerHTML = `<option value="">${ph}</option>`;
   if (!kelasId) { sel.disabled = true; return; }
   const subjects = getSubjects().filter(s => s.kelasId === kelasId);
   subjects.forEach(s => {
+    const guru = getTeacherForSubject(s.mataPelajaran);
     const o=document.createElement('option'); o.value=s.id;
-    o.textContent=`[${s.kodeMapel}] ${s.mataPelajaran}`; sel.appendChild(o);
+    o.textContent=`[${s.kodeMapel}] ${s.mataPelajaran}${guru ? ' — ' + guru : ''}`; sel.appendChild(o);
   });
   sel.disabled = false;
   if (!subjects.length) {
@@ -1017,6 +1067,7 @@ function populateMapelByKelas(sel, kelasId, placeholder) {
     sel.disabled = true;
   }
 }
+
 function populateSiswaSelect(sel, kelasId) {
   sel.innerHTML='<option value="">Pilih siswa...</option>';
   getStudents().filter(s=>s.kelasId===kelasId).forEach(s => {
@@ -1206,20 +1257,74 @@ document.getElementById('kelasSubmit').addEventListener('click', () => {
   else classes.push({id:uid(),kodeKelas:kode,kelas:level,jurusan,waliKelas:wali,tahunAjar:tahun});
   saveClasses(classes);closeModal('modalKelas');renderKelas();updateBadges();toast('Data kelas berhasil disimpan!');
 });
+
 function renderKelas() {
+  const allClasses = getClasses();
+
+  // ── Populate filter dropdowns ──
+  const jSel = document.getElementById('kelasFilterJurusan');
+  const wSel = document.getElementById('kelasFilterWali');
+  const tSel = document.getElementById('kelasFilterTahun');
+
+  if (jSel) {
+    const prevJ = jSel.value;
+    const jurusans = [...new Set(allClasses.map(c => c.jurusan).filter(Boolean))].sort();
+    jSel.innerHTML = '<option value="">Semua Jurusan</option>';
+    jurusans.forEach(j => { const o=document.createElement('option');o.value=j;o.textContent=j;jSel.appendChild(o); });
+    jSel.value = prevJ;
+  }
+  if (wSel) {
+    const prevW = wSel.value;
+    const walis = [...new Set(allClasses.map(c => c.waliKelas).filter(Boolean))].sort();
+    wSel.innerHTML = '<option value="">Semua Wali</option>';
+    walis.forEach(w => { const o=document.createElement('option');o.value=w;o.textContent=w;wSel.appendChild(o); });
+    wSel.value = prevW;
+  }
+  if (tSel) {
+    const prevT = tSel.value;
+    const tahuns = [...new Set(allClasses.map(c => c.tahunAjar).filter(Boolean))].sort();
+    tSel.innerHTML = '<option value="">Semua Tahun</option>';
+    tahuns.forEach(t => { const o=document.createElement('option');o.value=t;o.textContent=t;tSel.appendChild(o); });
+    tSel.value = prevT;
+  }
+
+  // ── Apply filters ──
+  const search  = (document.getElementById('kelasSearch')?.value || '').toLowerCase();
+  const filterJ = jSel?.value || '';
+  const filterW = wSel?.value || '';
+  const filterT = tSel?.value || '';
+
+  let filtered = allClasses;
+  if (filterJ) filtered = filtered.filter(c => c.jurusan === filterJ);
+  if (filterW) filtered = filtered.filter(c => c.waliKelas === filterW);
+  if (filterT) filtered = filtered.filter(c => c.tahunAjar === filterT);
+  if (search) filtered = filtered.filter(c =>
+    c.kodeKelas.toLowerCase().includes(search) ||
+    c.jurusan.toLowerCase().includes(search) ||
+    c.waliKelas.toLowerCase().includes(search)
+  );
+
+  const countEl = document.getElementById('kelasCount');
+  if (countEl) countEl.textContent = filtered.length + ' kelas';
+
   ['10','11','12'].forEach(lv => {
-    const col=document.getElementById(`col-kelas-${lv}`);
-    const cnt=document.getElementById(`count-${lv}`);
-    const group=getClasses().filter(c=>c.kelas===lv);
-    cnt.textContent=group.length+' kelas';
-    if(!group.length){col.innerHTML=emptyState('🏫','Belum ada kelas '+lv);return;}
-    col.innerHTML=group.map(c=>`<div class="kelas-card" style="--kelas-card-color:${getJurusanColor(c.jurusan)}">
+    const col = document.getElementById(`col-kelas-${lv}`);
+    const cnt = document.getElementById(`count-${lv}`);
+    const group = filtered.filter(c => c.kelas === lv);
+    cnt.textContent = group.length + ' kelas';
+    if (!group.length) {
+      const isFiltered = filterJ || filterW || filterT || search;
+      col.innerHTML = emptyState('🏫', isFiltered ? `Tidak ada kelas ${lv} sesuai filter` : `Belum ada kelas ${lv}`);
+      return;
+    }
+    col.innerHTML = group.map(c => `<div class="kelas-card" style="--kelas-card-color:${getJurusanColor(c.jurusan)}">
       <div class="kelas-card-top"><span class="kelas-card-kode" style="color:${getJurusanColor(c.jurusan)}">${c.kodeKelas}</span>
       <div class="kelas-card-actions"><button class="icon-btn" onclick="editKelas('${c.id}')">✏</button><button class="icon-btn del" onclick="deleteKelas('${c.id}')">🗑</button></div></div>
       ${jurusanBadge(c.jurusan)}<div class="kelas-card-wali">👤 ${c.waliKelas}</div><div class="kelas-card-tahun">📅 ${c.tahunAjar}</div>
     </div>`).join('');
   });
 }
+
 function editKelas(id) {
   const c=getClasses().find(x=>x.id===id); if(!c)return;
   document.getElementById('kelasEditId').value=c.id;
@@ -1234,6 +1339,12 @@ function deleteKelas(id) {
   if(!confirm('Hapus kelas ini?'))return;
   saveClasses(getClasses().filter(c=>c.id!==id));renderKelas();updateBadges();toast('Kelas dihapus.');
 }
+
+// ── Kelas filter event listeners ──
+document.getElementById('kelasSearch').addEventListener('input', renderKelas);
+document.getElementById('kelasFilterJurusan').addEventListener('change', renderKelas);
+document.getElementById('kelasFilterWali').addEventListener('change', renderKelas);
+document.getElementById('kelasFilterTahun').addEventListener('change', renderKelas);
 
 // ═══════════════════ SISWA ═══════════════════
 document.getElementById('openAddSiswa').addEventListener('click', () => {
@@ -1345,21 +1456,80 @@ document.getElementById('mapelSubmit').addEventListener('click', () => {
   else subjects.push({id:uid(),kodeMapel:kode,mataPelajaran:nama,kelasId:kelasId||null,tahunAjar:cls?cls.tahunAjar:''});
   saveSubjects(subjects);closeModal('modalMapel');renderMapel();updateBadges();toast('Mata pelajaran berhasil disimpan!');
 });
+
 function renderMapel() {
-  const subjects=getSubjects(); const classes=getClasses(); const grid=document.getElementById('mapelGrid');
-  let html='';
-  if(!subjects.length){grid.innerHTML=emptyState('📚','Belum ada mata pelajaran')+`<div class="mapel-add" onclick="document.getElementById('openAddMapel').click()"><span>＋</span><div style="font-size:13px">Tambah Mata Pelajaran</div></div>`;return;}
-  subjects.forEach(s=>{
-    const cls=classes.find(c=>c.id===s.kelasId);
-    html+=`<div class="mapel-card"><div class="mapel-kode">${s.kodeMapel}</div><div class="mapel-nama">${s.mataPelajaran}</div>
-      ${cls?`<div style="font-size:11px;color:var(--dim);margin-top:4px">📋 ${cls.kelas} ${cls.jurusan} — ${cls.kodeKelas}</div>`:''}
-      <div class="mapel-tahun">${s.tahunAjar||'—'}</div>
-      <div class="mapel-card-actions"><button class="icon-btn" onclick="editMapel('${s.id}')">✏</button><button class="icon-btn del" onclick="deleteMapel('${s.id}')">🗑</button></div>
+  const subjects  = getSubjects();
+  const classes   = getClasses();
+  const grid      = document.getElementById('mapelGrid');
+
+  // ── Populate filter kelas ──
+  const mfk = document.getElementById('mapelFilterKelas');
+  const mfm = document.getElementById('mapelFilterMapel');
+  if (mfk) {
+    const prevK = mfk.value;
+    mfk.innerHTML = '<option value="">Semua Kelas</option>';
+    classes.forEach(c => {
+      const o=document.createElement('option'); o.value=c.id;
+      o.textContent=`${c.kelas} ${c.jurusan} — ${c.kodeKelas}`;
+      mfk.appendChild(o);
+    });
+    mfk.value = prevK;
+    // Sync cascading mapel filter
+    if (mfk.value) {
+      const prevM = mfm.value;
+      populateMapelByKelas(mfm, mfk.value, 'Semua Mapel');
+      if (prevM) mfm.value = prevM;
+    } else {
+      mfm.innerHTML = '<option value="">— Pilih kelas dulu —</option>';
+      mfm.disabled = true;
+    }
+  }
+
+  // ── Read filter values ──
+  const search  = (document.getElementById('mapelSearch')?.value || '').toLowerCase();
+  const filterK = mfk?.value || '';
+  const filterM = mfm?.value || '';
+
+  // ── Apply filters ──
+  let filtered = subjects;
+  if (filterK) filtered = filtered.filter(s => s.kelasId === filterK);
+  if (filterM) filtered = filtered.filter(s => s.id === filterM);
+  if (search)  filtered = filtered.filter(s =>
+    s.kodeMapel.toLowerCase().includes(search) ||
+    s.mataPelajaran.toLowerCase().includes(search) ||
+    (getTeacherForSubject(s.mataPelajaran) || '').toLowerCase().includes(search)
+  );
+
+  const countEl = document.getElementById('mapelCount');
+  if (countEl) countEl.textContent = filtered.length + ' mapel';
+
+  if (!filtered.length) {
+    const isFiltered = filterK || filterM || search;
+    grid.innerHTML = emptyState('📚', isFiltered ? 'Tidak ada mapel sesuai filter' : 'Belum ada mata pelajaran') +
+      (isFiltered ? '' : `<div class="mapel-add" onclick="document.getElementById('openAddMapel').click()"><span>＋</span><div style="font-size:13px">Tambah Mata Pelajaran</div></div>`);
+    return;
+  }
+
+  let html = '';
+  filtered.forEach(s => {
+    const cls  = classes.find(c => c.id === s.kelasId);
+    const guru = getTeacherForSubject(s.mataPelajaran);
+    html += `<div class="mapel-card">
+      <div class="mapel-kode">${s.kodeMapel}</div>
+      <div class="mapel-nama">${s.mataPelajaran}</div>
+      ${guru ? `<div class="mapel-guru"><span style="font-size:14px">👤</span> ${guru}</div>` : ''}
+      ${cls  ? `<div style="font-size:11px;color:var(--dim);margin-top:2px">📋 ${cls.kelas} ${cls.jurusan} — ${cls.kodeKelas}</div>` : ''}
+      <div class="mapel-tahun">${s.tahunAjar || '—'}</div>
+      <div class="mapel-card-actions">
+        <button class="icon-btn" onclick="editMapel('${s.id}')">✏</button>
+        <button class="icon-btn del" onclick="deleteMapel('${s.id}')">🗑</button>
+      </div>
     </div>`;
   });
-  html+=`<div class="mapel-add" onclick="document.getElementById('openAddMapel').click()"><span>＋</span><div style="font-size:13px">Tambah Mapel</div></div>`;
-  grid.innerHTML=html;
+  html += `<div class="mapel-add" onclick="document.getElementById('openAddMapel').click()"><span>＋</span><div style="font-size:13px">Tambah Mapel</div></div>`;
+  grid.innerHTML = html;
 }
+
 function editMapel(id) {
   const s=getSubjects().find(x=>x.id===id); if(!s)return;
   document.getElementById('mapelEditId').value=s.id;
@@ -1373,6 +1543,21 @@ function deleteMapel(id) {
   if(!confirm('Hapus mata pelajaran ini?'))return;
   saveSubjects(getSubjects().filter(s=>s.id!==id));renderMapel();updateBadges();toast('Mata pelajaran dihapus.');
 }
+
+// ── Mapel filter event listeners ──
+document.getElementById('mapelSearch').addEventListener('input', renderMapel);
+document.getElementById('mapelFilterKelas').addEventListener('change', function() {
+  const kelasId = this.value;
+  const mfm = document.getElementById('mapelFilterMapel');
+  if (kelasId) {
+    populateMapelByKelas(mfm, kelasId, 'Semua Mapel');
+  } else {
+    mfm.innerHTML = '<option value="">— Pilih kelas dulu —</option>';
+    mfm.disabled = true;
+  }
+  renderMapel();
+});
+document.getElementById('mapelFilterMapel').addEventListener('change', renderMapel);
 
 // ═══════════════════ JADWAL ═══════════════════
 
@@ -1642,7 +1827,6 @@ function checkMatReady(){
   if(el){ el.addEventListener('input',checkMatReady); el.addEventListener('change',checkMatReady); }
 });
 
-// matKelas → filter matMapel by kelasId (upload panel)
 document.getElementById('matKelas').addEventListener('change', function() {
   const kelasId = this.value;
   const mapelSel = document.getElementById('matMapel');
@@ -1665,7 +1849,6 @@ document.getElementById('matUploadBtn').addEventListener('click',async()=>{
   for(const f of matSelectedFiles){const b64=await new Promise(res=>{const r=new FileReader();r.onload=()=>res(r.result);r.readAsDataURL(f);});entry.files.push({name:f.name,size:f.size,dataUrl:b64});}
   saveMaterials(materials);matSelectedFiles=[];renderMatFileChips();
   ['matJudul','matDesc','matKelas','matPertemuan'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-  // Reset mapel ke disabled
   const mp=document.getElementById('matMapel');mp.innerHTML='<option value="">— Pilih kelas dulu —</option>';mp.disabled=true;
   btn.textContent='⬆ Upload Materi';renderMateri();updateBadges();toast('Materi berhasil diunggah!');
 });
@@ -1674,20 +1857,17 @@ function renderMateri(){
   const classes=getClasses(); const subjects=getSubjects();
   populateKelasSelect(document.getElementById('matKelas'));
   populatePertemuanSelect(document.getElementById('matPertemuan'));
-  // matMapel stays disabled until kelas is selected
   const mp = document.getElementById('matMapel');
   if (!document.getElementById('matKelas').value) {
     mp.innerHTML = '<option value="">— Pilih kelas dulu —</option>';
     mp.disabled = true;
   }
 
-  // ── Filter kelas accordion: tampilkan tahun ajaran (sama format dengan upload panel) ──
   const mfk=document.getElementById('matFilterKelas');const prevK=mfk.value;
   mfk.innerHTML='<option value="">Semua Kelas</option>';
   classes.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=`${c.kelas} ${c.jurusan} — ${c.kodeKelas} (${c.tahunAjar})`;mfk.appendChild(o);});
   mfk.value=prevK;
 
-  // Filter mapel: hanya tampil setelah kelas dipilih
   const mfm=document.getElementById('matFilterMapel');const prevM=mfm.value;
   if (mfk.value) {
     populateMapelByKelas(mfm, mfk.value, 'Semua Mapel');
@@ -1743,7 +1923,6 @@ function deleteMateri(id){
   saveMaterials(getMaterials().filter(m=>m.id!==id));renderMateri();updateBadges();toast('Materi dihapus.');
 }
 
-// matFilterKelas → filter matFilterMapel (accordion)
 document.getElementById('matFilterKelas').addEventListener('change', function() {
   const kelasId = this.value;
   const mfm = document.getElementById('matFilterMapel');
@@ -1762,9 +1941,7 @@ document.getElementById('matFilterMapel').addEventListener('change', renderMater
 document.getElementById('openAddNilai').addEventListener('click',()=>{
   document.getElementById('nilaiEditId').value='';
   ['nilaiTugas','nilaiUH','nilaiUTS','nilaiUAS','nilaiKeaktifan'].forEach(id=>document.getElementById(id).value='');
-  // Reset kelas
   populateKelasSelect(document.getElementById('nilaiKelasSelect'));
-  // Disable siswa & mapel
   const siswaSel = document.getElementById('nilaiSiswa');
   siswaSel.innerHTML='<option value="">— Pilih kelas dulu —</option>';
   siswaSel.disabled=true;
@@ -1774,7 +1951,6 @@ document.getElementById('openAddNilai').addEventListener('click',()=>{
   openModal('modalNilai');
 });
 
-// Kelas change → populate siswa & filter mapel by kelas
 document.getElementById('nilaiKelasSelect').addEventListener('change', function() {
   const kelasId = this.value;
   const siswaSel = document.getElementById('nilaiSiswa');
@@ -1814,12 +1990,10 @@ document.getElementById('nilaiSubmit').addEventListener('click',()=>{
 function renderNilai(){
   const classes=getClasses();const students=getStudents();const subjects=getSubjects();const grades=getGrades();
 
-  // ── Filter kelas: tampilkan tahun ajaran (sama format Materi) ──
   const nkf=document.getElementById('nilaiFilterKelas');const prevK=nkf.value;
   nkf.innerHTML='<option value="">Semua Kelas</option>';
   classes.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=`${c.kelas} ${c.jurusan} — ${c.kodeKelas} (${c.tahunAjar})`;nkf.appendChild(o);});nkf.value=prevK;
 
-  // ── Filter mapel: difilter berdasarkan kelas terpilih (sama pola Materi) ──
   const nmf=document.getElementById('nilaiFilterMapel');const prevM=nmf.value;
   if (nkf.value) {
     populateMapelByKelas(nmf, nkf.value, 'Semua Mapel');
@@ -1883,7 +2057,6 @@ function deleteNilai(id){
   saveGrades(getGrades().filter(g=>g.id!==id));renderNilai();updateBadges();toast('Nilai dihapus.');
 }
 
-// ── Filter nilai: kelas dulu → mapel menyesuaikan (sama pola Materi) ──
 document.getElementById('nilaiFilterKelas').addEventListener('change', function() {
   const kelasId = this.value;
   const nmf = document.getElementById('nilaiFilterMapel');
