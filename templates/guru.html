@@ -174,7 +174,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 .empty .ei{font-size:48px;opacity:.3;display:block;margin-bottom:16px}
 .empty p{font-size:14px}
 
-/* disabled select helper — works for both .field select and bare selects */
+/* disabled select helper */
 select:disabled{cursor:not-allowed;opacity:.45;background:var(--bg3) !important}
 
 @keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
@@ -572,7 +572,11 @@ select:disabled{cursor:not-allowed;opacity:.45;background:var(--bg3) !important}
           <button class="btn btn-blue" id="openAddJadwal">＋ Tambah Jadwal</button>
         </div>
         <div class="sec-body">
+          <!-- ── Filter Jadwal (dengan cascading tahun → kelas) ── -->
           <div class="jadwal-filter">
+            <select id="jadwalFilterTahun">
+              <option value="">Semua Tahun</option>
+            </select>
             <select id="jadwalFilterKelas"><option value="">Semua Kelas</option></select>
             <select id="jadwalFilterHari">
               <option value="">Semua Hari</option>
@@ -614,7 +618,12 @@ select:disabled{cursor:not-allowed;opacity:.45;background:var(--bg3) !important}
               <button class="btn btn-orange" style="width:100%" id="matUploadBtn" disabled>⬆ Upload Materi</button>
             </div>
             <div>
-              <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+              <!-- ── Filter Materi (dengan cascading tahun → kelas → mapel) ── -->
+              <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:flex-end;">
+                <div class="field" style="color:var(--orange);flex:1;min-width:140px;max-width:200px">
+                  <label>Filter Tahun Ajaran</label>
+                  <select id="matFilterTahun"><option value="">Semua Tahun</option></select>
+                </div>
                 <div class="field" style="color:var(--orange);flex:1;min-width:160px">
                   <label>Filter Kelas</label>
                   <select id="matFilterKelas"><option value="">Semua Kelas</option></select>
@@ -1122,6 +1131,35 @@ function populateMapelNamaSelect(sel, currentValue) {
   if (prev) sel.value = prev;
 }
 
+// ─── Helper: populate tahun ajaran select ─────────────────────────────────────
+function populateTahunSelect(sel, placeholder) {
+  const ph = placeholder || 'Semua Tahun';
+  const prev = sel.value;
+  const wasDisabled = sel.disabled;
+  const tahuns = [...new Set(getClasses().map(c => c.tahunAjar).filter(Boolean))].sort();
+  sel.innerHTML = `<option value="">${ph}</option>`;
+  tahuns.forEach(t => { const o=document.createElement('option');o.value=t;o.textContent=t;sel.appendChild(o); });
+  if (tahuns.includes(prev)) sel.value = prev;
+  sel.disabled = wasDisabled;
+}
+
+// ─── Helper: populate kelas select filtered by tahun ──────────────────────────
+function populateKelasByTahun(sel, tahun, placeholder) {
+  const ph = placeholder || 'Semua Kelas';
+  const prev = sel.value;
+  const wasDisabled = sel.disabled;
+  const classes = getClasses();
+  const filtered = tahun ? classes.filter(c => c.tahunAjar === tahun) : classes;
+  sel.innerHTML = `<option value="">${ph}</option>`;
+  filtered.forEach(c => {
+    const o=document.createElement('option'); o.value=c.id;
+    o.textContent=`${c.kelas} ${c.jurusan} — ${c.kodeKelas} (${c.tahunAjar})`;
+    sel.appendChild(o);
+  });
+  if (filtered.find(c => c.id === prev)) sel.value = prev;
+  sel.disabled = wasDisabled;
+}
+
 // ═══════════════════ PROFIL ═══════════════════
 function renderProfil() {
   document.getElementById('profilHex').textContent = CU.name.charAt(0).toUpperCase();
@@ -1396,7 +1434,6 @@ function renderSiswa() {
   const filterK   = document.getElementById('siswaFilterKelas').value;
   const classes   = getClasses();
 
-  // ── Repopulate tahun filter (preserve disabled state) ──
   const stf = document.getElementById('siswaFilterTahun');
   const wasDisabledT = stf.disabled;
   const prevT = stf.value;
@@ -1404,9 +1441,8 @@ function renderSiswa() {
   stf.innerHTML = '<option value="">Semua Tahun</option>';
   tahuns.forEach(t => { const o=document.createElement('option');o.value=t;o.textContent=t;stf.appendChild(o); });
   stf.value = prevT;
-  stf.disabled = wasDisabledT; // restore
+  stf.disabled = wasDisabledT;
 
-  // ── Repopulate kelas filter (filtered by tahun if set) ──
   const sf = document.getElementById('siswaFilterKelas');
   const wasDisabledK = sf.disabled;
   const prev = sf.value;
@@ -1421,9 +1457,8 @@ function renderSiswa() {
     sf.appendChild(o);
   });
   if (filteredClasses.find(c => c.id === prev)) sf.value = prev;
-  sf.disabled = wasDisabledK; // restore
+  sf.disabled = wasDisabledK;
 
-  // ── Filter students ──
   let students = getStudents();
   if (search)  students = students.filter(s => s.namaLengkap.toLowerCase().includes(search) || s.nis.includes(search));
   if (filterT) students = students.filter(s => {
@@ -1480,29 +1515,20 @@ function deleteSiswa(id) {
   saveStudents(getStudents().filter(s=>s.id!==id));renderSiswa();updateBadges();toast('Siswa dihapus.');
 }
 
-// ── SISWA FILTER EVENT LISTENERS (cascading logic) ────────────────────────────
 document.getElementById('siswaSearch').addEventListener('input', renderSiswa);
 
 document.getElementById('siswaFilterTahun').addEventListener('change', function() {
   const kelasSel = document.getElementById('siswaFilterKelas');
-  if (!this.value) {
-    // Reset tahun → reset kelas juga & aktifkan kembali keduanya
-    kelasSel.value = '';
-    kelasSel.disabled = false;
-  } else {
-    // Tahun baru dipilih → reset kelas karena opsinya berubah
-    kelasSel.value = '';
-  }
+  kelasSel.value = '';
+  kelasSel.disabled = false;
   renderSiswa();
 });
 
 document.getElementById('siswaFilterKelas').addEventListener('change', function() {
   const tahunSel = document.getElementById('siswaFilterTahun');
   if (this.value && !tahunSel.value) {
-    // Kelas dipilih duluan tanpa tahun → nonaktifkan filter tahun
     tahunSel.disabled = true;
   } else if (!this.value) {
-    // Kelas direset → aktifkan kembali filter tahun
     tahunSel.disabled = false;
   }
   renderSiswa();
@@ -1545,7 +1571,7 @@ function renderMapel() {
     mft.innerHTML = '<option value="">Semua Tahun</option>';
     tahuns.forEach(t => { const o=document.createElement('option');o.value=t;o.textContent=t;mft.appendChild(o); });
     mft.value = prevTahun;
-    mft.disabled = wasDisabledTahun; // restore disabled state
+    mft.disabled = wasDisabledTahun;
   }
 
   if (mfk) {
@@ -1560,8 +1586,7 @@ function renderMapel() {
       mfk.appendChild(o);
     });
     if (filteredByTahun.find(c => c.id === prevK)) mfk.value = prevK;
-    mfk.disabled = wasDisabledK; // restore disabled state
-    // If kelas still has a value, keep mapel sub-filter populated
+    mfk.disabled = wasDisabledK;
     if (mfk.value && mfm) {
       const prevM = mfm.value;
       populateMapelByKelas(mfm, mfk.value, 'Semua Mapel');
@@ -1630,11 +1655,9 @@ function deleteMapel(id) {
 
 document.getElementById('mapelSearch').addEventListener('input', renderMapel);
 
-// ── MAPEL FILTER EVENT LISTENERS (cascading logic) ────────────────────────────
 document.getElementById('mapelFilterTahun').addEventListener('change', function() {
   const mfk = document.getElementById('mapelFilterKelas');
   const mfm = document.getElementById('mapelFilterMapel');
-  // Setiap kali tahun berubah: reset kelas & mapel sub-filter, aktifkan kembali kelas
   mfk.value = '';
   mfk.disabled = false;
   mfm.innerHTML = '<option value="">— Pilih kelas dulu —</option>';
@@ -1646,10 +1669,8 @@ document.getElementById('mapelFilterKelas').addEventListener('change', function(
   const tahunSel = document.getElementById('mapelFilterTahun');
   const mfm = document.getElementById('mapelFilterMapel');
   if (this.value && !tahunSel.value) {
-    // Kelas dipilih duluan tanpa tahun → nonaktifkan filter tahun
     tahunSel.disabled = true;
   } else if (!this.value) {
-    // Kelas direset → aktifkan kembali filter tahun
     tahunSel.disabled = false;
   }
   if (this.value) {
@@ -1772,26 +1793,55 @@ document.getElementById('jadwalSubmit').addEventListener('click', () => {
   toast('16 pertemuan berhasil dibuat! (P8=UTS, P16=UAS)');
 });
 
+// ── renderJadwal: dengan filter tahun → kelas (cascading) ─────────────────────
 function renderJadwal() {
-  const filterK = document.getElementById('jadwalFilterKelas').value;
-  const filterH = document.getElementById('jadwalFilterHari').value;
   const classes  = getClasses();
   const subjects = getSubjects();
+
+  // ── Repopulate tahun filter ──
+  const jft  = document.getElementById('jadwalFilterTahun');
+  const prevT = jft.value;
+  const wasDisabledT = jft.disabled;
+  const tahuns = [...new Set(classes.map(c => c.tahunAjar).filter(Boolean))].sort();
+  jft.innerHTML = '<option value="">Semua Tahun</option>';
+  tahuns.forEach(t => { const o=document.createElement('option');o.value=t;o.textContent=t;jft.appendChild(o); });
+  jft.value = prevT;
+  jft.disabled = wasDisabledT;
+
+  // ── Repopulate kelas filter (filtered by tahun) ──
   const jfk  = document.getElementById('jadwalFilterKelas');
   const prevK = jfk.value;
+  const wasDisabledK = jfk.disabled;
+  const filterTahun = jft.value;
+  const filteredByTahun = filterTahun ? classes.filter(c => c.tahunAjar === filterTahun) : classes;
   jfk.innerHTML = '<option value="">Semua Kelas</option>';
-  classes.forEach(c => {
+  filteredByTahun.forEach(c => {
     const o = document.createElement('option');
     o.value = c.id;
     o.textContent = `${c.kelas} ${c.jurusan} — ${c.kodeKelas} (${c.tahunAjar})`;
     jfk.appendChild(o);
   });
-  jfk.value = prevK;
+  if (filteredByTahun.find(c => c.id === prevK)) jfk.value = prevK;
+  jfk.disabled = wasDisabledK;
+
+  const filterK = jfk.value;
+  const filterH = document.getElementById('jadwalFilterHari').value;
+
   let schedules = getSchedules();
+  // Filter by tahun (via kelasId → class → tahunAjar)
+  if (filterTahun) schedules = schedules.filter(s => {
+    const cls = classes.find(c => c.id === s.kelasId);
+    return cls && cls.tahunAjar === filterTahun;
+  });
   if (filterK) schedules = schedules.filter(s => s.kelasId === filterK);
   if (filterH) schedules = schedules.filter(s => s.hari === filterH);
+
   const container = document.getElementById('jadwalList');
-  if (!schedules.length) { container.innerHTML = emptyState('📅', 'Belum ada jadwal pelajaran'); return; }
+  if (!schedules.length) {
+    const isFiltered = filterTahun || filterK || filterH;
+    container.innerHTML = emptyState('📅', isFiltered ? 'Tidak ada jadwal sesuai filter' : 'Belum ada jadwal pelajaran');
+    return;
+  }
   const groupMap = {};
   schedules.forEach(sch => {
     const key = sch.groupId || sch.id;
@@ -1848,6 +1898,7 @@ function renderJadwal() {
           </div>
           <div style="font-family:var(--mono);font-size:11px;color:var(--blue);margin-top:2px">
             ⏰ ${first.jamMulai} – ${first.jamSelesai} &nbsp;·&nbsp; setiap ${first.hari}
+            ${cls ? `&nbsp;·&nbsp; <span style="color:var(--amber)">${cls.tahunAjar}</span>` : ''}
           </div>
         </div>
         <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
@@ -1895,7 +1946,24 @@ function deleteJadwal(groupId) {
   toast('Jadwal dihapus.');
 }
 
-document.getElementById('jadwalFilterKelas').addEventListener('change', renderJadwal);
+// ── Event listeners Jadwal (cascading tahun → kelas) ──────────────────────────
+document.getElementById('jadwalFilterTahun').addEventListener('change', function() {
+  const jfk = document.getElementById('jadwalFilterKelas');
+  jfk.value = '';
+  jfk.disabled = false;
+  renderJadwal();
+});
+
+document.getElementById('jadwalFilterKelas').addEventListener('change', function() {
+  const jft = document.getElementById('jadwalFilterTahun');
+  if (this.value && !jft.value) {
+    jft.disabled = true;
+  } else if (!this.value) {
+    jft.disabled = false;
+  }
+  renderJadwal();
+});
+
 document.getElementById('jadwalFilterHari').addEventListener('change', renderJadwal);
 
 // ═══════════════════ MATERI ═══════════════════
@@ -1949,6 +2017,7 @@ document.getElementById('matUploadBtn').addEventListener('click',async()=>{
   btn.textContent='⬆ Upload Materi';renderMateri();updateBadges();toast('Materi berhasil diunggah!');
 });
 
+// ── renderMateri: dengan filter tahun → kelas → mapel (cascading) ─────────────
 function renderMateri(){
   const classes=getClasses(); const subjects=getSubjects();
   populateKelasSelect(document.getElementById('matKelas'));
@@ -1958,11 +2027,31 @@ function renderMateri(){
     mp.innerHTML = '<option value="">— Pilih kelas dulu —</option>';
     mp.disabled = true;
   }
-  const mfk=document.getElementById('matFilterKelas');const prevK=mfk.value;
+
+  // ── Tahun filter ──
+  const mftEl = document.getElementById('matFilterTahun');
+  const prevT = mftEl.value;
+  const wasDisabledT = mftEl.disabled;
+  const tahuns = [...new Set(classes.map(c => c.tahunAjar).filter(Boolean))].sort();
+  mftEl.innerHTML = '<option value="">Semua Tahun</option>';
+  tahuns.forEach(t => { const o=document.createElement('option');o.value=t;o.textContent=t;mftEl.appendChild(o); });
+  mftEl.value = prevT;
+  mftEl.disabled = wasDisabledT;
+
+  // ── Kelas filter (filtered by tahun) ──
+  const mfk=document.getElementById('matFilterKelas');
+  const prevK=mfk.value;
+  const wasDisabledK = mfk.disabled;
+  const filterTahun = mftEl.value;
+  const filteredByTahun = filterTahun ? classes.filter(c => c.tahunAjar === filterTahun) : classes;
   mfk.innerHTML='<option value="">Semua Kelas</option>';
-  classes.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=`${c.kelas} ${c.jurusan} — ${c.kodeKelas} (${c.tahunAjar})`;mfk.appendChild(o);});
-  mfk.value=prevK;
-  const mfm=document.getElementById('matFilterMapel');const prevM=mfm.value;
+  filteredByTahun.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=`${c.kelas} ${c.jurusan} — ${c.kodeKelas} (${c.tahunAjar})`;mfk.appendChild(o);});
+  if (filteredByTahun.find(c => c.id === prevK)) mfk.value = prevK;
+  mfk.disabled = wasDisabledK;
+
+  // ── Mapel filter (filtered by kelas) ──
+  const mfm=document.getElementById('matFilterMapel');
+  const prevM=mfm.value;
   if (mfk.value) {
     populateMapelByKelas(mfm, mfk.value, 'Semua Mapel');
     if (prevM) mfm.value = prevM;
@@ -1970,13 +2059,24 @@ function renderMateri(){
     mfm.innerHTML='<option value="">— Pilih kelas dulu —</option>';
     mfm.disabled=true;
   }
+
   const filterK=mfk.value;
   const filterM=mfm.value;
   let materials=getMaterials();
+  // Filter by tahun (via kelasId → class → tahunAjar)
+  if(filterTahun) materials=materials.filter(m=>{
+    const cls=classes.find(c=>c.id===m.kelasId);
+    return cls && cls.tahunAjar===filterTahun;
+  });
   if(filterK) materials=materials.filter(m=>m.kelasId===filterK);
   if(filterM) materials=materials.filter(m=>m.mapelId===filterM);
+
   const accordion=document.getElementById('materiAccordion');
-  if(!materials.length){accordion.innerHTML=emptyState('📁','Belum ada materi diunggah');return;}
+  if(!materials.length){
+    const isFiltered = filterTahun || filterK || filterM;
+    accordion.innerHTML=emptyState('📁', isFiltered ? 'Tidak ada materi sesuai filter' : 'Belum ada materi diunggah');
+    return;
+  }
   materials.sort((a,b)=>a.pertemuan-b.pertemuan);
   accordion.innerHTML=materials.map(m=>{
     const cls=classes.find(c=>c.id===m.kelasId);
@@ -2002,6 +2102,7 @@ function renderMateri(){
     </div>`;
   }).join('');
 }
+
 function toggleMatGroup(id){document.getElementById('mg_'+id).classList.toggle('open');}
 function downloadFile(matId,fi){const m=getMaterials().find(x=>x.id===matId);if(!m||!m.files[fi])return;const f=m.files[fi];const a=document.createElement('a');a.href=f.dataUrl;a.download=f.name;a.click();toast('Mengunduh '+f.name);}
 function deleteFile(matId,fi){
@@ -2014,17 +2115,35 @@ function deleteMateri(id){
   if(!confirm('Hapus semua file dalam materi ini?'))return;
   saveMaterials(getMaterials().filter(m=>m.id!==id));renderMateri();updateBadges();toast('Materi dihapus.');
 }
-document.getElementById('matFilterKelas').addEventListener('change', function() {
-  const kelasId = this.value;
+
+// ── Event listeners Materi (cascading tahun → kelas → mapel) ─────────────────
+document.getElementById('matFilterTahun').addEventListener('change', function() {
+  const mfk = document.getElementById('matFilterKelas');
   const mfm = document.getElementById('matFilterMapel');
-  if (kelasId) {
-    populateMapelByKelas(mfm, kelasId, 'Semua Mapel');
+  mfk.value = '';
+  mfk.disabled = false;
+  mfm.innerHTML = '<option value="">— Pilih kelas dulu —</option>';
+  mfm.disabled = true;
+  renderMateri();
+});
+
+document.getElementById('matFilterKelas').addEventListener('change', function() {
+  const mftEl = document.getElementById('matFilterTahun');
+  const mfm = document.getElementById('matFilterMapel');
+  if (this.value && !mftEl.value) {
+    mftEl.disabled = true;
+  } else if (!this.value) {
+    mftEl.disabled = false;
+  }
+  if (this.value) {
+    populateMapelByKelas(mfm, this.value, 'Semua Mapel');
   } else {
     mfm.innerHTML = '<option value="">— Pilih kelas dulu —</option>';
     mfm.disabled = true;
   }
   renderMateri();
 });
+
 document.getElementById('matFilterMapel').addEventListener('change', renderMateri);
 
 // ═══════════════════ NILAI ═══════════════════
