@@ -42,23 +42,23 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 
 /* LOGIN */
-#loginScreen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:999;background:var(--bg);transition:opacity .4s}
-.login-box{width:440px;max-width:95vw;background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:48px 40px;box-shadow:0 0 80px rgba(139,92,246,0.12);animation:slideUp .5s ease both}
-.login-logo{display:flex;align-items:center;gap:14px;margin-bottom:36px}
+#loginScreen{position:fixed;inset:0;display:flex;align-items:flex-start;justify-content:center;z-index:999;background:var(--bg);transition:opacity .4s;overflow-y:auto;padding:16px 0;}
+.login-box{width:440px;max-width:95vw;max-height:calc(100vh - 32px);overflow-y:auto;background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:32px 36px;box-shadow:0 0 80px rgba(139,92,246,0.12);animation:slideUp .5s ease both;margin:auto}
+.login-logo{display:flex;align-items:center;gap:14px;margin-bottom:20px}
 .login-logo-hex{width:52px;height:52px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
 .login-logo-text h1{font-family:var(--mono);font-size:20px;font-weight:700;line-height:1.1}
 .login-logo-text p{font-size:12px;color:var(--dim);margin-top:3px}
-.auth-tabs{display:flex;gap:2px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:3px;margin-bottom:28px}
-.auth-tab{flex:1;padding:9px;background:none;border:none;color:var(--dim);font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;border-radius:6px;transition:all .2s}
+.auth-tabs{display:flex;gap:2px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:3px;margin-bottom:16px}
+.auth-tab{flex:1;padding:7px;background:none;border:none;color:var(--dim);font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;border-radius:6px;transition:all .2s}
 .auth-tab.active{background:var(--purple);color:#fff}
 .auth-form-wrap{display:none}.auth-form-wrap.active{display:block}
-.fg{margin-bottom:14px}
+.fg{margin-bottom:10px}
 .fg label{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
-.fg input{width:100%;padding:11px 14px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:14px;transition:all .2s}
+.fg input{width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--sans);font-size:14px;transition:all .2s}
 .fg input:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px rgba(139,92,246,.12)}
 .fg input::placeholder{color:var(--dim)}
 .fg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.auth-btn-main{width:100%;padding:13px;background:var(--purple);border:none;border-radius:8px;color:#fff;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;margin-top:6px}
+.auth-btn-main{width:100%;padding:11px;background:var(--purple);border:none;border-radius:8px;color:#fff;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;margin-top:4px}
 .auth-btn-main:hover{background:#7c3aed;box-shadow:0 6px 20px rgba(139,92,246,.35)}
 .auth-msg{margin-top:12px;padding:10px;border-radius:7px;font-size:13px;text-align:center;display:none}
 .auth-msg.err{display:block;background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.3);color:#f87171}
@@ -644,7 +644,6 @@ select:disabled{cursor:not-allowed;opacity:.45;background:var(--bg3) !important}
           <button class="btn btn-rose" id="openAddNilai">＋ Input Nilai</button>
         </div>
         <div class="sec-body">
-          <!-- ── Filter Nilai: cascading tahun → kelas → mapel ── -->
           <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:flex-end;">
             <div class="field" style="color:var(--rose);flex:1;min-width:160px;max-width:220px">
               <label>Filter Tahun Ajaran</label>
@@ -2184,11 +2183,9 @@ document.getElementById('nilaiSubmit').addEventListener('click',()=>{
   saveGrades(grades);closeModal('modalNilai');renderNilai();updateBadges();toast('Nilai berhasil disimpan!');
 });
 
-// ── renderNilai: cascading tahun → kelas → mapel ──────────────────────────────
 function renderNilai(){
   const classes=getClasses();const students=getStudents();const subjects=getSubjects();const grades=getGrades();
 
-  // ── Tahun filter ──
   const ntf=document.getElementById('nilaiFilterTahun');
   const prevT=ntf.value;
   const wasDisabledT=ntf.disabled;
@@ -2198,7 +2195,6 @@ function renderNilai(){
   if(tahuns.includes(prevT)) ntf.value=prevT;
   ntf.disabled=wasDisabledT;
 
-  // ── Kelas filter (filtered by tahun) ──
   const nkf=document.getElementById('nilaiFilterKelas');
   const prevK=nkf.value;
   const wasDisabledK=nkf.disabled;
@@ -2209,7 +2205,6 @@ function renderNilai(){
   if(filteredByTahun.find(c=>c.id===prevK)) nkf.value=prevK;
   nkf.disabled=wasDisabledK;
 
-  // ── Mapel filter (filtered by kelas) ──
   const nmf=document.getElementById('nilaiFilterMapel');
   const prevM=nmf.value;
   if(nkf.value){
@@ -2220,7 +2215,6 @@ function renderNilai(){
     nmf.disabled=true;
   }
 
-  // ── Apply filters to grades ──
   let rows=grades;
   if(filterTahun) rows=rows.filter(g=>{
     const cls=classes.find(c=>c.id===g.kelasId);
@@ -2284,7 +2278,6 @@ function deleteNilai(id){
   saveGrades(getGrades().filter(g=>g.id!==id));renderNilai();updateBadges();toast('Nilai dihapus.');
 }
 
-// ── Event listeners Nilai (cascading tahun → kelas → mapel) ──────────────────
 document.getElementById('nilaiFilterTahun').addEventListener('change', function() {
   const nkf=document.getElementById('nilaiFilterKelas');
   const nmf=document.getElementById('nilaiFilterMapel');
