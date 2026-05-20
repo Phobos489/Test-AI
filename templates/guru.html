@@ -608,7 +608,7 @@ select:disabled{cursor:not-allowed;opacity:.45;background:var(--bg3) !important}
               <div class="field" style="color:var(--orange)"><label>Kelas</label><select id="matKelas"><option value="">Pilih kelas...</option></select></div>
               <div style="height:10px"></div>
               <div class="field" style="color:var(--orange)">
-                <label>Mata Pelajaran <span style="font-size:10px;color:var(--dim);text-transform:none">(sesuai kelas dipilih)</span></label>
+                <label>Mata Pelajaran <span style="font-size:10px;color:var(--dim);text-transform:none">(mapel Anda sesuai kelas dipilih)</span></label>
                 <select id="matMapel" disabled><option value="">— Pilih kelas dulu —</option></select>
               </div>
               <div style="height:10px"></div>
@@ -691,7 +691,6 @@ select:disabled{cursor:not-allowed;opacity:.45;background:var(--bg3) !important}
         <div class="field" style="color:var(--cyan)"><label>Tingkat Kelas</label><select id="kelasLevel"><option value="">Pilih...</option><option>10</option><option>11</option><option>12</option></select></div>
       </div>
       <div class="field" style="color:var(--cyan)"><label>Jurusan</label><input type="text" id="kelasJurusan" placeholder="cth: Teknik Komputer Jaringan, Multimedia..."></div>
-      <!-- Wali kelas: otomatis = akun yang sedang login, tidak dapat diubah -->
       <div class="field" style="color:var(--cyan)">
         <label>Wali Kelas <span style="font-size:10px;color:var(--dim);text-transform:none">(otomatis sesuai akun Anda)</span></label>
         <div class="auto-field-box" id="kelasWaliDisplay">
@@ -720,7 +719,6 @@ select:disabled{cursor:not-allowed;opacity:.45;background:var(--bg3) !important}
         <div class="field" style="color:var(--emerald)"><label>NIS</label><input type="text" id="siswaNis" placeholder="123456"></div>
         <div class="field" style="color:var(--emerald)"><label>Nama Lengkap</label><input type="text" id="siswaNama" placeholder="Nama lengkap siswa"></div>
       </div>
-      <!-- Kelas: hanya kelas milik guru yang login (waliKelas === CU.name) -->
       <div class="field" style="color:var(--emerald)">
         <label>Kelas &amp; Jurusan <span style="font-size:10px;color:var(--dim);text-transform:none">(hanya kelas di mana Anda adalah wali kelas)</span></label>
         <select id="siswaKelas"><option value="">Pilih kelas...</option></select>
@@ -751,7 +749,6 @@ select:disabled{cursor:not-allowed;opacity:.45;background:var(--bg3) !important}
       <input type="hidden" id="mapelEditId">
       <div class="grid-2">
         <div class="field" style="color:var(--purple)"><label>Kode Mata Pelajaran</label><input type="text" id="mapelKode" placeholder="cth: MTK-10"></div>
-        <!-- Nama mapel: otomatis = mata pelajaran akun yang login -->
         <div class="field" style="color:var(--purple)">
           <label>Nama Mata Pelajaran</label>
           <div class="auto-field-box" id="mapelNamaDisplay" style="border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.06)">
@@ -782,7 +779,7 @@ select:disabled{cursor:not-allowed;opacity:.45;background:var(--bg3) !important}
         <span>Isi sekali → otomatis membuat <strong style="color:var(--blue)">16 pertemuan</strong> dengan selisih 7 hari. Pertemuan 8 = <strong style="color:var(--amber)">UTS</strong>, Pertemuan 16 = <strong style="color:var(--rose)">UAS</strong>.</span>
       </div>
       <div class="field" style="color:var(--blue)">
-        <label>Mata Pelajaran <span style="font-size:10px;color:var(--dim);text-transform:none">(pilih dulu untuk mengisi kelas otomatis)</span></label>
+        <label>Mata Pelajaran <span style="font-size:10px;color:var(--dim);text-transform:none">(hanya mapel yang Anda tambahkan)</span></label>
         <select id="jadwalMapel"><option value="">Pilih mata pelajaran...</option></select>
       </div>
       <div class="field" style="color:var(--blue)">
@@ -826,7 +823,7 @@ select:disabled{cursor:not-allowed;opacity:.45;background:var(--bg3) !important}
         <select id="nilaiSiswa" disabled><option value="">— Pilih kelas dulu —</option></select>
       </div>
       <div class="field" style="color:var(--rose)">
-        <label>Mata Pelajaran <span style="font-size:10px;color:var(--dim);text-transform:none">(sesuai kelas yang dipilih)</span></label>
+        <label>Mata Pelajaran <span style="font-size:10px;color:var(--dim);text-transform:none">(hanya mapel yang Anda tambahkan)</span></label>
         <select id="nilaiMapel" disabled><option value="">— Pilih kelas dulu —</option></select>
       </div>
       <div class="grid-2">
@@ -871,13 +868,11 @@ select:disabled{cursor:not-allowed;opacity:.45;background:var(--bg3) !important}
 
 <script>
 // ═══════════════════════════════════════════════════════════
-// STORAGE — semua data akademik kini bersifat GLOBAL (shared)
-// sehingga seluruh guru dapat melihat data satu sama lain.
+// STORAGE
 // ═══════════════════════════════════════════════════════════
 const SK = {
   teachers:  'pEdu_teachers',
   session:   'pEdu_session',
-  // Data akademik global — tidak terikat uid guru
   classes:   'pEdu_classes',
   students:  'pEdu_students',
   subjects:  'pEdu_subjects',
@@ -890,9 +885,8 @@ const load  = k => { try { return JSON.parse(localStorage.getItem(k)) || null; }
 const save  = (k,v) => localStorage.setItem(k, JSON.stringify(v));
 const loadA = k => load(k) || [];
 const loadO = k => load(k) || {};
-let CU = null; // current user
+let CU = null;
 
-// Getters & setters — semua berbasis storage global
 const getClasses   = () => loadA(SK.classes);
 const getStudents  = () => loadA(SK.students);
 const getSubjects  = () => loadA(SK.subjects);
@@ -1096,11 +1090,7 @@ function getTeacherForSubject(subjectName) {
 
 // ─────────────────────────────────────────────────────────
 // populateKelasSelect
-//   includeEmpty    : tambahkan opsi kosong di awal
-//   myClassesOnly   : jika true → hanya kelas di mana
-//                     waliKelas === CU.name (dipakai di
-//                     modal Siswa agar guru hanya bisa
-//                     mendaftarkan siswa ke kelasnya sendiri)
+// myClassesOnly: hanya kelas di mana waliKelas === CU.name
 // ─────────────────────────────────────────────────────────
 function populateKelasSelect(sel, includeEmpty=true, myClassesOnly=false) {
   sel.innerHTML = includeEmpty ? '<option value="">Pilih kelas...</option>' : '';
@@ -1114,28 +1104,44 @@ function populateKelasSelect(sel, includeEmpty=true, myClassesOnly=false) {
   });
 }
 
-function populateMapelSelect(sel, includeEmpty=true) {
+// ─────────────────────────────────────────────────────────
+// populateMapelSelect
+// myOnly: hanya mapel milik guru yang sedang login
+// ─────────────────────────────────────────────────────────
+function populateMapelSelect(sel, includeEmpty=true, myOnly=false) {
   sel.innerHTML = includeEmpty ? '<option value="">Pilih mata pelajaran...</option>' : '';
-  getSubjects().forEach(s => {
+  let subs = getSubjects();
+  if (myOnly) subs = subs.filter(s => getTeacherForSubject(s.mataPelajaran) === CU.name);
+  subs.forEach(s => {
     const guru = getTeacherForSubject(s.mataPelajaran);
-    const o=document.createElement('option'); o.value=s.id;
-    o.textContent=`[${s.kodeMapel}] ${s.mataPelajaran}${guru ? ' — ' + guru : ''}`; sel.appendChild(o);
+    const o = document.createElement('option');
+    o.value = s.id;
+    // Jika myOnly, tidak perlu tampilkan nama guru (sudah pasti milik sendiri)
+    o.textContent = `[${s.kodeMapel}] ${s.mataPelajaran}${guru && !myOnly ? ' — ' + guru : ''}`;
+    sel.appendChild(o);
   });
 }
 
-function populateMapelByKelas(sel, kelasId, placeholder) {
+// ─────────────────────────────────────────────────────────
+// populateMapelByKelas
+// myOnly: hanya mapel milik guru yang sedang login
+// ─────────────────────────────────────────────────────────
+function populateMapelByKelas(sel, kelasId, placeholder, myOnly=false) {
   const ph = placeholder || '— Pilih kelas dulu —';
   sel.innerHTML = `<option value="">${ph}</option>`;
   if (!kelasId) { sel.disabled = true; return; }
-  const subjects = getSubjects().filter(s => s.kelasId === kelasId);
+  let subjects = getSubjects().filter(s => s.kelasId === kelasId);
+  if (myOnly) subjects = subjects.filter(s => getTeacherForSubject(s.mataPelajaran) === CU.name);
   subjects.forEach(s => {
     const guru = getTeacherForSubject(s.mataPelajaran);
-    const o=document.createElement('option'); o.value=s.id;
-    o.textContent=`[${s.kodeMapel}] ${s.mataPelajaran}${guru ? ' — ' + guru : ''}`; sel.appendChild(o);
+    const o = document.createElement('option');
+    o.value = s.id;
+    o.textContent = `[${s.kodeMapel}] ${s.mataPelajaran}${guru && !myOnly ? ' — ' + guru : ''}`;
+    sel.appendChild(o);
   });
   sel.disabled = false;
   if (!subjects.length) {
-    sel.innerHTML = '<option value="">— Tidak ada mapel untuk kelas ini —</option>';
+    sel.innerHTML = `<option value="">— ${myOnly ? 'Tidak ada mapel Anda untuk kelas ini' : 'Tidak ada mapel untuk kelas ini'} —</option>`;
     sel.disabled = true;
   }
 }
@@ -1153,10 +1159,6 @@ function populatePertemuanSelect(sel) {
   for(let i=1;i<=16;i++){const o=document.createElement('option');o.value=i;o.textContent=`Pertemuan ${i}`;sel.appendChild(o);}
 }
 
-// ─────────────────────────────────────────────────────────
-// Wali Kelas di modal Kelas:
-// Tampilkan nama guru yang sedang login, tidak bisa diubah.
-// ─────────────────────────────────────────────────────────
 function setWaliKelasDisplay() {
   const nameEl = document.getElementById('kelasWaliName');
   const hiddenEl = document.getElementById('kelasWali');
@@ -1165,10 +1167,6 @@ function setWaliKelasDisplay() {
   hiddenEl.value = CU.name;
 }
 
-// ─────────────────────────────────────────────────────────
-// Nama Mapel di modal Mapel:
-// Tampilkan mata pelajaran akun yang login, tidak bisa diubah.
-// ─────────────────────────────────────────────────────────
 function setMapelNamaDisplay() {
   const valEl   = document.getElementById('mapelNamaValue');
   const hiddenEl = document.getElementById('mapelNama');
@@ -1218,7 +1216,6 @@ function renderProfil() {
   document.getElementById('profilMapel').textContent = CU.subject||'Umum';
   document.getElementById('profilNip').textContent = CU.nip||'—';
   document.getElementById('profilJoined').textContent = formatDate(CU.createdAt);
-  // Profil menampilkan kelas & siswa milik guru yang login
   const myClasses = getClasses().filter(c => c.waliKelas === CU.name);
   const myClassIds = myClasses.map(c => c.id);
   document.getElementById('profilKelas').textContent = myClasses.length;
@@ -1349,7 +1346,7 @@ document.getElementById('openAddKelas').addEventListener('click', () => {
   document.getElementById('kelasJurusan').value='';
   document.getElementById('kelasTahun').value='';
   document.getElementById('kelasLevel').value='';
-  setWaliKelasDisplay(); // ← otomatis isi nama guru yang login
+  setWaliKelasDisplay();
   openModal('modalKelas');
 });
 
@@ -1358,7 +1355,7 @@ document.getElementById('kelasSubmit').addEventListener('click', () => {
   const kode=document.getElementById('kelasKode').value.trim();
   const level=document.getElementById('kelasLevel').value;
   const jurusan=document.getElementById('kelasJurusan').value.trim();
-  const wali=document.getElementById('kelasWali').value; // selalu = CU.name
+  const wali=document.getElementById('kelasWali').value;
   const tahun=document.getElementById('kelasTahun').value.trim();
   if(!kode||!level||!jurusan||!tahun){toast('Semua field wajib diisi!','err');return;}
   if(!wali){toast('Data akun tidak valid. Coba login ulang.','err');return;}
@@ -1453,7 +1450,7 @@ function editKelas(id) {
   document.getElementById('kelasLevel').value=c.kelas;
   document.getElementById('kelasJurusan').value=c.jurusan;
   document.getElementById('kelasTahun').value=c.tahunAjar;
-  setWaliKelasDisplay(); // selalu isi dengan CU.name
+  setWaliKelasDisplay();
   openModal('modalKelas');
 }
 function deleteKelas(id) {
@@ -1473,7 +1470,6 @@ document.getElementById('kelasFilterTahun').addEventListener('change', renderKel
 document.getElementById('openAddSiswa').addEventListener('click', () => {
   document.getElementById('siswaEditId').value='';
   ['siswaNis','siswaNama','siswaEmail','siswaTelp','siswaTinggal','siswaTglLahir','siswaPassword','siswaPasswordConfirm'].forEach(id=>document.getElementById(id).value='');
-  // Hanya tampilkan kelas milik guru yang login (myClassesOnly=true)
   populateKelasSelect(document.getElementById('siswaKelas'), true, true);
   openModal('modalSiswa');
 });
@@ -1557,7 +1553,6 @@ function renderSiswa() {
     const hasPass = s.password
       ? '<span style="font-family:var(--mono);font-size:12px;color:var(--emerald)">✓ Sudah diset</span>'
       : '<span style="font-family:var(--mono);font-size:11px;color:var(--dim)">— Belum diset</span>';
-    // Tombol edit/hapus: boleh jika wali kelas siswa tersebut adalah guru yang login
     const isOwner = cls && cls.waliKelas === CU.name;
     const actions = isOwner
       ? `<div style="display:flex;gap:4px"><button class="icon-btn" onclick="editSiswa('${s.id}')">✏</button><button class="icon-btn del" onclick="deleteSiswa('${s.id}')">🗑</button></div>`
@@ -1591,7 +1586,6 @@ function editSiswa(id) {
   document.getElementById('siswaTglLahir').value=s.tanggalLahir||'';
   document.getElementById('siswaPassword').value='';
   document.getElementById('siswaPasswordConfirm').value='';
-  // Hanya kelas milik guru yang login
   populateKelasSelect(document.getElementById('siswaKelas'), true, true);
   document.getElementById('siswaKelas').value=s.kelasId;
   openModal('modalSiswa');
@@ -1623,7 +1617,7 @@ document.getElementById('siswaFilterKelas').addEventListener('change', function(
 document.getElementById('openAddMapel').addEventListener('click', () => {
   document.getElementById('mapelEditId').value='';
   document.getElementById('mapelKode').value='';
-  setMapelNamaDisplay(); // ← otomatis isi nama mapel dari akun guru
+  setMapelNamaDisplay();
   populateKelasSelect(document.getElementById('mapelKelas'),true);
   openModal('modalMapel');
 });
@@ -1631,7 +1625,7 @@ document.getElementById('openAddMapel').addEventListener('click', () => {
 document.getElementById('mapelSubmit').addEventListener('click', () => {
   const id=document.getElementById('mapelEditId').value;
   const kode=document.getElementById('mapelKode').value.trim();
-  const nama=document.getElementById('mapelNama').value; // dari hidden input
+  const nama=document.getElementById('mapelNama').value;
   const kelasId=document.getElementById('mapelKelas').value;
   if(!kode){toast('Kode mapel wajib diisi!','err');return;}
   if(!nama){toast('Mata pelajaran tidak diset. Lengkapi profil Anda terlebih dahulu!','err');return;}
@@ -1736,7 +1730,7 @@ function editMapel(id) {
   if(guru!==CU.name){toast('Anda hanya bisa mengedit mapel milik Anda!','err');return;}
   document.getElementById('mapelEditId').value=s.id;
   document.getElementById('mapelKode').value=s.kodeMapel;
-  setMapelNamaDisplay(); // nama mapel tetap otomatis dari akun
+  setMapelNamaDisplay();
   populateKelasSelect(document.getElementById('mapelKelas'),true);
   document.getElementById('mapelKelas').value=s.kelasId||'';
   openModal('modalMapel');
@@ -1830,13 +1824,15 @@ function updateKelasFromMapel(mapelId) {
 document.getElementById('jadwalTanggal').addEventListener('change', function() { updateHariFromTanggal(this.value); });
 document.getElementById('jadwalMapel').addEventListener('change', function() { updateKelasFromMapel(this.value); });
 
+// ─── openAddJadwal: hanya mapel milik guru yang login ───
 document.getElementById('openAddJadwal').addEventListener('click', () => {
   document.getElementById('jadwalEditId').value = '';
   document.getElementById('jadwalMulai').value = '';
   document.getElementById('jadwalSelesai').value = '';
   document.getElementById('jadwalTanggal').value = '';
   updateHariFromTanggal('');
-  populateMapelSelect(document.getElementById('jadwalMapel'));
+  // myOnly=true → hanya tampilkan mapel milik CU
+  populateMapelSelect(document.getElementById('jadwalMapel'), true, true);
   updateKelasFromMapel('');
   openModal('modalJadwal');
 });
@@ -1998,6 +1994,7 @@ function toggleJadwalGroup(groupId) {
   if (toggle) toggle.style.transform = isOpen ? '' : 'rotate(180deg)';
 }
 
+// ─── editJadwal: hanya mapel milik guru yang login ───
 function editJadwal(groupId) {
   const groupItems = getSchedules().filter(s => s.groupId === groupId).sort((a, b) => a.pertemuan - b.pertemuan);
   if (!groupItems.length) return;
@@ -2007,7 +2004,8 @@ function editJadwal(groupId) {
   updateHariFromTanggal(first.tanggal || '');
   document.getElementById('jadwalMulai').value = first.jamMulai;
   document.getElementById('jadwalSelesai').value = first.jamSelesai;
-  populateMapelSelect(document.getElementById('jadwalMapel'));
+  // myOnly=true → hanya tampilkan mapel milik CU
+  populateMapelSelect(document.getElementById('jadwalMapel'), true, true);
   document.getElementById('jadwalMapel').value = first.mapelId;
   updateKelasFromMapel(first.mapelId);
   openModal('modalJadwal');
@@ -2059,10 +2057,12 @@ function checkMatReady(){
   if(el){ el.addEventListener('input',checkMatReady); el.addEventListener('change',checkMatReady); }
 });
 
+// ─── matKelas change: hanya mapel milik guru yang login ───
 document.getElementById('matKelas').addEventListener('change', function() {
   const kelasId = this.value;
   const mapelSel = document.getElementById('matMapel');
-  populateMapelByKelas(mapelSel, kelasId, '— Pilih mata pelajaran —');
+  // myOnly=true → hanya tampilkan mapel milik CU untuk kelas ini
+  populateMapelByKelas(mapelSel, kelasId, '— Pilih mata pelajaran —', true);
   checkMatReady();
 });
 
@@ -2211,6 +2211,7 @@ document.getElementById('openAddNilai').addEventListener('click',()=>{
   openModal('modalNilai');
 });
 
+// ─── nilaiKelasSelect change: hanya mapel milik guru yang login ───
 document.getElementById('nilaiKelasSelect').addEventListener('change', function() {
   const kelasId = this.value;
   const siswaSel = document.getElementById('nilaiSiswa');
@@ -2224,7 +2225,8 @@ document.getElementById('nilaiKelasSelect').addEventListener('change', function(
   }
   siswaSel.disabled=false;
   populateSiswaSelect(siswaSel, kelasId);
-  populateMapelByKelas(mapelSel, kelasId, 'Pilih mata pelajaran...');
+  // myOnly=true → hanya tampilkan mapel milik CU untuk kelas ini
+  populateMapelByKelas(mapelSel, kelasId, 'Pilih mata pelajaran...', true);
 });
 
 document.getElementById('nilaiSubmit').addEventListener('click',()=>{
@@ -2313,6 +2315,7 @@ function renderNilai(){
   }).join('');
 }
 
+// ─── editNilai: hanya mapel milik guru yang login ───
 function editNilai(id){
   const g=getGrades().find(x=>x.id===id);if(!g)return;
   document.getElementById('nilaiEditId').value=g.id;
@@ -2329,7 +2332,8 @@ function editNilai(id){
   populateSiswaSelect(siswaSel,g.kelasId);
   siswaSel.value=g.studentId;
   const mapelSel=document.getElementById('nilaiMapel');
-  populateMapelByKelas(mapelSel,g.kelasId,'Pilih mata pelajaran...');
+  // myOnly=true → hanya tampilkan mapel milik CU untuk kelas ini
+  populateMapelByKelas(mapelSel,g.kelasId,'Pilih mata pelajaran...',true);
   mapelSel.value=g.mapelId;
   openModal('modalNilai');
 }
