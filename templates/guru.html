@@ -2019,8 +2019,8 @@ function renderJadwal() {
           </div>
         </div>
         <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
-          <button class="icon-btn" onclick="event.stopPropagation();editJadwal('${group.groupId}')" title="Edit jadwal">✏</button>
-          <button class="icon-btn del" onclick="event.stopPropagation();deleteJadwal('${group.groupId}')" title="Hapus semua pertemuan">🗑</button>
+          <button class="icon-btn" onclick="event.stopPropagation();editJadwal('${group.groupId}')">✏</button>
+          <button class="icon-btn del" onclick="event.stopPropagation();deleteJadwal('${group.groupId}')">🗑</button>
           <span id="jgtgl_${group.groupId}" style="color:var(--dim);font-size:14px;transition:transform .3s;display:inline-block;flex-shrink:0">▾</span>
         </div>
       </div>
@@ -2220,7 +2220,7 @@ function renderMateri(){
           <div class="materi-group-meta">${cls?`${cls.kelas} ${cls.jurusan} — ${cls.kodeKelas}`:'—'} · ${(m.files||[]).length} file · ${formatDate(m.uploadedAt)}</div>
           ${mapel?`<div class="materi-mapel-tag">📚 ${mapel.mataPelajaran}</div>`:''}
         </div>
-        <button class="icon-btn btn-sm" style="color:var(--orange);opacity:1" onclick="event.stopPropagation();editMateri('${m.id}')" title="Edit materi ini">✏</button>
+        <button class="icon-btn btn-sm" onclick="event.stopPropagation();editMateri('${m.id}')">✏</button>
         <button class="icon-btn del btn-sm" style="opacity:1" onclick="event.stopPropagation();deleteMateri('${m.id}')">🗑</button>
         <span class="materi-group-toggle">▾</span>
       </div>
@@ -2228,8 +2228,8 @@ function renderMateri(){
         ${m.desc?`<div style="font-size:12px;color:var(--dim);margin-bottom:8px;padding:8px 0">${m.desc}</div>`:''}
         ${(m.files||[]).map((f,fi)=>`<div class="file-card"><div class="file-icon">${fileIcon(f.name)}</div>
           <div class="file-info"><div class="file-name" title="${f.name}">${f.name}</div><div class="file-size">${formatBytes(f.size)}</div></div>
-          <button class="file-dl" onclick="downloadFile('${m.id}',${fi})" title="Unduh">⬇</button>
-          <button class="file-del" onclick="deleteFile('${m.id}',${fi})" title="Hapus">🗑</button></div>`).join('')}
+          <button class="file-dl" onclick="downloadFile('${m.id}',${fi})">⬇</button>
+          <button class="file-del" onclick="deleteFile('${m.id}',${fi})">🗑</button></div>`).join('')}
       </div>
     </div>`;
   }).join('');

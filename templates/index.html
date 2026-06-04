@@ -493,15 +493,15 @@ body { font-family:var(--sans); background:var(--bg); color:var(--text); display
     <div class="login-divider"></div>
     <div class="login-subtitle">
       🎓 Portal Siswa<br>
-      Masuk menggunakan NIS dan password yang diberikan oleh guru
+      Masuk menggunakan <strong>email</strong> &amp; <strong>password</strong>
     </div>
     <div class="fg">
-      <label>NIS atau Email Siswa</label>
-      <input type="text" id="loginNis" placeholder="Masukkan NIS atau email..." autocomplete="username">
+      <label>Email Siswa</label>
+      <input type="email" id="loginNis" placeholder="contoh: siswa@sekolah.ac.id" autocomplete="email">
     </div>
     <div class="fg">
       <label>Password</label>
-      <input type="password" id="loginPass" placeholder="Password dari guru" autocomplete="current-password">
+      <input type="password" id="loginPass" placeholder="Password" autocomplete="current-password">
     </div>
     <div class="login-msg" id="loginMsg"></div>
     <button class="login-btn" id="loginBtn">🔓 Masuk ke Portal Siswa</button>
@@ -645,14 +645,15 @@ body { font-family:var(--sans); background:var(--bg); color:var(--text); display
 // ═══════════════════════════════════════
 //  STORAGE KEYS (same as guru.html)
 // ═══════════════════════════════════════
+// ── Storage keys HARUS sama persis dengan guru.html (flat keys) ──
 const SK = {
   teachers:  'pEdu_teachers',
   session:   'pEdu_student_session',
-  classes:   id => `pEdu_classes_${id}`,
-  students:  id => `pEdu_students_${id}`,
-  subjects:  id => `pEdu_subjects_${id}`,
-  schedules: id => `pEdu_schedules_${id}`,
-  materials: id => `pEdu_materials_${id}`,
+  classes:   'pEdu_classes',    // flat – sama dengan guru.html
+  students:  'pEdu_students',   // flat – sama dengan guru.html
+  subjects:  'pEdu_subjects',   // flat – sama dengan guru.html
+  schedules: 'pEdu_schedules',  // flat – sama dengan guru.html
+  materials: 'pEdu_materials',  // flat – sama dengan guru.html
   responses: sid => `pEdu_student_responses_${sid}`,
 };
 
@@ -730,58 +731,87 @@ function saveResponse(studentId, subjectId, pertemuan, data) {
 // ═══════════════════════════════════════
 //  LOGIN
 // ═══════════════════════════════════════
-function loginStudent(nisOrEmail, password) {
-  const teachers = loadO(SK.teachers);
-  const input = (nisOrEmail || '').trim();
-  if (!input || !password) return null;
+function loginStudent(emailOrNis, password) {
+  const raw   = (emailOrNis || '').trim();
+  const lower = raw.toLowerCase();
+  if (!raw || !password) return null;
 
-  for (const [, teacher] of Object.entries(teachers)) {
-    const students = loadA(SK.students(teacher.id));
-    const student = students.find(s =>
-      (s.nis === input || (s.email && s.email.toLowerCase() === input.toLowerCase()))
-      && s.password === password
-    );
-    if (student) return { student, teacherId: teacher.id, teacher };
+  // Semua siswa tersimpan flat di pEdu_students (sama dengan guru.html)
+  const students = loadA(SK.students);
+  const student  = students.find(s =>
+    ((s.email  && s.email.toLowerCase()  === lower) ||
+     (s.nis    && s.nis                  === raw))
+    && s.password === password
+  );
+  if (!student) return null;
+
+  // Temukan kelas siswa, lalu cari guru yang menjadi wali kelasnya
+  const allClasses = loadA(SK.classes);
+  const teachers   = loadO(SK.teachers);
+  const stuClass   = allClasses.find(c => c.id === student.kelasId);
+
+  let teacher = null;
+  if (stuClass?.waliKelas) {
+    teacher = Object.values(teachers).find(t => t.name === stuClass.waliKelas) || null;
   }
-  return null;
+  // Fallback: guru pertama yang terdaftar
+  if (!teacher) teacher = Object.values(teachers)[0] || {};
+
+  return { student, teacherId: teacher.id || null, teacher };
 }
 
 // ═══════════════════════════════════════
 //  PORTAL DATA (aggregated from all teachers)
 // ═══════════════════════════════════════
 function getPortalData(student, primaryTeacherId) {
-  const teachers  = loadO(SK.teachers);
-  const primClass = loadA(SK.classes(primaryTeacherId)).find(c => c.id === student.kelasId);
+  const teachers   = loadO(SK.teachers);
+  const allClasses = loadA(SK.classes);   // flat
+  const primClass  = allClasses.find(c => c.id === student.kelasId);
 
   if (!primClass) {
     return { studentClass: null, allSubjects: [], allSchedules: [], allMaterials: [] };
   }
 
-  const allSubjects = [], allSchedules = [], allMaterials = [];
+  // Kumpulkan semua kelas dengan kodeKelas + tahunAjar yang sama
+  // (agar mapel dari guru lain di kelas yang sama juga ditampilkan)
+  const matchClasses  = allClasses.filter(c =>
+    c.kodeKelas === primClass.kodeKelas && c.tahunAjar === primClass.tahunAjar
+  );
+  const matchClassIds = new Set(matchClasses.map(c => c.id));
 
-  for (const [, teacher] of Object.entries(teachers)) {
-    const tClasses = loadA(SK.classes(teacher.id));
-    // Match classes by kodeKelas + tahunAjar (to pick up subjects from other teachers)
-    const matchClasses = tClasses.filter(c =>
-      c.kodeKelas === primClass.kodeKelas && c.tahunAjar === primClass.tahunAjar
-    );
+  const allSubjRaw  = loadA(SK.subjects);   // flat
+  const allSchedRaw = loadA(SK.schedules);  // flat
+  const allMatRaw   = loadA(SK.materials);  // flat
 
-    for (const cls of matchClasses) {
-      loadA(SK.subjects(teacher.id))
-        .filter(s => s.kelasId === cls.id)
-        .forEach(s => allSubjects.push({ ...s, _tid: teacher.id, _tname: teacher.name, _clsName: `${cls.kelas} ${cls.jurusan}` }));
-
-      loadA(SK.schedules(teacher.id))
-        .filter(s => s.kelasId === cls.id)
-        .forEach(s => allSchedules.push({ ...s, _tid: teacher.id }));
-
-      loadA(SK.materials(teacher.id))
-        .filter(m => m.kelasId === cls.id)
-        .forEach(m => allMaterials.push({ ...m, _tid: teacher.id }));
-    }
+  // Resolusi guru berdasarkan nama mata pelajaran (field subject di akun guru)
+  function resolveTeacher(subjectName) {
+    return Object.values(teachers).find(t => t.subject === subjectName)
+        || Object.values(teachers)[0]
+        || {};
   }
 
-  // Deduplicate subjects
+  const allSubjects = allSubjRaw
+    .filter(s => matchClassIds.has(s.kelasId))
+    .map(s => {
+      const cls = allClasses.find(c => c.id === s.kelasId);
+      const t   = resolveTeacher(s.mataPelajaran);
+      return {
+        ...s,
+        _tid:     t.id   || null,
+        _tname:   t.name || '',
+        _clsName: cls ? `${cls.kelas} ${cls.jurusan}` : '',
+      };
+    });
+
+  const allSchedules = allSchedRaw
+    .filter(s => matchClassIds.has(s.kelasId))
+    .map(s => ({ ...s, _tid: null }));
+
+  const allMaterials = allMatRaw
+    .filter(m => matchClassIds.has(m.kelasId))
+    .map(m => ({ ...m, _tid: null }));
+
+  // Hapus duplikat mapel
   const seen = new Set();
   const uniqueSubjects = allSubjects.filter(s => {
     const key = s.kodeMapel + '|' + s.mataPelajaran;
@@ -1161,7 +1191,7 @@ function renderMatPanel(material, subject) {
         <div class="mat-fname" title="${f.name}">${f.name}</div>
         <div class="mat-fsize">${formatBytes(f.size)}</div>
       </div>
-      <button class="mat-fdl" onclick="downloadMat('${material._tid}','${material.id}',${fi})" title="Unduh">⬇</button>
+      <button class="mat-fdl" onclick="downloadMat('${material.id}',${fi})" title="Unduh">⬇</button>
     </div>
   `).join('');
 
@@ -1173,8 +1203,8 @@ function renderMatPanel(material, subject) {
   `;
 }
 
-function downloadMat(teacherId, matId, idx) {
-  const mats = loadA(SK.materials(teacherId));
+function downloadMat(matId, idx) {
+  const mats = loadA(SK.materials);   // flat – tidak butuh teacherId lagi
   const mat  = mats.find(m => m.id === matId);
   if (!mat || !mat.files[idx]) return;
   const f = mat.files[idx];
@@ -1234,10 +1264,10 @@ function showLoginMsg(msg, type) {
 function doLogin() {
   const nis  = document.getElementById('loginNis').value;
   const pass = document.getElementById('loginPass').value;
-  if (!nis || !pass) { showLoginMsg('Masukkan NIS/email dan password!', 'err'); return; }
+  if (!nis || !pass) { showLoginMsg('Masukkan email dan password!', 'err'); return; }
   const result = loginStudent(nis, pass);
   if (!result) {
-    showLoginMsg('NIS/email atau password salah. Pastikan datamu benar atau hubungi guru.', 'err');
+    showLoginMsg('Email atau password salah. Pastikan data yang dimasukkan sesuai dengan yang ditetapkan guru.', 'err');
     return;
   }
   CU = result;
@@ -1262,15 +1292,27 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
   const sess = loadJ(SK.session);
   if (!sess) return;
 
-  const teachers = loadO(SK.teachers);
-  const teacher  = teachers[sess.teacherEmail];
-  if (!teacher) return;
-
-  const students = loadA(SK.students(teacher.id));
+  // Siswa tersimpan flat di pEdu_students
+  const students = loadA(SK.students);
   const student  = students.find(s => s.id === sess.studentId);
   if (!student) return;
 
-  CU = { student, teacherId: teacher.id, teacher };
+  // Cari guru yang relevan
+  const teachers   = loadO(SK.teachers);
+  const allClasses = loadA(SK.classes);
+  let teacher = sess.teacherEmail ? teachers[sess.teacherEmail] : null;
+  if (!teacher && sess.teacherId) {
+    teacher = Object.values(teachers).find(t => t.id === sess.teacherId) || null;
+  }
+  if (!teacher) {
+    const stuClass = allClasses.find(c => c.id === student.kelasId);
+    if (stuClass?.waliKelas) {
+      teacher = Object.values(teachers).find(t => t.name === stuClass.waliKelas) || null;
+    }
+  }
+  teacher = teacher || Object.values(teachers)[0] || {};
+
+  CU = { student, teacherId: teacher.id || null, teacher };
   enterApp();
 })();
 </script>
