@@ -317,6 +317,17 @@ select:disabled{cursor:not-allowed;opacity:.45;background:var(--bg3) !important}
 .file-del{background:none;border:none;color:var(--dim);cursor:pointer;font-size:14px;padding:4px;border-radius:5px;transition:all .2s}
 .file-del:hover{color:#f87171;background:rgba(244,63,94,.1)}
 .materi-mapel-tag{display:inline-flex;align-items:center;gap:5px;padding:2px 10px;border-radius:20px;font-size:11px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);color:var(--purple);margin-top:4px}
+/* MATERI EXISTS NOTICE */
+.mat-exists-notice{margin:10px 0;padding:12px 14px;background:rgba(249,115,22,.07);border:1px solid rgba(249,115,22,.35);border-radius:10px;display:none}
+.mat-exists-notice.show{display:block}
+.mat-exists-notice .men-title{font-size:12px;font-weight:700;color:var(--orange);margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.mat-exists-notice .men-body{font-size:11px;color:var(--dim);margin-bottom:10px;line-height:1.6}
+/* UPLOAD PANEL LOCKED STATE */
+.materi-upload-panel.locked .drop-zone{opacity:.35;pointer-events:none}
+.materi-upload-panel.locked .field input,.materi-upload-panel.locked .field textarea{opacity:.4;pointer-events:none}
+/* EDIT MATERI CURRENT FILES */
+.edit-file-card{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;transition:all .2s}
+.edit-file-card:hover{border-color:rgba(249,115,22,.25)}
 
 /* NILAI */
 #sec-nilai .sec-header{border-left:3px solid var(--rose)}
@@ -613,6 +624,12 @@ select:disabled{cursor:not-allowed;opacity:.45;background:var(--bg3) !important}
               </div>
               <div style="height:10px"></div>
               <div class="field" style="color:var(--orange)"><label>Pertemuan Ke-</label><select id="matPertemuan"><option value="">Pilih pertemuan...</option></select></div>
+              <!-- NOTICE: pertemuan already has materi -->
+              <div class="mat-exists-notice" id="matExistsNotice">
+                <div class="men-title">⚠ Pertemuan ini sudah ada materinya!</div>
+                <div class="men-body">Anda tidak dapat membuat materi baru untuk pertemuan yang sama. Hapus materi yang ada terlebih dahulu, atau gunakan tombol Edit untuk mengubah materi yang sudah ada.</div>
+                <button class="btn btn-orange btn-sm" style="width:100%" id="matGoEditBtn">✏ Edit Materi Pertemuan Ini</button>
+              </div>
               <div style="height:10px"></div>
               <div class="field" style="color:var(--orange)"><label>Deskripsi (opsional)</label><textarea id="matDesc" placeholder="Deskripsikan materi ini..."></textarea></div>
               <div class="drop-zone" id="matDropzone">
@@ -860,6 +877,35 @@ select:disabled{cursor:not-allowed;opacity:.45;background:var(--bg3) !important}
     <div class="modal-foot">
       <button class="btn btn-ghost" data-close="modalHapusAkun">Batal</button>
       <button class="btn btn-rose" id="hapusAkunConfirm">🗑 Hapus Akun</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Edit Materi ═══ -->
+<div class="modal-bg" id="modalEditMateri">
+  <div class="modal modal-wide">
+    <div class="modal-head"><h3 style="color:var(--orange)">✏ Edit Materi</h3><button class="modal-close" data-close="modalEditMateri">✕</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="editMatId">
+      <div class="field" style="color:var(--orange)"><label>Judul Materi</label><input type="text" id="editMatJudul" placeholder="Judul materi"></div>
+      <div class="field" style="color:var(--orange)"><label>Deskripsi (opsional)</label><textarea id="editMatDesc" placeholder="Deskripsikan materi ini..."></textarea></div>
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);margin-bottom:10px">File Saat Ini</div>
+        <div id="editMatCurrentFiles"><div style="color:var(--dim);font-size:12px;padding:8px 0">Memuat file...</div></div>
+      </div>
+      <div>
+        <div style="font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--orange);margin-bottom:10px">Tambah File Baru</div>
+        <div class="drop-zone" id="editMatDropzone" style="padding:14px;margin:0 0 4px">
+          <input type="file" id="editMatFile" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.md">
+          <span class="dz-icon" style="font-size:24px">📂</span>
+          <div class="dz-text">Tarik &amp; lepas file atau klik untuk memilih</div>
+        </div>
+        <div class="file-chips" id="editMatFileChips"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" data-close="modalEditMateri">Batal</button>
+      <button class="btn btn-orange" id="editMatSaveBtn">💾 Simpan Perubahan</button>
     </div>
   </div>
 </div>
@@ -2050,7 +2096,27 @@ function renderMatFileChips() {
 }
 function removeMatFile(i){matSelectedFiles.splice(i,1);renderMatFileChips();checkMatReady();}
 function checkMatReady(){
-  document.getElementById('matUploadBtn').disabled=!(matSelectedFiles.length&&document.getElementById('matJudul').value.trim()&&document.getElementById('matKelas').value&&document.getElementById('matPertemuan').value);
+  const judul=document.getElementById('matJudul').value.trim();
+  const kelasId=document.getElementById('matKelas').value;
+  const pertemuan=+document.getElementById('matPertemuan').value;
+  const notice=document.getElementById('matExistsNotice');
+  const btn=document.getElementById('matUploadBtn');
+  const panel=document.querySelector('.materi-upload-panel');
+  // Periksa apakah pertemuan di kelas ini sudah ada materinya
+  if(kelasId&&pertemuan){
+    const existing=getMaterials().find(m=>m.kelasId===kelasId&&m.pertemuan===pertemuan);
+    if(existing){
+      notice.classList.add('show');
+      notice._existingId=existing.id;
+      btn.disabled=true;
+      panel.classList.add('locked');
+      return;
+    }
+  }
+  notice.classList.remove('show');
+  notice._existingId=null;
+  panel.classList.remove('locked');
+  btn.disabled=!(matSelectedFiles.length&&judul&&kelasId&&pertemuan);
 }
 ['matJudul','matKelas','matPertemuan','matMapel'].forEach(id=>{
   const el = document.getElementById(id);
@@ -2082,7 +2148,9 @@ document.getElementById('matUploadBtn').addEventListener('click',async()=>{
   saveMaterials(materials);matSelectedFiles=[];renderMatFileChips();
   ['matJudul','matDesc','matKelas','matPertemuan'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   const mp=document.getElementById('matMapel');mp.innerHTML='<option value="">— Pilih kelas dulu —</option>';mp.disabled=true;
-  btn.textContent='⬆ Upload Materi';renderMateri();updateBadges();toast('Materi berhasil diunggah!');
+  document.getElementById('matExistsNotice').classList.remove('show');
+  document.querySelector('.materi-upload-panel').classList.remove('locked');
+  btn.textContent='⬆ Upload Materi';renderMateri();updateBadges();toast('Materi berhasil diunggah!');checkMatReady();
 });
 
 function renderMateri(){
@@ -2152,6 +2220,7 @@ function renderMateri(){
           <div class="materi-group-meta">${cls?`${cls.kelas} ${cls.jurusan} — ${cls.kodeKelas}`:'—'} · ${(m.files||[]).length} file · ${formatDate(m.uploadedAt)}</div>
           ${mapel?`<div class="materi-mapel-tag">📚 ${mapel.mataPelajaran}</div>`:''}
         </div>
+        <button class="icon-btn btn-sm" style="color:var(--orange);opacity:1" onclick="event.stopPropagation();editMateri('${m.id}')" title="Edit materi ini">✏</button>
         <button class="icon-btn del btn-sm" style="opacity:1" onclick="event.stopPropagation();deleteMateri('${m.id}')">🗑</button>
         <span class="materi-group-toggle">▾</span>
       </div>
@@ -2176,8 +2245,90 @@ function deleteFile(matId,fi){
 }
 function deleteMateri(id){
   if(!confirm('Hapus semua file dalam materi ini?'))return;
-  saveMaterials(getMaterials().filter(m=>m.id!==id));renderMateri();updateBadges();toast('Materi dihapus.');
+  saveMaterials(getMaterials().filter(m=>m.id!==id));renderMateri();updateBadges();toast('Materi dihapus.');checkMatReady();
 }
+
+// ─── Edit Materi ───
+let editMatSelectedFiles=[];
+
+document.getElementById('matGoEditBtn').addEventListener('click',function(){
+  const notice=document.getElementById('matExistsNotice');
+  if(notice._existingId) editMateri(notice._existingId);
+});
+
+function editMateri(id){
+  const m=getMaterials().find(x=>x.id===id);if(!m)return;
+  document.getElementById('editMatId').value=m.id;
+  document.getElementById('editMatJudul').value=m.judul;
+  document.getElementById('editMatDesc').value=m.desc||'';
+  editMatSelectedFiles=[];
+  renderEditMatChips();
+  const cfd=document.getElementById('editMatCurrentFiles');
+  if(!m.files||!m.files.length){
+    cfd.innerHTML='<div style="color:var(--dim);font-size:12px;padding:8px 0;text-align:center">Belum ada file di materi ini</div>';
+  } else {
+    cfd.innerHTML=m.files.map((f,fi)=>`
+      <div class="edit-file-card">
+        <div class="file-icon">${fileIcon(f.name)}</div>
+        <div class="file-info"><div class="file-name" title="${f.name}">${f.name}</div><div class="file-size">${formatBytes(f.size)}</div></div>
+        <button class="file-dl" onclick="downloadFile('${m.id}',${fi})" title="Unduh">⬇</button>
+        <button class="file-del" onclick="deleteFileInEdit('${m.id}',${fi})" title="Hapus file ini">🗑</button>
+      </div>`).join('');
+  }
+  openModal('modalEditMateri');
+}
+
+function deleteFileInEdit(matId,fi){
+  if(!confirm('Hapus file ini dari materi?'))return;
+  const materials=getMaterials();
+  const m=materials.find(x=>x.id===matId);if(!m)return;
+  m.files.splice(fi,1);
+  saveMaterials(materials);
+  renderMateri();updateBadges();
+  toast('File dihapus.');
+  // Re-render file list inside modal
+  editMateri(matId);
+}
+
+function renderEditMatChips(){
+  document.getElementById('editMatFileChips').innerHTML=editMatSelectedFiles.map((f,i)=>`<div class="file-chip">${fileIcon(f.name)} ${f.name.length>20?f.name.slice(0,18)+'…':f.name}<button onclick="removeEditMatFile(${i})">✕</button></div>`).join('');
+}
+function removeEditMatFile(i){editMatSelectedFiles.splice(i,1);renderEditMatChips();}
+
+// Edit dropzone events
+const editMatDropzone=document.getElementById('editMatDropzone');
+const editMatFileInput=document.getElementById('editMatFile');
+editMatDropzone.addEventListener('dragover',e=>{e.preventDefault();editMatDropzone.classList.add('drag');});
+editMatDropzone.addEventListener('dragleave',()=>editMatDropzone.classList.remove('drag'));
+editMatDropzone.addEventListener('drop',e=>{e.preventDefault();editMatDropzone.classList.remove('drag');addEditMatFiles(Array.from(e.dataTransfer.files));});
+editMatFileInput.addEventListener('change',()=>{addEditMatFiles(Array.from(editMatFileInput.files));editMatFileInput.value='';});
+function addEditMatFiles(files){
+  const allowed=['pdf','doc','docx','xls','xlsx','ppt','pptx','txt','csv','md'];
+  files.forEach(f=>{const ext=f.name.split('.').pop().toLowerCase();if(allowed.includes(ext)&&f.size<=50*1024*1024)editMatSelectedFiles.push(f);else toast(`File "${f.name}" tidak didukung atau > 50MB`,'err');});
+  renderEditMatChips();
+}
+
+document.getElementById('editMatSaveBtn').addEventListener('click',async function(){
+  const id=document.getElementById('editMatId').value;
+  const judul=document.getElementById('editMatJudul').value.trim();
+  const desc=document.getElementById('editMatDesc').value.trim();
+  if(!judul){toast('Judul materi tidak boleh kosong!','err');return;}
+  const btn=this;btn.disabled=true;btn.textContent='⏳ Menyimpan...';
+  const materials=getMaterials();
+  const m=materials.find(x=>x.id===id);
+  if(!m){toast('Materi tidak ditemukan!','err');btn.disabled=false;btn.textContent='💾 Simpan Perubahan';return;}
+  m.judul=judul;m.desc=desc;
+  for(const f of editMatSelectedFiles){
+    const b64=await new Promise(res=>{const r=new FileReader();r.onload=()=>res(r.result);r.readAsDataURL(f);});
+    m.files.push({name:f.name,size:f.size,dataUrl:b64});
+  }
+  saveMaterials(materials);
+  editMatSelectedFiles=[];
+  closeModal('modalEditMateri');
+  renderMateri();updateBadges();
+  btn.disabled=false;btn.textContent='💾 Simpan Perubahan';
+  toast('Materi berhasil diperbarui!');
+});
 
 document.getElementById('matFilterTahun').addEventListener('change', function() {
   const mfk = document.getElementById('matFilterKelas');
