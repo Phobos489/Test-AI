@@ -10,7 +10,7 @@ import tempfile
 import base64
 
 app = Flask(__name__)
-app.secret_key = 'a'
+app.secret_key = 'A'
 
 USERS_FILE = 'users.json'
 
@@ -48,42 +48,53 @@ STOP_WORDS_EN = {
     'before', 'after', 'above', 'below', 'between', 'out', 'off', 'over',
     'under', 'again', 'then', 'once', 'i', 'me', 'my', 'we', 'our', 'you',
     'your', 'he', 'she', 'it', 'they', 'what', 'which', 'who', 'this',
-    'that', 'these', 'those', 'and', 'but', 'or', 'nor', 'so', 'not',
+    'that', 'these', 'those', 'and', 'but', 'or', 'nor', 'so',
     'if', 'about', 'up', 'just', 'very', 'also', 'all', 'any', 'both',
-    'each', 'few', 'more', 'most', 'no', 'only', 'same', 'than', 'too',
+    'each', 'few', 'more', 'most', 'only', 'same', 'than', 'too',
     'when', 'where', 'why', 'how', 'some', 'such', 'there', 'here', 'its'
 }
 
+# ── Kata-kata penanda PAHAM (positif dalam konteks pemahaman siswa) ──────────
 POS_WORDS_ID = {
-    'bagus', 'baik', 'senang', 'suka', 'hebat', 'mantap', 'keren', 'puas',
-    'benar', 'tepat', 'setuju', 'sukses', 'berhasil', 'mudah', 'sempurna',
-    'cantik', 'indah', 'menarik', 'luar', 'biasa', 'terima', 'kasih',
-    'luar biasa', 'oke', 'ya', 'tentu', 'jelas', 'bermanfaat', 'efektif',
-    'cepat', 'akurat', 'lengkap', 'membantu', 'menyenangkan', 'positif'
+    'paham', 'mengerti', 'faham', 'ngerti', 'jelas', 'mudah',
+    'tahu', 'tau', 'ingat', 'hafal', 'oke', 'ok', 'bagus', 'baik',
+    'benar', 'tepat', 'iya', 'ya', 'senang', 'suka', 'menarik',
+    'bermanfaat', 'membantu', 'berhasil', 'mampu', 'sanggup', 'siap',
+    'semangat', 'mantap', 'lengkap', 'keren', 'aktif', 'setuju',
+    'sukses', 'efektif', 'cepat', 'akurat', 'luar', 'biasa', 'terima',
+    'bisa', 'mahir', 'kuasai', 'menguasai', 'lancar', 'nangkap',
+    'nyambung', 'konek', 'connect', 'relate', 'relevan', 'menarik'
 }
 
+# ── Kata-kata penanda TIDAK PAHAM (negatif dalam konteks pemahaman siswa) ────
 NEG_WORDS_ID = {
-    'buruk', 'jelek', 'salah', 'error', 'gagal', 'masalah', 'sulit',
-    'susah', 'bingung', 'takut', 'kecewa', 'kurang', 'rusak', 'lambat',
-    'malas', 'payah', 'lemah', 'tidak', 'belum', 'bahaya', 'berbahaya',
-    'negatif', 'keliru', 'gagal', 'menyesal', 'khawatir', 'bosan',
-    'marah', 'kecewa', 'sedih', 'pesimis', 'mustahil', 'percuma'
+    'bingung', 'tidak', 'belum', 'kurang', 'sulit', 'susah', 'rumit',
+    'lupa', 'ragu', 'pusing', 'berat', 'kacau', 'salah', 'keliru',
+    'gagal', 'masalah', 'payah', 'lemah', 'buruk', 'jelek', 'kecewa',
+    'khawatir', 'takut', 'bosan', 'malas', 'capek', 'jenuh',
+    'ngantuk', 'mumet', 'kompleks', 'menyesal', 'percuma', 'mustahil',
+    'negatif', 'error', 'blur', 'blank', 'ngeblank', 'kosong',
+    'nggak', 'ngga', 'enggak', 'gak', 'ndak', 'ga', 'ngerti'
 }
 
+# ── Kata-kata penanda PAHAM dalam Bahasa Inggris ─────────────────────────────
 POS_WORDS_EN = {
-    'good', 'great', 'excellent', 'happy', 'love', 'like', 'awesome',
-    'perfect', 'wonderful', 'amazing', 'best', 'nice', 'cool', 'fantastic',
-    'thank', 'thanks', 'yes', 'correct', 'right', 'easy', 'helpful',
-    'brilliant', 'outstanding', 'superb', 'incredible', 'beautiful',
-    'effective', 'efficient', 'accurate', 'useful', 'positive', 'clear'
+    'understand', 'understood', 'comprehend', 'grasp', 'follow', 'clear',
+    'easy', 'know', 'get', 'learned', 'learn', 'good', 'great', 'nice',
+    'helpful', 'useful', 'yes', 'sure', 'ok', 'okay', 'able', 'ready',
+    'catch', 'familiar', 'excellent', 'perfect', 'wonderful', 'interesting',
+    'awesome', 'brilliant', 'mastered', 'remember', 'recall', 'confident',
+    'correct', 'right', 'smart', 'capable', 'engaged', 'focused'
 }
 
+# ── Kata-kata penanda TIDAK PAHAM dalam Bahasa Inggris ───────────────────────
 NEG_WORDS_EN = {
-    'bad', 'wrong', 'error', 'fail', 'problem', 'difficult', 'confused',
-    'afraid', 'disappointed', 'sorry', 'broken', 'slow', 'worse', 'worst',
-    'hate', 'dislike', 'terrible', 'awful', 'horrible', 'annoying',
-    'frustrating', 'useless', 'impossible', 'failed', 'bug', 'issue',
-    'sad', 'angry', 'boring', 'negative', 'incorrect', 'inaccurate'
+    'confused', 'confusing', 'hard', 'difficult', 'forget', 'forgot',
+    'forgotten', 'unsure', 'unclear', 'lost', 'blank', 'stuck', 'struggle',
+    'wrong', 'bad', 'boring', 'tired', 'complicated', 'complex', 'not',
+    'fail', 'failed', 'problem', 'trouble', 'miss', 'missed', 'slow',
+    'weak', 'cannot', 'cant', 'dont', 'error', 'negative', 'incorrect',
+    'distracted', 'sleepy', 'bored', 'lost', 'overwhelmed'
 }
 
 ID_MARKERS = {
@@ -126,11 +137,11 @@ def analyze_nlp(text):
         raw_score = (pos_count - neg_count) / total_sentiment_words
         sentiment_score = round(max(-1.0, min(1.0, raw_score)), 3)
         if sentiment_score > 0.1:
-            sentiment = 'positive'
+            sentiment = 'positive'   # siswa PAHAM
         elif sentiment_score < -0.1:
-            sentiment = 'negative'
+            sentiment = 'negative'   # siswa TIDAK PAHAM
         else:
-            sentiment = 'neutral'
+            sentiment = 'neutral'    # siswa KURANG PAHAM / campuran
 
     language = detect_language(words_raw)
 
