@@ -1474,7 +1474,7 @@ function renderKelas() {
         : `<div class="kelas-card-owner" style="color:var(--dim)">👤 ${c.waliKelas}</div>`;
       const actions = isOwner
         ? `<div class="kelas-card-actions"><button class="icon-btn" onclick="editKelas('${c.id}')">✏</button><button class="icon-btn del" onclick="deleteKelas('${c.id}')">🗑</button></div>`
-        : `<div class="kelas-card-actions" style="opacity:0.4;pointer-events:none"><span style="font-size:10px;font-family:var(--mono);color:var(--dim)">bukan milik Anda</span></div>`;
+        : `<div class="kelas-card-actions" style="opacity:0.4;pointer-events:none"><span style="color:var(--dim);font-size:10px;font-family:var(--mono)">—</span></div>`;
       return `<div class="kelas-card" style="--kelas-card-color:${getJurusanColor(c.jurusan)}">
         <div class="kelas-card-top">
           <span class="kelas-card-kode" style="color:${getJurusanColor(c.jurusan)}">${c.kodeKelas}</span>
@@ -1756,7 +1756,7 @@ function renderMapel() {
     const isOwner = guru === CU.name;
     const actions = isOwner
       ? `<div class="mapel-card-actions"><button class="icon-btn" onclick="editMapel('${s.id}')">✏</button><button class="icon-btn del" onclick="deleteMapel('${s.id}')">🗑</button></div>`
-      : `<div class="mapel-card-actions" style="opacity:0.4;pointer-events:none"><span style="font-size:10px;font-family:var(--mono);color:var(--dim)">bukan milik Anda</span></div>`;
+      : `<div class="mapel-card-actions" style="opacity:0.4;pointer-events:none"><span style="color:var(--dim);font-size:10px;font-family:var(--mono)">—</span></div>`;
     html += `<div class="mapel-card">
       <div class="mapel-kode">${s.kodeMapel}</div>
       <div class="mapel-nama">${s.mataPelajaran}</div>
@@ -1976,6 +1976,7 @@ function renderJadwal() {
     const last   = group.items[group.items.length - 1];
     const mapel  = subjects.find(m => m.id === first.mapelId);
     const cls    = classes.find(c => c.id === first.kelasId);
+    const isJadwalOwner = mapel && getTeacherForSubject(mapel.mataPelajaran) === CU.name;
     const meetingRows = group.items.map(sch => {
       const isUTS = sch.isUTS || sch.pertemuan === 8;
       const isUAS = sch.isUAS || sch.pertemuan === 16;
@@ -2019,8 +2020,9 @@ function renderJadwal() {
           </div>
         </div>
         <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
-          <button class="icon-btn" onclick="event.stopPropagation();editJadwal('${group.groupId}')">✏</button>
-          <button class="icon-btn del" onclick="event.stopPropagation();deleteJadwal('${group.groupId}')">🗑</button>
+          ${isJadwalOwner
+            ? `<button class="icon-btn" onclick="event.stopPropagation();editJadwal('${group.groupId}')">✏</button><button class="icon-btn del" onclick="event.stopPropagation();deleteJadwal('${group.groupId}')">🗑</button>`
+            : `<span style="color:var(--dim);font-size:10px;font-family:var(--mono)">—</span>`}
           <span id="jgtgl_${group.groupId}" style="color:var(--dim);font-size:14px;transition:transform .3s;display:inline-block;flex-shrink:0">▾</span>
         </div>
       </div>
@@ -2045,6 +2047,10 @@ function editJadwal(groupId) {
   const groupItems = getSchedules().filter(s => s.groupId === groupId).sort((a, b) => a.pertemuan - b.pertemuan);
   if (!groupItems.length) return;
   const first = groupItems[0];
+  const mapelItem = getSubjects().find(s => s.id === first.mapelId);
+  if (!mapelItem || getTeacherForSubject(mapelItem.mataPelajaran) !== CU.name) {
+    toast('Anda hanya bisa mengedit jadwal milik Anda!', 'err'); return;
+  }
   document.getElementById('jadwalEditId').value = groupId;
   document.getElementById('jadwalTanggal').value = first.tanggal || '';
   updateHariFromTanggal(first.tanggal || '');
@@ -2058,6 +2064,13 @@ function editJadwal(groupId) {
 }
 
 function deleteJadwal(groupId) {
+  const schedItems = getSchedules().filter(s => s.groupId === groupId);
+  if (schedItems.length) {
+    const mapelItem = getSubjects().find(s => s.id === schedItems[0].mapelId);
+    if (!mapelItem || getTeacherForSubject(mapelItem.mataPelajaran) !== CU.name) {
+      toast('Anda hanya bisa menghapus jadwal milik Anda!', 'err'); return;
+    }
+  }
   if (!confirm('Hapus semua 16 pertemuan jadwal ini?')) return;
   saveSchedules(getSchedules().filter(s => s.groupId !== groupId));
   renderJadwal();
@@ -2449,6 +2462,7 @@ function renderNilai(){
     const subj=subjects.find(s=>s.id===g.mapelId);
     const avg=calcNilaiAvg(g);
     const gc=avg!==null?gradeClass(avg):null;
+    const isNilaiOwner=subj&&getTeacherForSubject(subj.mataPelajaran)===CU.name;
     return `<tr>
       <td style="font-family:var(--mono);font-size:11px;color:var(--dim)">${i+1}</td>
       <td><div class="siswa-name-col"><div class="siswa-avatar" style="background:${std?avatarColor(std.namaLengkap):'var(--dim)'};width:28px;height:28px;font-size:10px">${std?std.namaLengkap.charAt(0).toUpperCase():'?'}</div>
@@ -2461,7 +2475,7 @@ function renderNilai(){
       <td style="font-family:var(--mono);font-size:12px;text-align:center">${fmtNilai(g.nilaiUAS)}</td>
       <td style="font-family:var(--mono);font-size:12px;text-align:center">${fmtNilai(g.nilaiKeaktifan)}</td>
       <td>${avg!==null?`<span class="nilai-grade ${gc}">${avg} (${gc})</span>`:'<span style="color:var(--dim);font-family:var(--mono);font-size:11px">— belum ada nilai</span>'}</td>
-      <td><div style="display:flex;gap:4px"><button class="icon-btn" onclick="editNilai('${g.id}')">✏</button><button class="icon-btn del" onclick="deleteNilai('${g.id}')">🗑</button></div></td>
+      <td><div style="display:flex;gap:4px;align-items:center">${isNilaiOwner?`<button class="icon-btn" onclick="editNilai('${g.id}')">✏</button><button class="icon-btn del" onclick="deleteNilai('${g.id}')">🗑</button>`:`<span style="color:var(--dim);font-size:10px;font-family:var(--mono)">—</span>`}</div></td>
     </tr>`;
   }).join('');
 }
@@ -2469,6 +2483,10 @@ function renderNilai(){
 // ─── editNilai: hanya mapel milik guru yang login ───
 function editNilai(id){
   const g=getGrades().find(x=>x.id===id);if(!g)return;
+  const subjItem=getSubjects().find(s=>s.id===g.mapelId);
+  if(!subjItem||getTeacherForSubject(subjItem.mataPelajaran)!==CU.name){
+    toast('Anda hanya bisa mengedit nilai yang Anda input!','err');return;
+  }
   document.getElementById('nilaiEditId').value=g.id;
   const rv=v=>(v===null||v===undefined)?'':v;
   document.getElementById('nilaiTugas').value=rv(g.nilaiTugas);
@@ -2489,6 +2507,8 @@ function editNilai(id){
   openModal('modalNilai');
 }
 function deleteNilai(id){
+  const g=getGrades().find(x=>x.id===id);
+  if(g){const subjItem=getSubjects().find(s=>s.id===g.mapelId);if(!subjItem||getTeacherForSubject(subjItem.mataPelajaran)!==CU.name){toast('Anda hanya bisa menghapus nilai yang Anda input!','err');return;}}
   if(!confirm('Hapus data nilai ini?'))return;
   saveGrades(getGrades().filter(g=>g.id!==id));renderNilai();updateBadges();toast('Nilai dihapus.');
 }

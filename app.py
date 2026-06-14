@@ -10,7 +10,7 @@ import tempfile
 import base64
 
 app = Flask(__name__)
-app.secret_key = '6598e01a2c5a5782d3241892e1fb99997a1dd6b043a4171e224bfe539184c7b0'
+app.secret_key = 'a'
 
 USERS_FILE = 'users.json'
 
