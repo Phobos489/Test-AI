@@ -327,6 +327,84 @@ def generate():
     return jsonify({"prompt": prompt, "result": result})
 
 
+def build_teacher_ai_prompt(payload):
+    payload = payload or {}
+    class_label = payload.get("classLabel", "Belum memilih kelas")
+    meeting_label = payload.get("meetingLabel", "Belum ada pertemuan selesai")
+    total_students = payload.get("totalStudents", 0)
+    responded_students = payload.get("respondedStudents", 0)
+    total_responses = payload.get("totalResponses", 0)
+    counts = payload.get("counts", {}) or {}
+    class_grades = payload.get("classGrades", {}) or {}
+    selected_student = payload.get("selectedStudent")
+    students = payload.get("students", []) or []
+    subjects = payload.get("subjects", []) or []
+    grade_records = payload.get("gradeRecords", []) or []
+
+    def safe_num(v):
+        try:
+            return int(round(float(v)))
+        except Exception:
+            return None
+
+    summary = {
+        "kelas": class_label,
+        "pertemuan_terakhir": meeting_label,
+        "total_siswa": total_students,
+        "respon_masuk": responded_students,
+        "total_tanggapan": total_responses,
+        "paham": counts.get("paham", 0),
+        "tidak_paham": counts.get("tidak", 0),
+        "perlu_ditinjau": counts.get("campuran", 0),
+        "belum_mengisi": counts.get("belum", 0),
+        "nilai_rata_rata_kelas": class_grades.get("average"),
+        "status_nilai_kelas": class_grades.get("label"),
+        "mata_pelajaran": subjects,
+        "data_nilai": grade_records,
+        "fokus_siswa": selected_student,
+        "daftar_siswa": students,
+    }
+
+    prompt = payload.get("prompt") or ""
+    if prompt:
+        return prompt
+
+    return f'''
+Kamu adalah asisten evaluasi guru. Susun evaluasi pembelajaran yang berbasis decision tree, NLP, dan nilai siswa dengan bahasa Indonesia yang jelas, singkat, dan profesional.
+
+Aturan keputusan yang harus dipakai:
+- Jika pemahaman dominan paham dan nilai rata-rata tinggi, sarankan lanjut materi atau pengayaan.
+- Jika pemahaman campuran atau nilai sedang, sarankan penguatan konsep, latihan bertahap, dan review.
+- Jika pemahaman dominan tidak paham atau nilai rendah, sarankan remedial, penjelasan ulang, dan pendampingan.
+- Jika banyak siswa belum mengisi, sarankan tindak lanjut pengisian dan pemantauan.
+
+Data terstruktur:
+{json.dumps(summary, ensure_ascii=False, indent=2)}
+
+Instruksi output:
+1. Ringkasan kelas.
+2. Diagnosis berdasarkan decision tree.
+3. Sorotan tanggapan siswa yang paling penting.
+4. Rekomendasi tindakan guru.
+5. Jika ada siswa fokus, beri catatan khusus untuk siswa itu.
+Gunakan poin-poin agar mudah dibaca.
+'''.strip()
+
+
+@app.route("/api/teacher-ai-feedback", methods=["POST"])
+def teacher_ai_feedback():
+    data = request.get_json(silent=True) or {}
+    payload = data.get("payload") or {}
+    prompt = build_teacher_ai_prompt({**payload, "prompt": data.get("prompt", "")})
+    if not prompt.strip():
+        return jsonify({"error": "Prompt AI tidak boleh kosong"}), 400
+    try:
+        result = main.generate_text(prompt)
+    except Exception as e:
+        return jsonify({"error": f"Gagal menghasilkan tanggapan AI: {str(e)}"}), 500
+    return jsonify({"feedback": result, "payload": payload})
+
+
 @app.route("/generate-with-file", methods=["POST"])
 def generate_with_file():
     prompt = request.form.get("prompt", "").strip()

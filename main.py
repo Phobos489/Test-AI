@@ -1,11 +1,14 @@
 import google.generativeai as phobosai
 
 # Konfigurasi API Key
-phobosai.configure(api_key="A")  
+phobosai.configure(api_key="AIzaSyCnyVfFGwhJ6OQrdEhGLmdhTYbYnQpki7g")  
 
 # Pilih model
 model = phobosai.GenerativeModel("models/gemini-3-flash-preview")
 
 def generate_text(prompt: str):
-    response = model.generate_content(prompt)
-    return response.text
+    try:
+        response = model.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        return f"[Gagal menghasilkan teks: {e}]"

@@ -272,6 +272,22 @@ select:disabled{cursor:not-allowed;opacity:.45;background:var(--bg3) !important}
 .tg-bar-pct{font-family:var(--mono);font-size:11px;color:var(--dim);text-align:right}
 .tg-student-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .tg-click-hint{font-size:11px;color:var(--dim);margin-top:10px}
+.tg-ai-panel{margin-top:16px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.tg-ai-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.tg-ai-head .tg-list-sub{max-width:900px}
+.tg-ai-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-family:var(--mono);font-size:10px;font-weight:700;border:1px solid rgba(139,92,246,.25);background:rgba(139,92,246,.12);color:var(--purple)}
+.tg-ai-body{display:flex;flex-direction:column;gap:12px}
+.tg-ai-loading{padding:14px 16px;border-radius:10px;background:rgba(139,92,246,.06);border:1px dashed rgba(139,92,246,.24);color:var(--dim);font-size:13px;line-height:1.7}
+.tg-ai-response{padding:14px 16px;border-radius:10px;background:rgba(255,255,255,.02);border:1px solid var(--border);font-size:13px;line-height:1.8;white-space:normal}
+.tg-ai-response strong{color:var(--text)}
+.tg-ai-response ul{margin:8px 0 8px 18px;padding:0}
+.tg-ai-response li{margin:4px 0}
+.tg-ai-meta{display:flex;flex-wrap:wrap;gap:8px}
+.tg-ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.tg-ai-mini{padding:12px 14px;border-radius:10px;background:var(--bg3);border:1px solid var(--border)}
+.tg-ai-mini .k{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.tg-ai-mini .v{margin-top:6px;font-size:13px;font-weight:600;line-height:1.5}
+
 
 @keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -1604,11 +1620,265 @@ function getStudentRecordsById(records, studentId) {
 }
 
 
+let tgAiRenderToken = 0;
+
+function getGradeRecordsForTeacherClass(kelasId) {
+  if (!kelasId) return [];
+  const subjectIds = new Set(getTeacherSubjectsForClass(kelasId).map(s => s.id));
+  return getGrades().filter(g => g.kelasId === kelasId && subjectIds.has(g.mapelId));
+}
+
+function getStudentGradeSummary(studentId, kelasId) {
+  const grades = getGradeRecordsForTeacherClass(kelasId).filter(g => g.studentId === studentId);
+  const values = grades
+    .map(g => calcNilaiAvg(g))
+    .filter(v => Number.isFinite(v));
+  if (!values.length) {
+    return { count: 0, average: null, label: 'Belum ada nilai' };
+  }
+  const average = Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+  let label = 'Perlu ditinjau';
+  if (average >= 85) label = 'Sangat baik';
+  else if (average >= 70) label = 'Baik';
+  else if (average >= 55) label = 'Cukup';
+  else label = 'Perlu remedial';
+  return { count: values.length, average, label };
+}
+
+function getClassGradeSummary(kelasId) {
+  const grades = getGradeRecordsForTeacherClass(kelasId);
+  const values = grades.map(g => calcNilaiAvg(g)).filter(v => Number.isFinite(v));
+  if (!values.length) return { count: 0, average: null, label: 'Belum ada nilai' };
+  const average = Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+  let label = 'Perlu ditinjau';
+  if (average >= 85) label = 'Sangat baik';
+  else if (average >= 70) label = 'Baik';
+  else if (average >= 55) label = 'Cukup';
+  else label = 'Perlu remedial';
+  return { count: values.length, average, label };
+}
+
+function buildTeacherAiPayload(kelasId, selectedStudentId = '') {
+  const kelas = kelasId ? (getClasses().find(c => c.id === kelasId) || null) : null;
+  const subjects = kelasId ? getTeacherSubjectsForClass(kelasId) : [];
+  const scope = kelasId ? getLatestCompletedScope(kelasId) : null;
+  const students = kelasId ? getStudents().filter(s => s.kelasId === kelasId) : [];
+  const allRecords = kelasId && scope
+    ? collectResponseInsights().filter(r =>
+        r.kelas?.id === kelasId &&
+        r.subject &&
+        scope.subjectIds.includes(r.subject.id)
+      )
+    : [];
+  const latestByStudent = getLatestRecordByStudent(allRecords);
+  const classGrades = getClassGradeSummary(kelasId);
+  const gradeRecords = getGradeRecordsForTeacherClass(kelasId);
+  const totalStudents = students.length;
+  const respondedStudents = students.filter(student => getStudentRecordsById(allRecords, student.id).length).length;
+  const pahamCount = students.filter(student => summarizeStudentInsights(getStudentRecordsById(allRecords, student.id)).key === 'paham').length;
+  const tidakCount = students.filter(student => summarizeStudentInsights(getStudentRecordsById(allRecords, student.id)).key === 'tidak').length;
+  const campuranCount = students.filter(student => summarizeStudentInsights(getStudentRecordsById(allRecords, student.id)).key === 'campuran').length;
+  const belumCount = Math.max(totalStudents - respondedStudents, 0);
+
+  const studentSummaries = students.map(student => {
+    const records = getStudentRecordsById(allRecords, student.id).sort((a, b) => {
+      const ta = new Date(a.responseTimestamp || a.nlp?.timestamp || 0).getTime();
+      const tb = new Date(b.responseTimestamp || b.nlp?.timestamp || 0).getTime();
+      if (tb !== ta) return tb - ta;
+      return (b.pertemuan || 0) - (a.pertemuan || 0);
+    });
+    const responseItems = records.map(r => ({
+      sessionId: r.sessionId,
+      pertemuan: r.pertemuan,
+      subject: r.subject ? `${r.subject.kodeMapel || '—'} ${r.subject.mataPelajaran || ''}`.trim() : '—',
+      response: r.response || r.nlp?.text_preview || '',
+      timestamp: r.responseTimestamp || r.nlp?.timestamp || null,
+      insight: summarizeStudentInsights([r]),
+      score: Number(r.nlp?.sentiment_score ?? 0),
+      topWords: Array.isArray(r.nlp?.top_words) ? r.nlp.top_words.slice(0, 5).map(item => Array.isArray(item) ? item[0] : '').filter(Boolean) : []
+    }));
+    const latest = latestByStudent.get(student.id) || null;
+    const gradeSummary = getStudentGradeSummary(student.id, kelasId);
+    const latestInsight = summarizeStudentInsights(records);
+    return {
+      id: student.id,
+      name: student.namaLengkap || '—',
+      nis: student.nis || '—',
+      responseCount: records.length,
+      latestInsight,
+      latestResponse: latest?.response || latest?.nlp?.text_preview || '',
+      latestTimestamp: latest?.responseTimestamp || latest?.nlp?.timestamp || null,
+      gradeAverage: gradeSummary.average,
+      gradeLabel: gradeSummary.label,
+      gradeCount: gradeSummary.count,
+      records: responseItems
+    };
+  });
+
+  const selectedStudent = selectedStudentId ? studentSummaries.find(s => s.id === selectedStudentId) || null : null;
+  const totalResponses = allRecords.length;
+  const meetingLabel = scope?.schedule
+    ? `Pertemuan ${scope.schedule.pertemuan} · ${formatDate(scope.schedule.tanggal)}`
+    : 'Belum ada pertemuan selesai';
+
+  return {
+    mode: selectedStudent ? 'student' : 'class',
+    teacherName: CU?.name || '',
+    classLabel: kelas ? `${kelas.kelas} ${kelas.jurusan} — ${kelas.kodeKelas}` : 'Belum memilih kelas',
+    meetingLabel,
+    classHasScope: !!scope,
+    totalStudents,
+    respondedStudents,
+    totalResponses,
+    counts: {
+      paham: pahamCount,
+      tidak: tidakCount,
+      campuran: campuranCount,
+      belum: belumCount
+    },
+    classGrades,
+    subjects: subjects.map(s => ({
+      id: s.id,
+      kode: s.kodeMapel,
+      name: s.mataPelajaran
+    })),
+    selectedStudentId: selectedStudentId || '',
+    selectedStudent,
+    students: studentSummaries,
+    scope: scope ? {
+      pertemuan: scope.schedule?.pertemuan || null,
+      tanggal: scope.schedule?.tanggal || null
+    } : null,
+    gradeRecords: gradeRecords.map(g => ({
+      studentId: g.studentId,
+      mapelId: g.mapelId,
+      average: calcNilaiAvg(g)
+    }))
+  };
+}
+
+function buildTeacherAiFallback(payload) {
+  const counts = payload?.counts || {};
+  const classGrades = payload?.classGrades || {};
+  const classLine = `${payload?.classLabel || 'Kelas dipilih'} · ${payload?.meetingLabel || 'Belum ada pertemuan selesai'}`;
+  const gradeLine = classGrades.average !== null && classGrades.average !== undefined
+    ? `Rata-rata nilai kelas: ${classGrades.average} (${classGrades.label || '—'})`
+    : 'Belum ada data nilai untuk kelas ini.';
+  const dominant = Math.max(counts.paham || 0, counts.tidak || 0, counts.campuran || 0);
+  let decision = 'Lanjutkan pembelajaran dengan pemantauan rutin.';
+  if ((counts.tidak || 0) === dominant && dominant > 0) decision = 'Prioritaskan remedial dan penjelasan ulang.';
+  else if ((counts.campuran || 0) === dominant && dominant > 0) decision = 'Lakukan penguatan konsep dan latihan bertahap.';
+  else if ((counts.paham || 0) === dominant && dominant > 0) decision = 'Berikan pengayaan atau pendalaman materi.';
+  const summary = [
+    `**Ringkasan kelas**`,
+    `• ${classLine}`,
+    `• ${gradeLine}`,
+    `• Respon masuk: ${payload?.respondedStudents || 0}/${payload?.totalStudents || 0}`,
+    `• Paham: ${counts.paham || 0}, Tidak paham: ${counts.tidak || 0}, Perlu ditinjau: ${counts.campuran || 0}, Belum mengisi: ${counts.belum || 0}`,
+    ``,
+    `**Rekomendasi awal**`,
+    `• ${decision}`,
+    `• Gunakan tanggapan yang paling sering muncul sebagai dasar penguatan/remedial.`,
+  ];
+  if (payload?.selectedStudent) {
+    summary.push(``, `**Siswa terpilih**`, `• ${payload.selectedStudent.name} — ${payload.selectedStudent.latestInsight?.label || 'Belum mengisi'}`);
+  }
+  return summary.join('\\n');
+}
+
+function buildTeacherAiPrompt(payload) {
+  const safeJson = JSON.stringify(payload, null, 2);
+  return `
+Kamu adalah asisten evaluasi pembelajaran untuk guru. Gunakan data tanggapan siswa, hasil NLP, dan nilai siswa yang tersedia untuk menyusun evaluasi yang praktis, objektif, dan langsung bisa dipakai guru.
+
+Gunakan logika decision tree berikut sebagai kerangka analisis:
+1. Jika nilai rata-rata siswa atau kelas tinggi dan pemahaman dominan "Paham", rekomendasikan lanjut materi atau pengayaan.
+2. Jika pemahaman campuran atau nilai sedang, rekomendasikan penguatan konsep, latihan bertahap, dan klarifikasi bagian yang masih lemah.
+3. Jika pemahaman dominan "Tidak paham" atau nilai rendah, rekomendasikan remedial, penjelasan ulang, dan pendampingan tambahan.
+4. Jika banyak siswa belum mengisi, tekankan tindak lanjut pengisian dan pemantauan.
+5. Jika ada siswa yang sangat kuat, beri catatan pengayaan individual.
+
+Instruksi output:
+- Tulis dalam bahasa Indonesia yang natural dan profesional.
+- Beri ringkasan kelas terlebih dahulu.
+- Lanjutkan dengan diagnosis berdasarkan decision tree.
+- Sebutkan pola tanggapan siswa yang menonjol.
+- Berikan rekomendasi tindakan guru yang spesifik.
+- Jika ada siswa yang dipilih, beri fokus tambahan pada siswa tersebut.
+- Jangan mengada-ada; gunakan hanya data yang ada.
+- Gunakan poin-poin agar mudah dibaca.
+
+Data terstruktur yang harus kamu baca seluruhnya:
+${safeJson}
+`.trim();
+}
+
+async function renderTeacherAiFeedback(payload, token) {
+  const target = document.getElementById('tanggapanAiContent');
+  if (!target) return;
+
+  const currentToken = token || tgAiRenderToken;
+  target.innerHTML = `<div class="tg-ai-loading">⏳ AI sedang menyusun evaluasi berdasarkan seluruh tanggapan siswa dan nilai kelas…</div>`;
+
+  try {
+    const resp = await fetch('/api/teacher-ai-feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ payload, prompt: buildTeacherAiPrompt(payload) })
+    });
+    const data = await resp.json();
+    if (currentToken !== tgAiRenderToken) return;
+
+    const text = String(data.feedback || data.result || '').trim();
+    target.innerHTML = text
+      ? `<div class="tg-ai-response">${escapeHtml(text).replace(/\n/g, '<br>')}</div>`
+      : `<div class="tg-ai-loading">AI belum menghasilkan teks. Berikut ringkasan sementara:<br><br>${escapeHtml(buildTeacherAiFallback(payload)).replace(/\n/g, '<br>')}</div>`;
+  } catch (err) {
+    if (currentToken !== tgAiRenderToken) return;
+    target.innerHTML = `<div class="tg-ai-response">${escapeHtml(buildTeacherAiFallback(payload)).replace(/\n/g, '<br>')}</div>`;
+  }
+}
+
+function appendTeacherAiPanel(contentEl, payload, subtitle) {
+  const dash = contentEl.querySelector('.tg-dashboard');
+  if (!dash) return;
+
+  const panel = document.createElement('div');
+  panel.className = 'tg-ai-panel';
+  panel.innerHTML = `
+    <div class="tg-ai-head">
+      <div>
+        <div class="tg-list-title">Tanggapan AI</div>
+        <div class="tg-list-sub">${escapeHtml(subtitle)}</div>
+      </div>
+      <div class="tg-ai-badge">Decision Tree + NLP + Nilai</div>
+    </div>
+    <div class="tg-ai-meta">
+      <span class="tg-pill emerald">${escapeHtml(payload.classLabel || '—')}</span>
+      <span class="tg-pill cyan">${escapeHtml(payload.meetingLabel || '—')}</span>
+      <span class="tg-pill dim">${payload.respondedStudents || 0}/${payload.totalStudents || 0} respon</span>
+      <span class="tg-pill orange">${payload.classGrades?.average !== null && payload.classGrades?.average !== undefined ? `Rata-rata nilai ${payload.classGrades.average}` : 'Tanpa nilai'}</span>
+    </div>
+    <div class="tg-ai-grid">
+      <div class="tg-ai-mini"><div class="k">Paham</div><div class="v">${payload.counts?.paham || 0} siswa</div></div>
+      <div class="tg-ai-mini"><div class="k">Tidak Paham</div><div class="v">${payload.counts?.tidak || 0} siswa</div></div>
+      <div class="tg-ai-mini"><div class="k">Perlu Ditinjau</div><div class="v">${payload.counts?.campuran || 0} siswa</div></div>
+      <div class="tg-ai-mini"><div class="k">Belum Mengisi</div><div class="v">${payload.counts?.belum || 0} siswa</div></div>
+    </div>
+    <div class="tg-ai-body">
+      <div id="tanggapanAiContent" class="tg-ai-loading">⏳ AI sedang membaca setiap tanggapan siswa pada kelas yang dipilih.</div>
+    </div>
+  `;
+  dash.appendChild(panel);
+  renderTeacherAiFeedback(payload, ++tgAiRenderToken);
+}
+
 function renderTanggapan() {
   const content = document.getElementById('tanggapanContent');
   const scopeInfo = document.getElementById('tanggapanScopeInfo');
   const kelasEl = document.getElementById('tanggapanFilterKelas');
   if (!content || !scopeInfo || !kelasEl) return;
+  tgAiRenderToken += 1;
 
   const teacherClasses = getTeacherClassesAvailable();
   const prevClass = kelasEl.value || '';
@@ -1834,6 +2104,9 @@ function renderTanggapan() {
           </div>
         </div>
       </div>`;
+    const aiPayload = buildTeacherAiPayload(kelasId, tgSelectedStudentId);
+    appendTeacherAiPanel(content, aiPayload, 'AI membaca seluruh tanggapan pada kelas yang dipilih dan memberi fokus tambahan pada siswa terpilih.');
+
 
     const backBtn = document.getElementById('tanggapanBackBtn');
     if (backBtn) {
@@ -1888,6 +2161,9 @@ function renderTanggapan() {
         </div>
       </div>
     </div>`;
+  const aiPayload = buildTeacherAiPayload(kelasId, '');
+  appendTeacherAiPanel(content, aiPayload, 'AI membaca seluruh tanggapan siswa pada kelas yang dipilih, lalu memadukannya dengan nilai untuk evaluasi guru.');
+
 }
 function getTeacherForSubject(subjectName) {
 
