@@ -95,6 +95,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 .nav-jadwal{color:#9090c0}.nav-jadwal.active{color:var(--blue);background:var(--blue-bg);border-color:rgba(59,130,246,.25)}
 .nav-materi{color:#9090c0}.nav-materi.active{color:var(--orange);background:var(--orange-bg);border-color:rgba(249,115,22,.25)}
 .nav-nilai{color:#9090c0}.nav-nilai.active{color:var(--rose);background:var(--rose-bg);border-color:rgba(244,63,94,.25)}
+.nav-tanggapan{color:#9090c0}.nav-tanggapan.active{color:var(--emerald);background:var(--emerald-bg);border-color:rgba(16,185,129,.25)}
 .main{flex:1;overflow-y:auto;position:relative}
 
 /* SECTION */
@@ -182,6 +183,95 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 
 /* disabled select helper */
 select:disabled{cursor:not-allowed;opacity:.45;background:var(--bg3) !important}
+
+
+/* TANGGAPAN V2 */
+.tg-scope-title{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--emerald);font-weight:700}
+.tg-scope-sub{font-size:12px;color:var(--dim);margin-top:4px;line-height:1.5}
+.tg-shell{display:flex;flex-direction:column;gap:16px}
+.tg-panel-note{font-size:12px;color:var(--dim);line-height:1.6}
+.tg-dashboard{display:flex;flex-direction:column;gap:16px}
+.tg-overview{display:grid;grid-template-columns:minmax(280px,320px) 1fr;gap:16px;align-items:stretch}
+.tg-chart-card,.tg-summary-wrap,.tg-detail-panel{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.tg-chart-card{padding:18px}
+.tg-chart-title{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--emerald);margin-bottom:14px}
+.tg-chart{display:flex;align-items:center;justify-content:center;min-height:220px}
+.tg-donut{width:180px;height:180px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;background:conic-gradient(var(--emerald) 0deg 0deg,var(--rose) 0deg 0deg,var(--amber) 0deg 0deg,var(--dim) 0deg 360deg);box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}
+.tg-donut::before{content:'';position:absolute;inset:28px;border-radius:50%;background:var(--bg2);border:1px solid var(--border)}
+.tg-donut-inner{position:relative;z-index:1;text-align:center}
+.tg-donut-value{font-family:var(--mono);font-size:30px;font-weight:700;line-height:1}
+.tg-donut-label{font-size:12px;color:var(--dim);margin-top:4px}
+.tg-chart-legend{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.tg-legend-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;font-size:12px}
+.tg-legend-left{display:flex;align-items:center;gap:8px;min-width:0}
+.tg-legend-swatch{width:10px;height:10px;border-radius:999px;flex-shrink:0}
+.tg-legend-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tg-legend-meta{font-family:var(--mono);font-size:10px;color:var(--dim);white-space:nowrap}
+.tg-summary-wrap{padding:18px}
+.tg-summary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tg-summary-card{padding:14px;border-radius:12px;background:var(--bg3);border:1px solid var(--border)}
+.tg-summary-card .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.tg-summary-card .val{font-family:var(--mono);font-size:24px;font-weight:700;line-height:1;margin-top:8px}
+.tg-summary-card .note{font-size:12px;color:var(--dim);line-height:1.5;margin-top:8px}
+.tg-summary-card.paham{border-color:rgba(16,185,129,.25);background:rgba(16,185,129,.06)}
+.tg-summary-card.tidak{border-color:rgba(244,63,94,.25);background:rgba(244,63,94,.06)}
+.tg-summary-card.campuran{border-color:rgba(245,158,11,.25);background:rgba(245,158,11,.06)}
+.tg-summary-card.belum{border-color:rgba(96,96,160,.25);background:rgba(96,96,160,.06)}
+.tg-summary-card.total{border-color:rgba(59,130,246,.2);background:rgba(59,130,246,.05)}
+.tg-class-switch{display:flex;flex-direction:column;gap:12px;padding:14px;border-radius:12px;background:var(--bg3);border:1px solid var(--border)}
+.tg-switch-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.tg-switch-title{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--emerald);font-weight:700}
+.tg-switch-sub{font-size:12px;color:var(--dim);line-height:1.6;margin-top:4px}
+.tg-switch-note{font-size:11px;color:var(--dim);line-height:1.6}
+.tg-list-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:4px 2px}
+.tg-list-title{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--text)}
+.tg-list-sub{font-size:12px;color:var(--dim);margin-top:4px;line-height:1.5;max-width:760px}
+.tg-pill-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tg-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-family:var(--mono);font-size:10px;font-weight:700;border:1px solid var(--border2);background:var(--bg3);color:var(--dim)}
+.tg-pill.emerald{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.24);color:var(--emerald)}
+.tg-pill.cyan{background:rgba(6,182,212,.12);border-color:rgba(6,182,212,.24);color:var(--cyan)}
+.tg-pill.orange{background:rgba(249,115,22,.12);border-color:rgba(249,115,22,.24);color:var(--orange)}
+.tg-pill.rose{background:rgba(244,63,94,.12);border-color:rgba(244,63,94,.24);color:var(--rose)}
+.tg-pill.dim{background:rgba(96,96,160,.12);border-color:rgba(96,96,160,.22);color:var(--dim)}
+.tg-student-card,.tg-response-card{position:relative;cursor:pointer}
+.tg-student-card:hover,.tg-response-card:hover{border-color:rgba(16,185,129,.3);transform:translateY(-1px)}
+.tg-student-card .tg-response,.tg-response-card .tg-response{max-height:120px;overflow:hidden}
+.tg-student-card.empty{opacity:.82}
+.tg-card-actions{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.tg-grid-note{font-size:12px;color:var(--dim);margin-top:10px}
+.tg-student-list-panel{padding:18px}
+.tg-student-list{display:flex;flex-direction:column;gap:10px;max-height:360px;overflow:auto;padding-right:4px}
+.tg-student-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg3);cursor:pointer;transition:all .2s}
+.tg-student-row:hover{border-color:rgba(16,185,129,.28);transform:translateY(-1px)}
+.tg-student-row.empty{opacity:.84}
+.tg-student-row.selected{border-color:rgba(16,185,129,.32);background:rgba(16,185,129,.06)}
+.tg-student-row-main{min-width:0;flex:1}
+.tg-student-row-name{font-size:13px;font-weight:700;line-height:1.2}
+.tg-student-row-sub{font-size:11px;color:var(--dim);font-family:var(--mono);margin-top:3px}
+.tg-student-row-side{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.tg-response-stack{display:flex;flex-direction:column;gap:12px;max-height:420px;overflow:auto;padding-right:4px}
+.tg-response-stack .tg-card{flex:0 0 auto}
+.tg-status-note{font-size:11px;color:var(--dim);margin-top:8px;line-height:1.5}
+.tg-student-status{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:11px;font-family:var(--mono);font-weight:700;border:1px solid transparent}
+.tg-student-status.paham{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.24);color:var(--emerald)}
+.tg-student-status.tidak{background:rgba(244,63,94,.12);border-color:rgba(244,63,94,.24);color:var(--rose)}
+.tg-student-status.campuran{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.24);color:var(--amber)}
+.tg-student-status.belum{background:rgba(96,96,160,.12);border-color:rgba(96,96,160,.24);color:var(--dim)}
+.tg-empty-state{background:var(--bg2);border:1px dashed var(--border2);border-radius:14px;padding:28px;text-align:center;color:var(--dim)}
+.tg-empty-state .ei{font-size:42px;opacity:.35;display:block;margin-bottom:10px}
+.tg-empty-state p{font-size:13px;line-height:1.7}
+.tg-detail-panel{padding:18px}
+.tg-detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.tg-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.tg-bar-list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.tg-bar-row{display:grid;grid-template-columns:160px 1fr 56px;gap:10px;align-items:center}
+.tg-bar-label{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;min-width:0}
+.tg-bar-dot{width:10px;height:10px;border-radius:999px;flex-shrink:0}
+.tg-bar-track{height:10px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:999px;overflow:hidden}
+.tg-bar-fill{height:100%;border-radius:999px}
+.tg-bar-pct{font-family:var(--mono);font-size:11px;color:var(--dim);text-align:right}
+.tg-student-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.tg-click-hint{font-size:11px;color:var(--dim);margin-top:10px}
 
 @keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -329,6 +419,50 @@ select:disabled{cursor:not-allowed;opacity:.45;background:var(--bg3) !important}
 .edit-file-card{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;transition:all .2s}
 .edit-file-card:hover{border-color:rgba(249,115,22,.25)}
 
+
+/* TANGGAPAN & NLP */
+#sec-tanggapan .sec-header{border-left:3px solid var(--emerald)}
+#sec-tanggapan .sec-body{display:flex;flex-direction:column;gap:16px}
+.tanggapan-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.tanggapan-toolbar .field{min-width:160px}
+.tanggapan-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.tg-stat{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;min-height:102px}
+.tg-stat.total{border-color:rgba(16,185,129,.24)}
+.tg-stat.paham{border-color:rgba(16,185,129,.24)}
+.tg-stat.tidak{border-color:rgba(244,63,94,.24)}
+.tg-stat.tinjau{border-color:rgba(245,158,11,.24)}
+.tg-stat .ts-label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.tg-stat .ts-value{font-size:26px;font-weight:700;margin-top:8px;line-height:1}
+.tg-stat .ts-note{font-size:12px;color:var(--dim);margin-top:8px;line-height:1.5}
+.tanggapan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+.tg-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;transition:all .2s}
+.tg-card:hover{border-color:rgba(16,185,129,.28);transform:translateY(-1px)}
+.tg-card-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.tg-student{font-size:14px;font-weight:700;line-height:1.2}
+.tg-nis{font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:3px}
+.tg-head-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.tg-time{font-family:var(--mono);font-size:10px;color:var(--dim);white-space:nowrap}
+.tg-meta{display:flex;flex-wrap:wrap;gap:6px}
+.tg-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-family:var(--mono);font-size:10px;border:1px solid var(--border2);background:var(--bg3);color:var(--dim)}
+.tg-chip.emerald{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.24);color:var(--emerald)}
+.tg-chip.cyan{background:rgba(6,182,212,.12);border-color:rgba(6,182,212,.24);color:var(--cyan)}
+.tg-chip.orange{background:rgba(249,115,22,.12);border-color:rgba(249,115,22,.24);color:var(--orange)}
+.tg-chip.rose{background:rgba(244,63,94,.12);border-color:rgba(244,63,94,.24);color:var(--rose)}
+.tg-chip.dim{background:rgba(96,96,160,.10);border-color:rgba(96,96,160,.22);color:var(--dim)}
+.tg-response{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:13px;line-height:1.65;white-space:pre-wrap;word-break:break-word}
+.tg-analysis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tg-mini{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px}
+.tg-mini .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.tg-mini .val{font-size:13px;font-weight:700;margin-top:4px}
+.tg-status{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:11px;font-family:var(--mono);font-weight:700;align-self:flex-start}
+.tg-status.paham{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.24);color:var(--emerald)}
+.tg-status.tidak{background:rgba(244,63,94,.12);border:1px solid rgba(244,63,94,.24);color:var(--rose)}
+.tg-status.campuran{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.24);color:var(--amber)}
+.tg-status.belum{background:rgba(96,96,160,.12);border:1px solid rgba(96,96,160,.24);color:var(--dim)}
+.tg-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.tg-topwords{display:flex;flex-wrap:wrap;gap:6px}
+.tg-word{display:inline-flex;align-items:center;padding:3px 8px;border-radius:16px;font-family:var(--mono);font-size:10px;background:rgba(139,92,246,.10);border:1px solid rgba(139,92,246,.22);color:var(--purple)}
+
 /* NILAI */
 #sec-nilai .sec-header{border-left:3px solid var(--rose)}
 .nilai-grade{display:inline-block;min-width:46px;text-align:center;font-family:var(--mono);font-size:12px;font-weight:700;padding:3px 8px;border-radius:5px}
@@ -409,6 +543,7 @@ select:disabled{cursor:not-allowed;opacity:.45;background:var(--bg3) !important}
       <div class="nav-item nav-jadwal" data-sec="jadwal"><span class="ni-icon">📅</span><span class="ni-label">Jadwal Pelajaran</span><span class="ni-badge" id="badge-jadwal">0</span></div>
       <div class="nav-item nav-materi" data-sec="materi"><span class="ni-icon">📁</span><span class="ni-label">Materi</span><span class="ni-badge" id="badge-materi">0</span></div>
       <div class="nav-item nav-nilai" data-sec="nilai"><span class="ni-icon">📊</span><span class="ni-label">Nilai Siswa</span><span class="ni-badge" id="badge-nilai">0</span></div>
+      <div class="nav-item nav-tanggapan" data-sec="tanggapan"><span class="ni-icon">💬</span><span class="ni-label">Tanggapan Siswa</span><span class="ni-badge" id="badge-tanggapan">0</span></div>
     </nav>
 
     <div class="main">
@@ -657,6 +792,33 @@ select:disabled{cursor:not-allowed;opacity:.45;background:var(--bg3) !important}
               </div>
               <div class="materi-accordion" id="materiAccordion"></div>
             </div>
+          </div>
+        </div>
+      </div>
+      <!-- ═══ TANGGAPAN SISWA ═══ -->
+      <div class="section" id="sec-tanggapan">
+        <div class="sec-header">
+          <div class="sec-header-left">
+            <h2 style="color:var(--emerald)">Tanggapan Siswa</h2>
+            <p>Pilih kelas di panel kanan untuk memuat diagram kelas dan data tanggapan siswa. Saat pertama dibuka, ringkasan ditampilkan kosong agar siap diisi begitu kelas dipilih.</p>
+          </div>
+        </div>
+        <div class="sec-body">
+          <div class="tg-shell">
+            <div class="tg-class-switch" style="padding:16px 18px">
+              <div class="tg-switch-head">
+                <div>
+                  <div class="tg-switch-title">Ringkasan Kelas</div>
+                  <div class="tg-switch-sub" id="tanggapanScopeInfo">Pilih kelas di sebelah kanan untuk memuat diagram, ringkasan, dan daftar tanggapan siswa.</div>
+                </div>
+                <div class="field" style="color:var(--emerald);min-width:240px;max-width:360px;flex:0 0 320px">
+                  <label>Kelas</label>
+                  <select id="tanggapanFilterKelas"><option value="">Pilih kelas terlebih dahulu</option></select>
+                </div>
+              </div>
+            </div>
+
+            <div id="tanggapanContent"></div>
           </div>
         </div>
       </div>
@@ -946,6 +1108,8 @@ const saveSchedules = d => save(SK.schedules, d);
 const saveMaterials = d => save(SK.materials, d);
 const saveGrades    = d => save(SK.grades,    d);
 const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
+const NLP_KEY = 'phobosNLPHistory';
+const RESPONSE_STORE_PREFIX = 'pEdu_student_responses_';
 
 // ═══════════════════ TOAST ═══════════════════
 function toast(msg, type='ok') {
@@ -1029,6 +1193,7 @@ navItems.forEach(item => {
     if (sec==='mapel')  renderMapel();
     if (sec==='jadwal') renderJadwal();
     if (sec==='materi') renderMateri();
+    if (sec==='tanggapan') renderTanggapan();
     if (sec==='nilai')  renderNilai();
     if (sec==='profil') renderProfil();
   });
@@ -1039,6 +1204,12 @@ function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', () => closeModal(el.dataset.close)));
 document.querySelectorAll('.modal-bg').forEach(bg => bg.addEventListener('click', e => { if (e.target===bg) closeModal(bg.id); }));
+
+window.addEventListener('storage', e => {
+  if (![NLP_KEY, SK.schedules, ...Object.values(SK).map(v => v)].includes(e.key)) return;
+  updateBadges();
+  if (document.getElementById('sec-tanggapan')?.classList.contains('active')) renderTanggapan();
+});
 
 // ═══════════════════ BADGES ═══════════════════
 function updateBadges() {
@@ -1052,8 +1223,11 @@ function updateBadges() {
   document.getElementById('badge-jadwal').textContent = jGroups.length;
   document.getElementById('badge-materi').textContent = getMaterials().reduce((s,m) => s+(m.files||[]).length, 0);
   document.getElementById('badge-nilai').textContent = getGrades().length;
+  const nlpTotal = collectResponseInsights().length;
+  const tanggapanBadge = document.getElementById('badge-tanggapan');
+  if (tanggapanBadge) tanggapanBadge.textContent = nlpTotal;
 }
-function refreshAll() { updateBadges(); renderProfil(); }
+function refreshAll() { updateBadges(); renderProfil(); renderTanggapan(); }
 
 // ═══════════════════ HELPERS ═══════════════════
 
@@ -1127,7 +1301,596 @@ function calcNilaiAvg(g) {
 function fmtNilai(v){return(v===null||v===undefined)?'<span style="color:var(--dim);font-family:var(--mono)">—</span>':String(v);}
 function emptyState(icon,text) { return `<div class="empty"><span class="ei">${icon}</span><p>${text}</p></div>`; }
 
+function escapeHtml(text) {
+  return String(text ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function formatDateTime(ts) {
+  if (!ts) return '—';
+  const dt = new Date(ts);
+  if (isNaN(dt)) return '—';
+  return dt.toLocaleString('id-ID', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+function getNlpHistory() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(NLP_KEY));
+    return Array.isArray(raw) ? raw : [];
+  } catch {
+    return [];
+  }
+}
+
+function getStudentResponseStore(studentId) {
+  return loadO(`${RESPONSE_STORE_PREFIX}${studentId}`);
+}
+
+function parseResponseEntryKey(key) {
+  const idx = String(key).lastIndexOf('_');
+  if (idx < 0) return { subjectId: String(key), pertemuan: null };
+  const subjectId = String(key).slice(0, idx);
+  const pertemuanRaw = Number(String(key).slice(idx + 1));
+  return {
+    subjectId,
+    pertemuan: Number.isFinite(pertemuanRaw) ? pertemuanRaw : null
+  };
+}
+
+function classifyUnderstanding(nlp) {
+  if (!nlp) {
+    return { key: 'belum', label: 'Belum dianalisis', icon: '⏳' };
+  }
+  const score = Number(nlp.sentiment_score ?? 0);
+  const sentiment = String(nlp.sentiment || '').toLowerCase();
+  if (sentiment === 'positive' || score > 0.1) {
+    return { key: 'paham', label: 'Paham', icon: '✅' };
+  }
+  if (sentiment === 'negative' || score < -0.1) {
+    return { key: 'tidak', label: 'Tidak paham', icon: '⚠' };
+  }
+  return { key: 'campuran', label: 'Perlu ditinjau', icon: '🟡' };
+}
+
+
+let tgSelectedStudentId = '';
+
+function collectResponseInsights() {
+  const students = getStudents();
+  const subjects = getSubjects();
+  const classes = getClasses();
+  const nlpHistory = getNlpHistory();
+  const nlpMap = new Map(nlpHistory.filter(n => n && n.session_id).map(n => [String(n.session_id), n]));
+  const records = [];
+
+  students.forEach(student => {
+    const store = getStudentResponseStore(student.id);
+    Object.entries(store || {}).forEach(([key, payload]) => {
+      const { subjectId, pertemuan } = parseResponseEntryKey(key);
+      if (pertemuan === null) return;
+      const subject = subjects.find(s => s.id === subjectId) || null;
+      const kelas = classes.find(c => c.id === student.kelasId) || null;
+      const sessionId = `${student.id}_${subjectId}_p${pertemuan}`;
+      const nlp = nlpMap.get(sessionId) || null;
+      records.push({
+        sessionId,
+        student,
+        subject,
+        kelas,
+        pertemuan,
+        response: payload?.response || '',
+        responseTimestamp: payload?.timestamp || nlp?.timestamp || null,
+        nlp,
+        insight: classifyUnderstanding(nlp)
+      });
+    });
+  });
+
+  nlpHistory.forEach(nlp => {
+    if (!nlp || !nlp.session_id) return;
+    if (records.some(r => r.sessionId === nlp.session_id)) return;
+    const parts = String(nlp.session_id).split('_');
+    if (parts.length < 3) return;
+    const studentId = parts[0];
+    const subjectId = parts[1];
+    const pertemuan = Number(String(parts[2]).replace(/^p/i, ''));
+    const student = students.find(s => s.id === studentId) || {
+      id: studentId,
+      namaLengkap: nlp.student_name || '—',
+      nis: nlp.student_nis || '—',
+      kelasId: ''
+    };
+    const subject = subjects.find(s => s.id === subjectId) || {
+      id: subjectId,
+      mataPelajaran: nlp.subject || '—',
+      kodeMapel: nlp.subject_code || '—'
+    };
+    const kelas = classes.find(c => c.id === student.kelasId) || null;
+    records.push({
+      sessionId: nlp.session_id,
+      student,
+      subject,
+      kelas,
+      pertemuan: Number.isFinite(pertemuan) ? pertemuan : null,
+      response: nlp.text_preview || '',
+      responseTimestamp: nlp.timestamp || null,
+      nlp,
+      insight: classifyUnderstanding(nlp)
+    });
+  });
+
+  return records.sort((a, b) => {
+    const ta = new Date(a.responseTimestamp || a.nlp?.timestamp || 0).getTime();
+    const tb = new Date(b.responseTimestamp || b.nlp?.timestamp || 0).getTime();
+    return tb - ta;
+  });
+}
+
+function getTeacherSubjectsOwned() {
+  if (!CU) return [];
+  return getSubjects().filter(s => getTeacherForSubject(s.mataPelajaran) === CU.name);
+}
+
+function getTeacherClassesAvailable() {
+  const classIds = new Set(getTeacherSubjectsOwned().map(s => s.kelasId));
+  return getClasses().filter(c => classIds.has(c.id));
+}
+
+function getTeacherSubjectsForClass(kelasId) {
+  return getTeacherSubjectsOwned().filter(s => s.kelasId === kelasId);
+}
+
+function isCompletedSchedule(scheduleOrDate) {
+  if (!scheduleOrDate) return false;
+  const schedule = typeof scheduleOrDate === 'string' ? { tanggal: scheduleOrDate } : scheduleOrDate;
+  const tanggal = schedule.tanggal || '';
+  if (!tanggal) return false;
+  const jamSelesai = String(schedule.jamSelesai || '23:59').slice(0, 5);
+  const endTime = jamSelesai.includes(':') ? `${jamSelesai}:59` : '23:59:59';
+  const dt = new Date(`${tanggal}T${endTime}`);
+  return !isNaN(dt.getTime()) && new Date() >= dt;
+}
+
+function getLatestCompletedScope(kelasId) {
+  const subjects = getTeacherSubjectsForClass(kelasId);
+  if (!subjects.length) return null;
+  const subjectIds = new Set(subjects.map(s => s.id));
+  const endValue = sch => {
+    const jam = String(sch.jamSelesai || '23:59').slice(0, 5);
+    const endTime = jam.includes(':') ? `${jam}:59` : '23:59:59';
+    return new Date(`${sch.tanggal || ''}T${endTime}`).getTime();
+  };
+  const schedules = getSchedules()
+    .filter(s => s.kelasId === kelasId && subjectIds.has(s.mapelId) && isCompletedSchedule(s))
+    .sort((a, b) => {
+      const da = endValue(a);
+      const db = endValue(b);
+      if (db !== da) return db - da;
+      return (b.pertemuan || 0) - (a.pertemuan || 0);
+    });
+  if (!schedules.length) return null;
+  const schedule = schedules[0];
+  return {
+    schedule,
+    subjectIds: [...subjectIds],
+    subjectCount: subjects.length
+  };
+}
+
+function normalizeSearch(text) {
+  return String(text || '').toLowerCase().trim();
+}
+
+function calcPct(num, den) {
+  if (!den) return 0;
+  return Math.round((num / den) * 100);
+}
+
+function pickLatestRecord(records) {
+  if (!Array.isArray(records) || !records.length) return null;
+  return [...records].sort((a, b) => {
+    const ta = new Date(a.responseTimestamp || a.nlp?.timestamp || 0).getTime();
+    const tb = new Date(b.responseTimestamp || b.nlp?.timestamp || 0).getTime();
+    if (tb !== ta) return tb - ta;
+    return (b.pertemuan || 0) - (a.pertemuan || 0);
+  })[0] || null;
+}
+
+function deleteResponseSession(studentId, subjectId, pertemuan) {
+  if (!studentId || !subjectId || !pertemuan) return false;
+  const key = `${subjectId}_${pertemuan}`;
+  const storeKey = `${RESPONSE_STORE_PREFIX}${studentId}`;
+  const store = getStudentResponseStore(studentId);
+  if (store && Object.prototype.hasOwnProperty.call(store, key)) {
+    delete store[key];
+    save(storeKey, store);
+  }
+  const sessionId = `${studentId}_${subjectId}_p${pertemuan}`;
+  const nlpHistory = getNlpHistory().filter(n => String(n.session_id) !== sessionId);
+  localStorage.setItem(NLP_KEY, JSON.stringify(nlpHistory));
+  return true;
+}
+
+function buildInsightTone(key) {
+  if (key === 'paham') return 'emerald';
+  if (key === 'tidak') return 'rose';
+  if (key === 'campuran') return 'orange';
+  return 'dim';
+}
+
+function buildBarRows(items, total) {
+  return items.map(item => {
+    const pct = calcPct(item.count, total);
+    return `
+      <div class="tg-bar-row">
+        <div class="tg-bar-label">
+          <span class="tg-bar-dot" style="background:${item.color}"></span>
+          <span class="tg-legend-name">${escapeHtml(item.label)}</span>
+        </div>
+        <div class="tg-bar-track"><div class="tg-bar-fill" style="width:${pct}%;background:${item.color}"></div></div>
+        <div class="tg-bar-pct">${pct}%</div>
+      </div>`;
+  }).join('');
+}
+
+function buildLegendRows(items, total, nounLabel = 'siswa') {
+  return items.map(item => {
+    const pct = calcPct(item.count, total);
+    return `
+      <div class="tg-legend-item">
+        <div class="tg-legend-left">
+          <span class="tg-legend-swatch" style="background:${item.color}"></span>
+          <span class="tg-legend-name">${escapeHtml(item.label)}</span>
+        </div>
+        <div class="tg-legend-meta">${item.count} ${nounLabel} · ${pct}%</div>
+      </div>`;
+  }).join('');
+}
+
+function renderEmptyTanggapan(message, icon='💬') {
+  return `<div class="tg-empty-state"><span class="ei">${icon}</span><p>${escapeHtml(message)}</p></div>`;
+}
+
+function summarizeStudentInsights(records) {
+  const list = Array.isArray(records) ? records.filter(Boolean) : [];
+  if (!list.length) return { key: 'belum', label: 'Belum mengisi', icon: '⏳', score: 0 };
+  const scores = list
+    .map(r => Number(r?.nlp?.sentiment_score))
+    .filter(v => Number.isFinite(v));
+  if (scores.length) {
+    const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+    if (avg > 0.1) return { key: 'paham', label: 'Paham', icon: '✅', score: avg };
+    if (avg < -0.1) return { key: 'tidak', label: 'Tidak paham', icon: '⚠', score: avg };
+    return { key: 'campuran', label: 'Perlu ditinjau', icon: '🟡', score: avg };
+  }
+  const counts = list.reduce((acc, r) => {
+    const key = r?.insight?.key || 'campuran';
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+  if ((counts.paham || 0) >= (counts.tidak || 0) && (counts.paham || 0) >= (counts.campuran || 0)) {
+    return { key: 'paham', label: 'Paham', icon: '✅', score: 0.2 };
+  }
+  if ((counts.tidak || 0) >= (counts.paham || 0) && (counts.tidak || 0) >= (counts.campuran || 0)) {
+    return { key: 'tidak', label: 'Tidak paham', icon: '⚠', score: -0.2 };
+  }
+  return { key: 'campuran', label: 'Perlu ditinjau', icon: '🟡', score: 0 };
+}
+
+function getLatestRecordByStudent(records) {
+  const map = new Map();
+  (records || []).forEach(r => {
+    const sid = r?.student?.id;
+    if (!sid) return;
+    const prev = map.get(sid);
+    const candidate = pickLatestRecord([prev, r].filter(Boolean));
+    if (candidate) map.set(sid, candidate);
+  });
+  return map;
+}
+
+function getStudentRecordsById(records, studentId) {
+  return (records || []).filter(r => r?.student?.id === studentId);
+}
+
+
+function renderTanggapan() {
+  const content = document.getElementById('tanggapanContent');
+  const scopeInfo = document.getElementById('tanggapanScopeInfo');
+  const kelasEl = document.getElementById('tanggapanFilterKelas');
+  if (!content || !scopeInfo || !kelasEl) return;
+
+  const teacherClasses = getTeacherClassesAvailable();
+  const prevClass = kelasEl.value || '';
+  kelasEl.innerHTML = '<option value="">Pilih kelas terlebih dahulu</option>';
+  teacherClasses.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c.id;
+    o.textContent = `${c.kelas} ${c.jurusan} — ${c.kodeKelas} (${c.tahunAjar})`;
+    kelasEl.appendChild(o);
+  });
+  if (teacherClasses.find(c => c.id === prevClass)) kelasEl.value = prevClass;
+
+  const kelasId = kelasEl.value || '';
+  const kelas = kelasId ? (getClasses().find(c => c.id === kelasId) || null) : null;
+  const subjects = kelasId ? getTeacherSubjectsForClass(kelasId) : [];
+  const scope = kelasId ? getLatestCompletedScope(kelasId) : null;
+  const students = kelasId ? getStudents().filter(s => s.kelasId === kelasId) : [];
+  const records = kelasId && scope
+    ? collectResponseInsights().filter(r =>
+        r.kelas?.id === kelasId &&
+        r.subject &&
+        scope.subjectIds.includes(r.subject.id)
+      )
+    : [];
+  const latestMeeting = scope?.schedule?.pertemuan || null;
+
+  if (!teacherClasses.length) {
+    scopeInfo.textContent = 'Belum ada kelas yang terhubung dengan mata pelajaran Anda.';
+    tgSelectedStudentId = '';
+  } else if (!kelasId) {
+    scopeInfo.textContent = 'Pilih kelas di sebelah kanan untuk memuat diagram, ringkasan, dan daftar tanggapan siswa.';
+    tgSelectedStudentId = '';
+  } else if (!kelas) {
+    scopeInfo.textContent = 'Kelas tidak ditemukan.';
+    tgSelectedStudentId = '';
+  } else if (!subjects.length) {
+    scopeInfo.textContent = `${kelas.kelas} ${kelas.jurusan} — ${kelas.kodeKelas}. Kelas ini belum memiliki mata pelajaran yang diajar oleh Anda.`;
+    tgSelectedStudentId = '';
+  } else if (!scope) {
+    scopeInfo.textContent = `${kelas.kelas} ${kelas.jurusan} — ${kelas.kodeKelas}. Belum ada pertemuan yang selesai untuk kelas ini.`;
+    tgSelectedStudentId = '';
+  } else {
+    const classLabel = `${kelas.kelas} ${kelas.jurusan} — ${kelas.kodeKelas}`;
+    scopeInfo.textContent = `${classLabel}. Analisis otomatis aktif setelah jadwal selesai lewat.`;
+  }
+
+  const classLabel = kelas ? `${kelas.kelas} ${kelas.jurusan} — ${kelas.kodeKelas}` : 'Belum memilih kelas';
+  const totalStudents = students.length;
+  const latestByStudent = getLatestRecordByStudent(records);
+
+  const respondedCards = students
+    .map(student => getStudentRecordsById(records, student.id))
+    .filter(list => list.length);
+  const respondedCount = respondedCards.length;
+  const pahamCount = students.filter(student => summarizeStudentInsights(getStudentRecordsById(records, student.id)).key === 'paham').length;
+  const tidakCount = students.filter(student => summarizeStudentInsights(getStudentRecordsById(records, student.id)).key === 'tidak').length;
+  const campuranCount = students.filter(student => summarizeStudentInsights(getStudentRecordsById(records, student.id)).key === 'campuran').length;
+  const belumCount = Math.max(totalStudents - respondedCount, 0);
+
+  const overviewItems = [
+    { label: 'Paham', count: pahamCount, color: 'var(--emerald)' },
+    { label: 'Tidak Paham', count: tidakCount, color: 'var(--rose)' },
+    { label: 'Perlu Ditinjau', count: campuranCount, color: 'var(--amber)' },
+    { label: 'Belum Mengisi', count: belumCount, color: 'var(--dim)' }
+  ];
+
+  const totalForPercent = totalStudents || 1;
+  const donutParts = [];
+  let start = 0;
+  overviewItems.forEach(item => {
+    const deg = 360 * (item.count / totalForPercent);
+    const end = start + deg;
+    donutParts.push(`${item.color} ${start}deg ${end}deg`);
+    start = end;
+  });
+
+  const meetingLabel = scope?.schedule ? `Pertemuan ${scope.schedule.pertemuan} · ${formatDate(scope.schedule.tanggal)}` : (kelas ? 'Belum ada pertemuan selesai' : 'Belum memilih kelas');
+
+  const overviewNote = !kelasId
+    ? 'Pilih kelas untuk memuat diagram kelas dan daftar siswa.'
+    : !subjects.length
+      ? 'Kelas ini belum memiliki mata pelajaran yang diajar oleh Anda.'
+      : !scope
+        ? 'Belum ada pertemuan yang selesai untuk kelas ini. Ringkasan akan muncul setelah jadwal terakhir lewat.'
+        : 'Ringkasan akan terisi otomatis setelah tanggapan siswa masuk.';
+
+  const chartBackground = `conic-gradient(${donutParts.length ? donutParts.join(', ') : 'var(--dim) 0deg 360deg'})`;
+  const totalMeetingSlots = Math.max(Number(latestMeeting || 0), respondedCount, totalStudents);
+  const selectedStudent = tgSelectedStudentId ? (students.find(s => s.id === tgSelectedStudentId) || null) : null;
+
+  if (tgSelectedStudentId && !selectedStudent) {
+    tgSelectedStudentId = '';
+  }
+
+  const buildStudentRow = student => {
+    const studentRecords = getStudentRecordsById(records, student.id);
+    const aggregate = summarizeStudentInsights(studentRecords);
+    const latestRecord = latestByStudent.get(student.id) || null;
+    const time = formatDateTime(latestRecord?.responseTimestamp || latestRecord?.nlp?.timestamp);
+    return `
+      <div class="tg-student-row ${studentRecords.length ? '' : 'empty'} ${tgSelectedStudentId === student.id ? 'selected' : ''}" data-student-id="${student.id}">
+        <div class="tg-student-row-main">
+          <div class="tg-student-row-name">${escapeHtml(student.namaLengkap || '—')}</div>
+          <div class="tg-student-row-sub">NIS ${escapeHtml(student.nis || '—')}</div>
+        </div>
+        <div class="tg-student-row-side">
+          <span class="tg-pill ${buildInsightTone(aggregate.key)}">${studentRecords.length ? `${aggregate.icon} ${aggregate.label}` : '⏳ Belum mengisi'}</span>
+          <span class="tg-pill dim">${studentRecords.length ? time : 'Kosong'}</span>
+        </div>
+      </div>`;
+  };
+
+  const studentListHTML = students.length
+    ? `<div class="tg-student-list">${students.map(buildStudentRow).join('')}</div>`
+    : `<div class="tg-empty-state"><span class="ei">🧾</span><p>Belum ada siswa pada kelas ini.</p></div>`;
+
+  if (selectedStudent && kelasId) {
+    const studentRecords = records.filter(r => r.student?.id === tgSelectedStudentId).sort((a, b) => {
+      const ta = new Date(a.responseTimestamp || a.nlp?.timestamp || 0).getTime();
+      const tb = new Date(b.responseTimestamp || b.nlp?.timestamp || 0).getTime();
+      if (ta !== tb) return ta - tb;
+      return (a.pertemuan || 0) - (b.pertemuan || 0);
+    });
+    const total = studentRecords.length;
+    const paham = studentRecords.filter(r => r.insight?.key === 'paham').length;
+    const tidak = studentRecords.filter(r => r.insight?.key === 'tidak').length;
+    const campuran = studentRecords.filter(r => !r.insight || r.insight.key === 'campuran').length;
+    const belum = Math.max(totalMeetingSlots - total, 0);
+    const items = [
+      { label: 'Paham', count: paham, color: 'var(--emerald)' },
+      { label: 'Tidak Paham', count: tidak, color: 'var(--rose)' },
+      { label: 'Perlu Ditinjau', count: campuran, color: 'var(--amber)' },
+      { label: 'Belum Diisi', count: belum, color: 'var(--dim)' }
+    ];
+    let detailStart = 0;
+    const detailParts = items.map(item => {
+      const deg = totalMeetingSlots ? 360 * (item.count / totalMeetingSlots) : 0;
+      const end = detailStart + deg;
+      const seg = `${item.color} ${detailStart}deg ${end}deg`;
+      detailStart = end;
+      return seg;
+    });
+
+    const detailCards = studentRecords.length
+      ? studentRecords.map(r => {
+          const ins = r.insight || classifyUnderstanding(null);
+          const text = escapeHtml(r.response || r.nlp?.text_preview || '—').replace(/\n/g, '<br>');
+          const topWords = Array.isArray(r.nlp?.top_words)
+            ? r.nlp.top_words.slice(0, 4).map(item => {
+                const word = Array.isArray(item) ? item[0] : '';
+                const count = Array.isArray(item) ? item[1] : '';
+                return `<span class="tg-pill dim">${escapeHtml(word)}${count !== '' ? ` · ${count}` : ''}</span>`;
+              }).join('')
+            : '<span class="tg-pill dim">Tidak ada top word</span>';
+          return `
+            <div class="tg-card tg-response-card">
+              <div class="tg-card-head">
+                <div>
+                  <div class="tg-student">Pertemuan ${r.pertemuan || '—'}</div>
+                  <div class="tg-nis">${formatDateTime(r.responseTimestamp || r.nlp?.timestamp)}</div>
+                  <div class="tg-student-meta">
+                    <span class="tg-pill orange">Riwayat siswa</span>
+                    <span class="tg-pill ${buildInsightTone(ins.key)}">${ins.icon} ${ins.label}</span>
+                    <span class="tg-pill cyan">Skor ${r.nlp?.sentiment_score ?? '—'}</span>
+                  </div>
+                </div>
+                <div class="tg-card-actions">
+                  <button class="btn btn-danger btn-sm" data-delete-session data-student-id="${r.student?.id || ''}" data-subject-id="${r.subject?.id || ''}" data-pertemuan="${r.pertemuan || ''}">🗑 Hapus</button>
+                </div>
+              </div>
+              <div class="tg-response">${text}</div>
+              <div class="tg-footer">
+                <div class="tg-topwords">${topWords}</div>
+              </div>
+            </div>`;
+        }).join('')
+      : `<div class="tg-empty-state"><span class="ei">🧾</span><p>Belum ada tanggapan untuk siswa ini.</p></div>`;
+
+    content.innerHTML = `
+      <div class="tg-dashboard">
+        <div class="tg-detail-panel">
+          <div class="tg-detail-head">
+            <div>
+              <div class="tg-list-title">${escapeHtml(selectedStudent?.namaLengkap || '—')}</div>
+              <div class="tg-list-sub">Semua tanggapan siswa pada kelas yang dipilih. Diagram menampilkan jumlah tanggapan dan statusnya.</div>
+              <div class="tg-student-meta">
+                <span class="tg-pill emerald">${escapeHtml(selectedStudent?.nis || '—')}</span>
+                <span class="tg-pill cyan">${escapeHtml(classLabel)}</span>
+                <span class="tg-pill dim">${total} tanggapan</span>
+              </div>
+            </div>
+            <div class="tg-card-actions">
+              <button class="btn btn-ghost btn-sm" id="tanggapanBackBtn">← Kembali ke ringkasan kelas</button>
+            </div>
+          </div>
+
+          <div class="tg-overview" style="grid-template-columns:minmax(280px,320px) 1fr;">
+            <div class="tg-chart-card">
+              <div class="tg-chart-title">Diagram riwayat siswa</div>
+              <div class="tg-chart">
+                <div class="tg-donut" style="background:${chartBackground};">
+                  <div class="tg-donut-inner">
+                    <div class="tg-donut-value">${total}</div>
+                    <div class="tg-donut-label">Tanggapan</div>
+                  </div>
+                </div>
+              </div>
+              <div class="tg-chart-legend">
+                ${buildLegendRows(items, totalMeetingSlots || 1, 'tanggapan')}
+              </div>
+            </div>
+            <div class="tg-summary-wrap tg-student-list-panel">
+              <div class="tg-list-head" style="padding:0 0 12px">
+                <div>
+                  <div class="tg-list-title">Tanggapan per Pertemuan</div>
+                  <div class="tg-list-sub">Daftar tanggapan siswa setiap pertemuan ditampilkan di sisi kanan diagram riwayat.</div>
+                </div>
+              </div>
+              <div class="tg-response-stack">
+                ${detailCards}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+    const backBtn = document.getElementById('tanggapanBackBtn');
+    if (backBtn) {
+      backBtn.addEventListener('click', () => {
+        tgSelectedStudentId = '';
+        renderTanggapan();
+      });
+    }
+    return;
+  }
+
+  content.innerHTML = `
+    <div class="tg-dashboard">
+      <div class="tg-detail-panel">
+        <div class="tg-detail-head">
+          <div>
+            <div class="tg-list-title">${escapeHtml(classLabel)}</div>
+            <div class="tg-list-sub">${escapeHtml(overviewNote)}</div>
+            <div class="tg-student-meta">
+              <span class="tg-pill emerald">${escapeHtml(classLabel)}</span>
+              <span class="tg-pill cyan">${escapeHtml(meetingLabel)}</span>
+              <span class="tg-pill dim">${respondedCount}/${totalStudents} respon masuk</span>
+            </div>
+          </div>
+          <div class="tg-card-actions"></div>
+        </div>
+
+        <div class="tg-overview" style="grid-template-columns:minmax(280px,320px) 1fr;">
+          <div class="tg-chart-card">
+            <div class="tg-chart-title">Diagram kelas</div>
+            <div class="tg-chart">
+              <div class="tg-donut" style="background:${chartBackground};">
+                <div class="tg-donut-inner">
+                  <div class="tg-donut-value">${totalStudents}</div>
+                  <div class="tg-donut-label">Siswa</div>
+                </div>
+              </div>
+            </div>
+            <div class="tg-chart-legend">
+              ${buildLegendRows(overviewItems, totalStudents || 1, 'siswa')}
+            </div>
+          </div>
+          <div class="tg-summary-wrap tg-student-list-panel">
+            <div class="tg-list-head" style="padding:0 0 12px">
+              <div>
+                <div class="tg-list-title">Daftar Siswa</div>
+                <div class="tg-list-sub">Klik salah satu siswa untuk membuka riwayat tanggapannya.</div>
+              </div>
+            </div>
+            ${studentListHTML}
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
 function getTeacherForSubject(subjectName) {
+
   if (!subjectName) return null;
   const ts = Object.values(loadO(SK.teachers));
   const t = ts.find(t => t.subject === subjectName);
@@ -2530,6 +3293,42 @@ document.getElementById('nilaiFilterKelas').addEventListener('change', function(
   renderNilai();
 });
 document.getElementById('nilaiFilterMapel').addEventListener('change', renderNilai);
+
+
+
+const tanggapanKelasEl = document.getElementById('tanggapanFilterKelas');
+if (tanggapanKelasEl) tanggapanKelasEl.addEventListener('change', () => {
+  tgSelectedStudentId = '';
+  renderTanggapan();
+});
+const tgGrid = document.getElementById('tanggapanContent');
+if (tgGrid) {
+  tgGrid.addEventListener('click', (e) => {
+    const delBtn = e.target.closest('[data-delete-session]');
+    if (delBtn) {
+      e.stopPropagation();
+      const studentId = delBtn.dataset.studentId;
+      const subjectId = delBtn.dataset.subjectId;
+      const pertemuan = delBtn.dataset.pertemuan;
+      if (!studentId || !subjectId || !pertemuan) return;
+      if (!confirm('Hapus tanggapan siswa ini? Siswa akan bisa mengisi ulang pada pertemuan tersebut.')) return;
+      if (deleteResponseSession(studentId, subjectId, pertemuan)) {
+        toast('Tanggapan siswa dihapus.');
+        renderTanggapan();
+        updateBadges();
+      }
+      return;
+    }
+    const card = e.target.closest('[data-student-id]');
+    if (card && !e.target.closest('button')) {
+      const studentId = card.dataset.studentId;
+      if (!studentId) return;
+      tgSelectedStudentId = studentId;
+      renderTanggapan();
+    }
+  });
+}
+
 
 // ═══════════════════ INIT ═══════════════════
 const session=load(SK.session);
