@@ -1425,6 +1425,9 @@ function classifyUnderstanding(nlp) {
   }
   const score = Number(nlp.sentiment_score ?? 0);
   const sentiment = String(nlp.sentiment || '').toLowerCase();
+  if (score === 0) {
+    return { key: 'paham', label: 'Paham', icon: '✅' };
+  }
   if (sentiment === 'positive' || score > 0.1) {
     return { key: 'paham', label: 'Paham', icon: '✅' };
   }
@@ -1636,28 +1639,28 @@ function renderEmptyTanggapan(message, icon='💬') {
 function summarizeStudentInsights(records) {
   const list = Array.isArray(records) ? records.filter(Boolean) : [];
   if (!list.length) return { key: 'belum', label: 'Belum mengisi', icon: '⏳', score: 0 };
-  const scores = list
-    .map(r => Number(r?.nlp?.sentiment_score))
-    .filter(v => Number.isFinite(v));
-  if (scores.length) {
-    const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
-    if (avg > 0.1) return { key: 'paham', label: 'Paham', icon: '✅', score: avg };
-    if (avg < -0.1) return { key: 'tidak', label: 'Tidak paham', icon: '⚠', score: avg };
-    return { key: 'campuran', label: 'Perlu ditinjau', icon: '🟡', score: avg };
-  }
+
   const counts = list.reduce((acc, r) => {
-    const key = r?.insight?.key || 'campuran';
-    acc[key] = (acc[key] || 0) + 1;
+    const key = r?.insight?.key || classifyUnderstanding(r?.nlp)?.key || 'campuran';
+    if (key === 'paham') acc.paham += 1;
+    else if (key === 'tidak') acc.tidak += 1;
+    else if (key === 'campuran') acc.campuran += 1;
+    else if (key === 'belum') acc.belum += 1;
     return acc;
-  }, {});
-  if ((counts.paham || 0) >= (counts.tidak || 0) && (counts.paham || 0) >= (counts.campuran || 0)) {
-    return { key: 'paham', label: 'Paham', icon: '✅', score: 0.2 };
+  }, { paham: 0, tidak: 0, campuran: 0, belum: 0 });
+
+  if (counts.paham === 0 && counts.tidak === 0) {
+    return { key: 'campuran', label: 'Perlu ditinjau', icon: '🟡', score: 0 };
   }
-  if ((counts.tidak || 0) >= (counts.paham || 0) && (counts.tidak || 0) >= (counts.campuran || 0)) {
-    return { key: 'tidak', label: 'Tidak paham', icon: '⚠', score: -0.2 };
+  if (counts.paham > counts.tidak) {
+    return { key: 'paham', label: 'Paham', icon: '✅', score: counts.paham - counts.tidak };
+  }
+  if (counts.tidak > counts.paham) {
+    return { key: 'tidak', label: 'Tidak paham', icon: '⚠', score: counts.paham - counts.tidak };
   }
   return { key: 'campuran', label: 'Perlu ditinjau', icon: '🟡', score: 0 };
 }
+
 
 function getLatestRecordByStudent(records) {
   const map = new Map();
@@ -1730,11 +1733,33 @@ function buildTeacherAiPayload(kelasId, selectedStudentId = '') {
   const classGrades = getClassGradeSummary(kelasId);
   const gradeRecords = getGradeRecordsForTeacherClass(kelasId);
   const totalStudents = students.length;
+  const studentInsightMap = new Map(students.map(student => {
+    const recordsByStudent = getStudentRecordsById(allRecords, student.id);
+    return [student.id, summarizeStudentInsights(recordsByStudent)];
+  }));
   const respondedStudents = students.filter(student => getStudentRecordsById(allRecords, student.id).length).length;
-  const pahamCount = students.filter(student => summarizeStudentInsights(getStudentRecordsById(allRecords, student.id)).key === 'paham').length;
-  const tidakCount = students.filter(student => summarizeStudentInsights(getStudentRecordsById(allRecords, student.id)).key === 'tidak').length;
-  const campuranCount = students.filter(student => summarizeStudentInsights(getStudentRecordsById(allRecords, student.id)).key === 'campuran').length;
-  const belumCount = Math.max(totalStudents - respondedStudents, 0);
+  const pahamCount = [...studentInsightMap.values()].filter(v => v.key === 'paham').length;
+  const tidakCount = [...studentInsightMap.values()].filter(v => v.key === 'tidak').length;
+  const campuranCount = [...studentInsightMap.values()].filter(v => v.key === 'campuran').length;
+  const belumCount = [...studentInsightMap.values()].filter(v => v.key === 'belum').length || Math.max(totalStudents - respondedStudents, 0);
+
+  const overviewItems = [
+    { label: 'Paham', count: pahamCount, color: 'var(--emerald)' },
+    { label: 'Tidak Paham', count: tidakCount, color: 'var(--rose)' },
+    { label: 'Perlu Ditinjau', count: campuranCount, color: 'var(--amber)' },
+    { label: 'Belum Mengisi', count: belumCount, color: 'var(--dim)' }
+  ];
+
+  const totalForPercent = totalStudents || 1;
+  let start = 0;
+  const donutParts = overviewItems.map(item => {
+    const deg = 360 * (item.count / totalForPercent);
+    const end = start + deg;
+    const seg = `${item.color} ${start}deg ${end}deg`;
+    start = end;
+    return seg;
+  });
+  const chartBackground = `conic-gradient(${donutParts.length ? donutParts.join(', ') : 'var(--dim) 0deg 360deg'})`;
 
   const studentSummaries = students.map(student => {
     const records = getStudentRecordsById(allRecords, student.id).sort((a, b) => {
@@ -2166,28 +2191,39 @@ function renderTanggapan() {
       return (a.pertemuan || 0) - (b.pertemuan || 0);
     });
     const total = studentRecords.length;
-    const paham = studentRecords.filter(r => r.insight?.key === 'paham').length;
-    const tidak = studentRecords.filter(r => r.insight?.key === 'tidak').length;
-    const campuran = studentRecords.filter(r => !r.insight || r.insight.key === 'campuran').length;
+    const detailAggregate = studentRecords.reduce((acc, r) => {
+      const key = r?.insight?.key || classifyUnderstanding(r?.nlp)?.key || 'campuran';
+      if (key === 'paham') acc.paham += 1;
+      else if (key === 'tidak') acc.tidak += 1;
+      else acc.belum += 1;
+      return acc;
+    }, { paham: 0, tidak: 0, belum: 0 });
+
+    const paham = detailAggregate.paham;
+    const tidak = detailAggregate.tidak;
     const belum = Math.max(totalMeetingSlots - total, 0);
     const items = [
       { label: 'Paham', count: paham, color: 'var(--emerald)' },
       { label: 'Tidak Paham', count: tidak, color: 'var(--rose)' },
-      { label: 'Perlu Ditinjau', count: campuran, color: 'var(--amber)' },
       { label: 'Belum Diisi', count: belum, color: 'var(--dim)' }
     ];
+    const detailTotal = Math.max(items.reduce((sum, item) => sum + item.count, 0), 1);
     let detailStart = 0;
     const detailParts = items.map(item => {
-      const deg = totalMeetingSlots ? 360 * (item.count / totalMeetingSlots) : 0;
+      const deg = 360 * (item.count / detailTotal);
       const end = detailStart + deg;
       const seg = `${item.color} ${detailStart}deg ${end}deg`;
       detailStart = end;
       return seg;
     });
+    const detailChartBackground = `conic-gradient(${detailParts.length ? detailParts.join(', ') : 'var(--dim) 0deg 360deg'})`;
 
     const detailCards = studentRecords.length
       ? studentRecords.map(r => {
-          const ins = r.insight || classifyUnderstanding(null);
+          const rawIns = r.insight || classifyUnderstanding(null);
+          const ins = rawIns.key === 'campuran'
+            ? { key: 'paham', label: 'Paham', icon: '✅' }
+            : rawIns;
           const text = escapeHtml(r.response || r.nlp?.text_preview || '—').replace(/\n/g, '<br>');
           const topWords = Array.isArray(r.nlp?.top_words)
             ? r.nlp.top_words.slice(0, 4).map(item => {
@@ -2242,7 +2278,7 @@ function renderTanggapan() {
             <div class="tg-chart-card">
               <div class="tg-chart-title">Diagram riwayat siswa</div>
               <div class="tg-chart">
-                <div class="tg-donut" style="background:${chartBackground};">
+                <div class="tg-donut" style="background:${detailChartBackground};">
                   <div class="tg-donut-inner">
                     <div class="tg-donut-value">${total}</div>
                     <div class="tg-donut-label">Tanggapan</div>
@@ -2250,7 +2286,7 @@ function renderTanggapan() {
                 </div>
               </div>
               <div class="tg-chart-legend">
-                ${buildLegendRows(items, totalMeetingSlots || 1, 'tanggapan')}
+                ${buildLegendRows(items, detailTotal, 'tanggapan')}
               </div>
             </div>
             <div class="tg-summary-wrap tg-student-list-panel">
