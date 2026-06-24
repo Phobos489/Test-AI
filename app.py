@@ -387,7 +387,7 @@ Instruksi output:
 3. Sorotan tanggapan siswa yang paling penting.
 4. Rekomendasi tindakan guru.
 5. Jika ada siswa fokus, beri catatan khusus untuk siswa itu.
-Gunakan poin-poin agar mudah dibaca.
+Gunakan judul, bold, italic, dan daftar bernomor/berpoin secara wajar. Jangan gunakan blok kode.
 '''.strip()
 
 

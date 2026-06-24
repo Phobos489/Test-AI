@@ -112,7 +112,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);display:flex
 .btn-amber{background:var(--amber);color:#000}.btn-amber:hover{background:var(--amber-d)}
 .btn-cyan{background:var(--cyan);color:#000}.btn-cyan:hover{background:#0891b2}
 .btn-emerald{background:var(--emerald);color:#000}.btn-emerald:hover{background:#059669}
-.btn-purple{background:var(--purple);color:#fff}.btn-purple:hover{background:#7c3aed}
+.btn-purple{background:var(--purple);color:#fff}.btn-purple:hover{background:#7c3aed}\n.btn-purple:disabled,.btn-purple.disabled{opacity:.45;cursor:not-allowed;box-shadow:none;filter:saturate(.7)}
 .btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:#2563eb}
 .btn-orange{background:var(--orange);color:#fff}.btn-orange:hover{background:#ea6e10}
 .btn-rose{background:var(--rose);color:#fff}.btn-rose:hover{background:#e11d48}
@@ -278,10 +278,19 @@ select:disabled{cursor:not-allowed;opacity:.45;background:var(--bg3) !important}
 .tg-ai-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-family:var(--mono);font-size:10px;font-weight:700;border:1px solid rgba(139,92,246,.25);background:rgba(139,92,246,.12);color:var(--purple)}
 .tg-ai-body{display:flex;flex-direction:column;gap:12px}
 .tg-ai-loading{padding:14px 16px;border-radius:10px;background:rgba(139,92,246,.06);border:1px dashed rgba(139,92,246,.24);color:var(--dim);font-size:13px;line-height:1.7}
-.tg-ai-response{padding:14px 16px;border-radius:10px;background:rgba(255,255,255,.02);border:1px solid var(--border);font-size:13px;line-height:1.8;white-space:normal}
-.tg-ai-response strong{color:var(--text)}
-.tg-ai-response ul{margin:8px 0 8px 18px;padding:0}
+.tg-ai-response{padding:14px 16px;border-radius:10px;background:rgba(255,255,255,.02);border:1px solid var(--border);font-size:13px;line-height:1.8;white-space:normal;color:#fff}
+.tg-ai-response h1,.tg-ai-response h2,.tg-ai-response h3,.tg-ai-response h4{margin:0 0 10px;color:#fff;line-height:1.25}
+.tg-ai-response h1{font-size:20px}
+.tg-ai-response h2{font-size:17px}
+.tg-ai-response h3{font-size:15px}
+.tg-ai-response p{margin:0 0 10px}
+.tg-ai-response ul,.tg-ai-response ol{margin:8px 0 10px 20px;padding:0}
 .tg-ai-response li{margin:4px 0}
+.tg-ai-response strong{color:#fff;font-weight:700}
+.tg-ai-response em{color:#fff;font-style:italic}
+.tg-ai-response hr{border:none;border-top:1px solid var(--border);margin:12px 0}
+.tg-ai-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.tg-ai-actions .tg-ai-note{font-size:12px;color:var(--dim);line-height:1.5}
 .tg-ai-meta{display:flex;flex-wrap:wrap;gap:8px}
 .tg-ai-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
 .tg-ai-mini{padding:12px 14px;border-radius:10px;background:var(--bg3);border:1px solid var(--border)}
@@ -1126,6 +1135,53 @@ const saveGrades    = d => save(SK.grades,    d);
 const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
 const NLP_KEY = 'phobosNLPHistory';
 const RESPONSE_STORE_PREFIX = 'pEdu_student_responses_';
+const TEACHER_AI_STORE_PREFIX = 'pEdu_teacher_ai_';
+
+function getActiveTeacherKey() {
+  return CU?.id || CU?.email || 'anonymous';
+}
+
+function getTeacherAiStoreKey(payload) {
+  const classId = payload?.classId || 'no-class';
+  const studentId = payload?.selectedStudentId || 'class';
+  return `${TEACHER_AI_STORE_PREFIX}${getActiveTeacherKey()}_${classId}_${studentId}`;
+}
+
+function loadTeacherAiState(payload) {
+  try {
+    return loadO(getTeacherAiStoreKey(payload)) || null;
+  } catch {
+    return null;
+  }
+}
+
+function saveTeacherAiState(payload, data) {
+  try {
+    save(getTeacherAiStoreKey(payload), {
+      ...data,
+      savedAt: new Date().toISOString(),
+    });
+  } catch {
+    // ignore storage quota / serialization issues
+  }
+}
+
+function clearTeacherAiState(payload) {
+  try {
+    localStorage.removeItem(getTeacherAiStoreKey(payload));
+  } catch {
+    // ignore
+  }
+}
+
+function normalizeTeacherAiText(text) {
+  return String(text ?? '')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/&lt;br\s*\/?>/gi, '\n')
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n')
+    .trim();
+}
 
 // ═══════════════════ TOAST ═══════════════════
 function toast(msg, type='ok') {
@@ -1724,6 +1780,7 @@ function buildTeacherAiPayload(kelasId, selectedStudentId = '') {
   return {
     mode: selectedStudent ? 'student' : 'class',
     teacherName: CU?.name || '',
+    classId: kelasId || '',
     classLabel: kelas ? `${kelas.kelas} ${kelas.jurusan} — ${kelas.kodeKelas}` : 'Belum memilih kelas',
     meetingLabel,
     classHasScope: !!scope,
@@ -1800,17 +1857,93 @@ Gunakan logika decision tree berikut sebagai kerangka analisis:
 
 Instruksi output:
 - Tulis dalam bahasa Indonesia yang natural dan profesional.
-- Beri ringkasan kelas terlebih dahulu.
-- Lanjutkan dengan diagnosis berdasarkan decision tree.
-- Sebutkan pola tanggapan siswa yang menonjol.
-- Berikan rekomendasi tindakan guru yang spesifik.
-- Jika ada siswa yang dipilih, beri fokus tambahan pada siswa tersebut.
+- Gunakan susunan bernomor seperti: 1) Ringkasan Kelas, 2) Diagnosis, 3) Sorotan Tanggapan, 4) Rekomendasi Guru, 5) Catatan Siswa (jika ada).
+- Boleh memakai judul, bold, italic, dan daftar berpoin/bernomor untuk menegaskan bagian penting.
+- Jangan gunakan blok kode.
 - Jangan mengada-ada; gunakan hanya data yang ada.
-- Gunakan poin-poin agar mudah dibaca.
+- Tetap ringkas, jelas, dan langsung bisa dipakai guru.
 
 Data terstruktur yang harus kamu baca seluruhnya:
 ${safeJson}
 `.trim();
+}
+
+
+function formatTeacherAiInline(text) {
+  let out = escapeHtml(String(text ?? ''));
+  out = out.replace(/`([^`]+)`/g, '<code>$1</code>');
+  out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  out = out.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+  out = out.replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, '<em>$1</em>');
+  out = out.replace(/(?<!_)_([^_\n]+)_(?!_)/g, '<em>$1</em>');
+  return out;
+}
+
+function renderTeacherAiMarkdown(text) {
+  const lines = normalizeTeacherAiText(text).split('\n');
+  const html = [];
+  let listType = null;
+  let paragraph = [];
+
+  const flushParagraph = () => {
+    if (!paragraph.length) return;
+    html.push(`<p>${formatTeacherAiInline(paragraph.join(' '))}</p>`);
+    paragraph = [];
+  };
+
+  const closeList = () => {
+    if (!listType) return;
+    html.push(listType === 'ol' ? '</ol>' : '</ul>');
+    listType = null;
+  };
+
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line) {
+      flushParagraph();
+      closeList();
+      continue;
+    }
+
+    const heading = line.match(/^(#{1,6})\s+(.*)$/);
+    if (heading) {
+      flushParagraph();
+      closeList();
+      const level = Math.min(heading[1].length, 4);
+      html.push(`<h${level}>${formatTeacherAiInline(heading[2])}</h${level}>`);
+      continue;
+    }
+
+    const ordered = line.match(/^(\d+)\.\s+(.*)$/);
+    if (ordered) {
+      flushParagraph();
+      if (listType !== 'ol') {
+        closeList();
+        html.push('<ol>');
+        listType = 'ol';
+      }
+      html.push(`<li>${formatTeacherAiInline(ordered[2])}</li>`);
+      continue;
+    }
+
+    const bullet = line.match(/^[-*•]\s+(.*)$/);
+    if (bullet) {
+      flushParagraph();
+      if (listType !== 'ul') {
+        closeList();
+        html.push('<ul>');
+        listType = 'ul';
+      }
+      html.push(`<li>${formatTeacherAiInline(bullet[1])}</li>`);
+      continue;
+    }
+
+    paragraph.push(line);
+  }
+
+  flushParagraph();
+  closeList();
+  return html.join('');
 }
 
 async function renderTeacherAiFeedback(payload, token) {
@@ -1829,20 +1962,26 @@ async function renderTeacherAiFeedback(payload, token) {
     const data = await resp.json();
     if (currentToken !== tgAiRenderToken) return;
 
-    const text = String(data.feedback || data.result || '').trim();
-    target.innerHTML = text
-      ? `<div class="tg-ai-response">${escapeHtml(text).replace(/\n/g, '<br>')}</div>`
-      : `<div class="tg-ai-loading">AI belum menghasilkan teks. Berikut ringkasan sementara:<br><br>${escapeHtml(buildTeacherAiFallback(payload)).replace(/\n/g, '<br>')}</div>`;
+    const rawText = String(data.feedback || data.result || '').trim();
+    const text = normalizeTeacherAiText(rawText) || normalizeTeacherAiText(buildTeacherAiFallback(payload));
+    const html = `<div class="tg-ai-response">${renderTeacherAiMarkdown(text)}</div>`;
+    target.innerHTML = html;
+    if (rawText) saveTeacherAiState(payload, { html, text, source: 'api' });
   } catch (err) {
     if (currentToken !== tgAiRenderToken) return;
-    target.innerHTML = `<div class="tg-ai-response">${escapeHtml(buildTeacherAiFallback(payload)).replace(/\n/g, '<br>')}</div>`;
+    const text = normalizeTeacherAiText(buildTeacherAiFallback(payload));
+    const html = `<div class="tg-ai-response">${renderTeacherAiMarkdown(text)}</div>`;
+    target.innerHTML = html;
+    saveTeacherAiState(payload, { html, text, source: 'fallback' });
   }
 }
 
-function appendTeacherAiPanel(contentEl, payload, subtitle) {
+function appendTeacherAiPanel(contentEl, payload, subtitle, options = {}) {
   const dash = contentEl.querySelector('.tg-dashboard');
   if (!dash) return;
 
+  const autoGenerate = !!options.autoGenerate;
+  const canGenerate = !!payload?.classId && !!payload.classHasScope && !!payload.totalStudents;
   const panel = document.createElement('div');
   panel.className = 'tg-ai-panel';
   panel.innerHTML = `
@@ -1851,7 +1990,7 @@ function appendTeacherAiPanel(contentEl, payload, subtitle) {
         <div class="tg-list-title">Tanggapan AI</div>
         <div class="tg-list-sub">${escapeHtml(subtitle)}</div>
       </div>
-      <div class="tg-ai-badge">Decision Tree + NLP + Nilai</div>
+      <div class="tg-ai-badge">${autoGenerate ? 'Auto UTS / UAS' : 'Manual Generate'}</div>
     </div>
     <div class="tg-ai-meta">
       <span class="tg-pill emerald">${escapeHtml(payload.classLabel || '—')}</span>
@@ -1866,11 +2005,34 @@ function appendTeacherAiPanel(contentEl, payload, subtitle) {
       <div class="tg-ai-mini"><div class="k">Belum Mengisi</div><div class="v">${payload.counts?.belum || 0} siswa</div></div>
     </div>
     <div class="tg-ai-body">
-      <div id="tanggapanAiContent" class="tg-ai-loading">⏳ AI sedang membaca setiap tanggapan siswa pada kelas yang dipilih.</div>
+      <div class="tg-ai-actions">
+        <div class="tg-ai-note">
+          ${autoGenerate ? 'AI akan terisi otomatis untuk jadwal UTS/UAS setelah tanggapan kelas tersedia.' : 'Klik tombol di samping untuk meminta AI membaca tanggapan kelas ini.'}
+        </div>
+        ${autoGenerate ? '' : `<button class="btn btn-purple btn-sm" id="tanggapanAiGenerateBtn" ${canGenerate ? '' : 'disabled aria-disabled="true"'}>Generate AI</button>`}
+      </div>
+      <div id="tanggapanAiContent" class="tg-ai-loading">${autoGenerate ? '⏳ AI sedang menyusun evaluasi otomatis pada jadwal UTS/UAS…' : 'AI belum dijalankan. Klik Generate AI untuk memulai.'}</div>
     </div>
   `;
   dash.appendChild(panel);
-  renderTeacherAiFeedback(payload, ++tgAiRenderToken);
+
+  const cached = loadTeacherAiState(payload);
+  const content = panel.querySelector('#tanggapanAiContent');
+  if (content && cached?.html) {
+    content.innerHTML = cached.html;
+  }
+
+  const run = async () => {
+    if (!canGenerate) return;
+    await renderTeacherAiFeedback(payload, ++tgAiRenderToken);
+  };
+
+  if (autoGenerate) {
+    if (!cached?.html) run();
+  } else {
+    const btn = panel.querySelector('#tanggapanAiGenerateBtn');
+    if (btn) btn.addEventListener('click', run);
+  }
 }
 
 function renderTanggapan() {
@@ -1904,6 +2066,7 @@ function renderTanggapan() {
       )
     : [];
   const latestMeeting = scope?.schedule?.pertemuan || null;
+  const isAutoGenerate = !!scope?.schedule && [8, 16].includes(Number(scope.schedule.pertemuan));
 
   if (!teacherClasses.length) {
     scopeInfo.textContent = 'Belum ada kelas yang terhubung dengan mata pelajaran Anda.';
@@ -1922,7 +2085,7 @@ function renderTanggapan() {
     tgSelectedStudentId = '';
   } else {
     const classLabel = `${kelas.kelas} ${kelas.jurusan} — ${kelas.kodeKelas}`;
-    scopeInfo.textContent = `${classLabel}. Analisis otomatis aktif setelah jadwal selesai lewat.`;
+    scopeInfo.textContent = `${classLabel}. Analisis AI otomatis aktif saat pertemuan UTS/UAS.`;
   }
 
   const classLabel = kelas ? `${kelas.kelas} ${kelas.jurusan} — ${kelas.kodeKelas}` : 'Belum memilih kelas';
@@ -1962,7 +2125,7 @@ function renderTanggapan() {
     : !subjects.length
       ? 'Kelas ini belum memiliki mata pelajaran yang diajar oleh Anda.'
       : !scope
-        ? 'Belum ada pertemuan yang selesai untuk kelas ini. Ringkasan akan muncul setelah jadwal terakhir lewat.'
+        ? 'Belum ada pertemuan yang selesai untuk kelas ini. Ringkasan akan muncul setelah jadwal terakhir lewat. AI otomatis hanya aktif pada jadwal UTS/UAS; pertemuan biasa perlu klik Generate AI.'
         : 'Ringkasan akan terisi otomatis setelah tanggapan siswa masuk.';
 
   const chartBackground = `conic-gradient(${donutParts.length ? donutParts.join(', ') : 'var(--dim) 0deg 360deg'})`;
@@ -2105,7 +2268,7 @@ function renderTanggapan() {
         </div>
       </div>`;
     const aiPayload = buildTeacherAiPayload(kelasId, tgSelectedStudentId);
-    appendTeacherAiPanel(content, aiPayload, 'AI membaca seluruh tanggapan pada kelas yang dipilih dan memberi fokus tambahan pada siswa terpilih.');
+    appendTeacherAiPanel(content, aiPayload, 'AI membaca seluruh tanggapan pada kelas yang dipilih dan memberi fokus tambahan pada siswa terpilih.', { autoGenerate: isAutoGenerate });
 
 
     const backBtn = document.getElementById('tanggapanBackBtn');
@@ -2162,7 +2325,7 @@ function renderTanggapan() {
       </div>
     </div>`;
   const aiPayload = buildTeacherAiPayload(kelasId, '');
-  appendTeacherAiPanel(content, aiPayload, 'AI membaca seluruh tanggapan siswa pada kelas yang dipilih, lalu memadukannya dengan nilai untuk evaluasi guru.');
+  appendTeacherAiPanel(content, aiPayload, 'AI membaca seluruh tanggapan siswa pada kelas yang dipilih, lalu memadukannya dengan nilai untuk evaluasi guru.', { autoGenerate: isAutoGenerate });
 
 }
 function getTeacherForSubject(subjectName) {

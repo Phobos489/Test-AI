@@ -1,7 +1,7 @@
 import google.generativeai as phobosai
 
 # Konfigurasi API Key
-phobosai.configure(api_key="AIzaSyCnyVfFGwhJ6OQrdEhGLmdhTYbYnQpki7g")  
+phobosai.configure(api_key="")  
 
 # Pilih model
 model = phobosai.GenerativeModel("models/gemini-3-flash-preview")
